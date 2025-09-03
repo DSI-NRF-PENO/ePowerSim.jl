@@ -1,0 +1,7 @@
+name = "ePowerSim"
+uuid = "1b852b95-b2ba-496b-86f2-86546cc1bb56"
+authors = ["Adedayo Ademola Yusuff dsi.nrf.peno@gmail.com"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.10"
