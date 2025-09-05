@@ -1,0 +1,110 @@
+{
+    "SM_2axis_cb_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_cb_idq": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_cb_millano": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SC_2axis_cb_idq": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_cb": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_cb_direct": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "pf_SM_2axis_wt_loc_load_cb_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SC_2axis_cb_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_cb_inf": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_cb_inf_bus": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_wt_loc_load_cb_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SC_2axis_wt_loc_load_cb_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_idq": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "pf_SM_2axis_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "pf_SC_2axis_wt_loc_load_cb_v6": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SC_2axis_wt_loc_load_cb_idq": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ],
+    "SM_2axis_wt_loc_load_cb_idq": [
+        "δ",
+        "ω",
+        "ed_dash",
+        "eq_dash"
+    ]
+}

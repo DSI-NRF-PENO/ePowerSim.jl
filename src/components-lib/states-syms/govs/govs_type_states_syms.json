@@ -1,0 +1,23 @@
+{
+    "gov_t0_cb": [
+        "xg1",
+        "xg2",
+        "xg3"
+    ],
+    "nothing": [
+        "nothing"
+    ],
+    "gov_t1_cb_sauer": [
+        "xg1",
+        "xg2"
+    ],
+    "gov_t1_cb": [
+        "xg1",
+        "xg2",
+        "xg3"
+    ],
+    "gov_ieee_tgov1_cb": [
+        "xg1",
+        "xg2"
+    ]
+}

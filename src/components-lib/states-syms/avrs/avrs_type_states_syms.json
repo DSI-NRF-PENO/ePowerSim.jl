@@ -1,0 +1,19 @@
+{
+    "avr_t1_cb": [
+        "vm",
+        "vr1",
+        "vr2",
+        "vf_tilade"
+    ],
+    "avr_t0_cb": [
+        "vm",
+        "vr1",
+        "vr2",
+        "vf_tilade"
+    ],
+    "avr_t1_cb_sauer": [
+        "vr1",
+        "vr2",
+        "vf_tilade"
+    ]
+}

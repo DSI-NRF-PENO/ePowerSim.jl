@@ -1,0 +1,555 @@
+# (c) 2024 Power, Energy, Networks and Optimisation Research Group, Unisa, authors and contributors (see AUTHORS file)
+# Licensed under GNU GPL v3 (see LICENSE file)
+
+# AA Yusuff : yusufaa@unisa.ac.za
+
+# Sauer: section 6.4:  pg 135 - 136, 6.121 - 6.123
+
+####################################################
+
+using Revise
+
+using SciMLBase
+
+using SciMLNLSolve: NLSolveJL
+
+using NLSolvers
+
+using NLsolve: nlsolve, converged, OnceDifferentiable
+
+using NLsolve
+
+using NonlinearSolve
+
+using NonlinearSolve: TrustRegion
+
+using FiniteDiff, LinearSolve
+
+using ForwardDiff, Calculus
+
+using DifferentialEquations
+
+using OrdinaryDiffEq, Sundials, ODEInterfaceDiffEq
+
+# using ModelingToolkit
+
+using LinearAlgebra, PreallocationTools, GenericSchur
+
+using Arblib
+
+# using Gurobi
+
+using OrderedCollections: OrderedDict
+
+using Permutations
+
+using SparseArrays, StaticArrays, ComponentArrays
+
+using Graphs, DataFrames, CSV, Tables, Plots
+
+using Query, DataFramesMeta
+
+using JLD2
+
+using Accessors, AccessorsExtra 
+
+import Base.@kwdef
+
+using SmartAsserts
+
+using Latexify
+
+using NamedTupleTools
+
+using SciMLSensitivity
+
+using ComponentArrays
+
+using RecursiveArrayTools
+
+using Parameters: @unpack
+
+using Zygote
+
+using DiffRules
+
+using Optimization
+
+using OptimizationOptimJL
+
+using Integrals
+
+using Glob
+
+using JSONTables, JSON, JSON3
+
+using StructTypes
+
+# ------------------------------------------------------
+
+using Alpine
+using HiGHS
+using Pavito
+using JuMP
+
+import Clarabel
+import Ipopt
+import StatsPlots
+import PATHSolver
+
+import Test
+
+# ------------------------------------------------------
+
+using BifurcationKit
+
+# ------------------------------------------------------
+
+import XLSX
+
+using SpecialFunctions, Random, Distributions
+
+using PDMats
+
+using Juniper
+
+using Latexify
+
+using LatexPrint
+
+using StatsBase
+
+# using Interpolations
+
+# using RecursiveArrayTools
+
+# using LazyJSON,
+
+# ------------------------------------------------------
+
+using Logging
+
+# ------------------------------------------------------
+
+# import HELICS
+
+# const h = HELICS
+
+# ------------------------------------------------------
+
+using ADTypes
+
+using Symbolics
+
+# ------------------------------------------------------
+# Benchmark
+# ------------------------------------------------------
+
+using BenchmarkTools, BenchmarkPlots
+
+########################################################
+# ------------------------------------------------------
+#  ePowerSim.jl package files
+# ------------------------------------------------------
+########################################################
+
+
+#---------------------------------------------------
+#---------------------------------------------------
+# global settings
+#---------------------------------------------------
+#---------------------------------------------------
+
+freq = 60
+
+Ωb = 2 * pi * freq
+
+ωs = Ωb 
+
+ω_ref0 = ωs
+
+Δω_toleraance = 0.001
+
+package_dir = pkgdir(ePowerSim)
+
+data_dir =
+    joinpath( package_dir, "data")
+
+converted_data =
+    joinpath( data_dir, "converted-data")
+
+examples_dir =
+    joinpath( package_dir, "examples")
+
+scripts_dir =
+    joinpath( package_dir, "scripts")
+
+src_dir =
+    joinpath( package_dir, "src")
+
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+# Subunits folders
+# ------------------------------------------------------
+# ------------------------------------------------------
+
+callbacks_dir =
+    joinpath( src_dir, "callbacks")
+
+components_lib_dir =
+    joinpath( src_dir, "components_lib_dir")
+
+components_types_dir =
+    joinpath( src_dir, "components-types")
+
+core_dir =
+    joinpath( src_dir, "core")
+
+cosim_dir =
+    joinpath( src_dir, "cosim")
+
+headers_dir =
+    joinpath( src_dir, "headers")
+
+init_dir =
+    joinpath( src_dir, "init")
+
+models_dir =
+    joinpath( src_dir, "models")
+
+network_dir =
+    joinpath( src_dir, "network")
+
+parser_dir =
+    joinpath( src_dir, "parser")
+
+powerflow_dir =
+    joinpath( src_dir, "powerflow")
+
+pertubation_dir =
+    joinpath( src_dir, "pertubation")
+
+reduced_order_dir =
+    joinpath( src_dir, "reduced-order")
+
+sensitivity_dir =
+    joinpath( src_dir, "sensitivity")
+
+sim_dir =
+    joinpath( src_dir, "sim")
+
+stability_dir =
+    joinpath( src_dir, "stability")
+
+
+
+utilities_dir =
+    joinpath( src_dir, "utilities")
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+# package  files
+# ------------------------------------------------------
+# ------------------------------------------------------
+
+dynamics_abstract_types =
+    joinpath(components_types_dir,
+             "sd-dynamics-abstract-types.jl")
+
+include(dynamics_abstract_types)
+
+dynamics_utility_net_state_generic_funcs =
+    joinpath(
+        utilities_dir,
+        "sd-dynamics-utility-net-state-generic-funcs.jl")
+
+include(dynamics_utility_net_state_generic_funcs)
+
+# dynamics_utility_net_state_funcs =
+#     joinpath( utilities_dir,
+#              "sd-dynamics-utility-net-state-funcs.jl")
+
+# include( dynamics_utility_net_state_funcs)
+
+dynamics_utility_powerflow_generic_funcs =
+    joinpath( utilities_dir,
+             "sd-dynamics-utility-powerflow-generic-funcs.jl")
+
+include( dynamics_utility_powerflow_generic_funcs )
+
+# dynamics_utility_powerflow_funcs =
+#     joinpath( utilities_dir,
+#              "sd-dynamics-utility-powerflow-funcs.jl")
+
+# include( dynamics_utility_powerflow_funcs )
+
+dynamics_utility_plots_funcs =
+    joinpath( utilities_dir,
+             "sd-dynamics-utility-plots-funcs.jl")
+
+include( dynamics_utility_plots_funcs )
+
+# dynamics_stability =
+#     joinpath( network_dir,
+#              "sd-dynamics-stability-x-new-sparse.jl")
+
+# include( dynamics_stability )
+
+# dynamics_control_devices_structure =
+#     joinpath( network_dir,
+#              "sd-dynamics-control-devices-structure.jl")
+
+# include( dynamics_control_devices_structure)
+
+# dynamics_edge_components_structure =
+#     joinpath( network_dir,
+#              "sd-dynamics-edge-components-structure.jl")
+
+# include( dynamics_edge_components_structure)
+
+# dynamics_node_components_structure =
+#     joinpath( network_dir,
+#              "sd-dynamics-node-components-structure.jl")
+
+# include( dynamics_node_components_structure)
+
+# dynamics_plants_structures =
+#     joinpath( network_dir,
+#              "sd-dynamics-plants-structures.jl")
+
+# include( dynamics_plants_structures)
+
+# dynamics_plants_accessor_func =
+#     joinpath( network_dir,
+#              "sd-dynamics-plants-accessor-func.jl")
+
+# include( dynamics_plants_accessor_func)
+
+# dynamics_network_data_structure =
+#     joinpath( network_dir,
+#              "sd-dynamics-network-data-structure.jl")
+
+# include( dynamics_network_data_structure)
+
+# dynamics_init =
+#     joinpath( init_dir,
+#              "sd-dynamics-init.jl")
+
+# include( dynamics_init)
+
+# dynamics_network_Idx =
+#     joinpath( network_dir,
+#              "sd-dynamics-network-Idx.jl")
+
+# include( dynamics_network_Idx)
+
+# dynamics_core =
+#     joinpath( network_dir,
+#              "sd-dynamics-core.jl")
+
+# include( dynamics_core)
+
+dynamics_powerflow_parameters =
+    joinpath( powerflow_dir,
+             "sd-dynamics-powerflow-parameters.jl")
+
+include( dynamics_powerflow_parameters  )
+
+dynamics_dynamic_powerflow =
+    joinpath( powerflow_dir,
+             "sd-dynamics-dynamic-powerflow.jl")
+
+include( dynamics_dynamic_powerflow )
+
+dynamics_types_utility_funcs =
+    joinpath( components_types_dir,
+             "sd-dynamics-types-utility-funcs.jl")
+
+include( dynamics_types_utility_funcs )
+
+# ------------------------------------------------------
+
+dynamics_ode_models =
+    joinpath( models_dir,
+            "sd-dynamics-ode-models.jl")
+
+include( dynamics_ode_models )
+
+dynamics_ode_models_update_and_para =
+    joinpath( models_dir,
+    "sd-dynamics-ode-models-update-parameters.jl")
+
+include( dynamics_ode_models_update_and_para )
+
+dynamics_powerflow_mismatch =
+    joinpath( powerflow_dir,
+             "sd-dynamics-powerflow-mismatch.jl")
+
+include( dynamics_powerflow_mismatch  )
+
+dynamics_powerflow_results =
+    joinpath( powerflow_dir,
+             "sd-dynamics-powerflow-results.jl")
+
+include( dynamics_powerflow_results  )
+
+# dynamics_small_signal_stability =
+#     joinpath( stability_dir,
+#              "sd-dynamics-small-signal-stability.jl")
+
+# include( dynamics_small_signal_stability )
+
+dynamics_reduced_order_models =
+    joinpath( reduced_order_dir,
+             "sd-dynamics-reduced-order-models.jl")
+
+include( dynamics_reduced_order_models )
+
+dynamics_dae_formulation =
+    joinpath( models_dir,
+             "sd-dynamics-dae-formulation.jl")
+
+include( dynamics_dae_formulation )
+
+dynamics_dae_generic_algebraic_equations =
+    joinpath( models_dir,
+             "sd-dynamics-dae-generic-algebraic-equations.jl")
+
+include( dynamics_dae_generic_algebraic_equations )
+
+dynamics_utility_linearisation_stability =
+    joinpath( stability_dir,
+             "sd-dynamics-utility-linearisation-stability.jl")
+
+include( dynamics_utility_linearisation_stability )
+
+dynamics_dae_ode_generic_models =
+    joinpath( models_dir,
+             "sd-dynamics-dae-ode-generic-models.jl")
+
+include( dynamics_dae_ode_generic_models )
+
+dynamics_fault_events =
+    joinpath( pertubation_dir,
+             "sd-dynamics-fault-events.jl")
+
+include( dynamics_fault_events )
+
+#---------------------------------------------------
+# Splitting of dynamics_utility_additional
+#---------------------------------------------------
+
+dynamics_utility_network_reduction =
+    joinpath( utilities_dir,
+             "sd-dynamics-utility-network-reduction.jl")
+include( dynamics_utility_network_reduction )
+
+dynamics_utility_data_aggregation =
+    joinpath( utilities_dir,
+             "sd-dynamics-utility-data-aggregation.jl")
+include(dynamics_utility_data_aggregation )
+
+dynamics_utility_pertubation =
+    joinpath( pertubation_dir,
+             "sd-dynamics-utility-pertubation.jl")
+
+include( dynamics_utility_pertubation )
+
+dynamics_utility_callbacks_components =
+    joinpath( callbacks_dir,
+           "sd-dynamics-utility-callbacks-components.jl")
+
+include(dynamics_utility_callbacks_components )
+
+dynamics_utility_state_syms_dict_funcs =
+    joinpath( utilities_dir,
+         "sd-dynamics-utility-state-syms-dict-funcs.jl")
+
+include( dynamics_utility_state_syms_dict_funcs )
+
+dynamics_utility_utility_init =
+    joinpath(init_dir,
+         "sd-dynamics-utility-init.jl")
+
+include( dynamics_utility_utility_init )
+
+dynamics_utility_labels_indices_aggregation =
+    joinpath( utilities_dir,
+      "sd-dynamics-utility-labels-indices-aggregation.jl")
+
+include( dynamics_utility_labels_indices_aggregation )
+
+# ------------------------------------------------------
+
+dynamics_utility_accessors =
+    joinpath(utilities_dir,
+             "sd-dynamics-utility-accessors-funcs.jl")
+
+include( dynamics_utility_accessors  )
+
+# ------------------------------------------------------
+
+dynamics_matpower_parser =
+    joinpath(parser_dir,
+             "sd-dynamics-matpower-parser.jl")
+
+include( dynamics_matpower_parser )
+
+dynamics_libs =
+    joinpath(utilities_dir,
+             "sd-dynamics-libs.jl")
+
+include( dynamics_libs )
+
+
+dynamics_utility_generic_funcs =
+    joinpath(core_dir,
+             "sd-dynamics-utility-generic-funcs.jl")
+
+include( dynamics_utility_generic_funcs )
+
+
+dynamics_functions_by_mpc =
+    joinpath(core_dir,
+             "sd-dynamics-functions-by-mpc.jl")
+
+include( dynamics_functions_by_mpc )
+
+dynamics_optimal_powerflow =
+    joinpath(powerflow_dir,
+             "sd-dynamics-optimal-powerflow.jl")
+
+include( dynamics_optimal_powerflow )
+
+dynamics_distributed_powerflow =
+    joinpath(powerflow_dir,
+             "sd-dynamics-distributed-powerflow.jl")
+
+include( dynamics_distributed_powerflow )
+
+dynamics_continuation_powerflow =
+    joinpath(powerflow_dir,
+             "sd-dynamics-continuation-powerflow.jl")
+
+include( dynamics_continuation_powerflow )
+
+dynamics_sim_funcs =
+    joinpath(sim_dir,
+             "sd-dynamics-sim-funcs.jl")
+
+include( dynamics_sim_funcs )
+
+# ------------------------------------------------------
+
+# dynamics_utility_helics =
+#     joinpath(cosim_dir,
+#              "sd-dynamics-utility-helics.jl")
+
+# include( dynamics_utility_helics )
+
+# ------------------------------------------------------
+
+println( "I am done with include files" )
+
+#-------------------------------------------------------

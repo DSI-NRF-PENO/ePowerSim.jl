@@ -1,0 +1,4174 @@
+# (C) 2025 Power, Energy, Networks and Optimisation Research Group, Unisa, authors and contributors (see AUTHORS file)
+# Licensed under GNU GPL v3 (see LICENSE file)
+
+# AA Yusuff : yusufaa@unisa.ac.za
+
+# Sauer: section 6.10:  pg 135 - 136, 6.242 - 6.247
+
+
+#####################################################
+# ---------------------------------------------------
+# Pertubation utility functions
+# ---------------------------------------------------
+#####################################################
+
+
+"""
+These functions are used in generating results for load
+pertubation, co-simulation, etc.
+
+`get_sol_auxilliary_results`, `pertubation_by_itegrator`
+
+`a_parameter_pertubation!`, `a_parameter_pertubation_and_step!`
+
+`save_pertubation_stage_plot`, `save_co_sim_stage_plot`,
+
+`get_P_or_Q_idx_in_generic_model_dynamics_para`
+
+`get_make_df_header_generic_model_dynamics_para`
+
+"""
+function pertubation_by_itegrator(
+    var_normal_value,
+    pertubation_factor,
+    pertubation_tstop,
+    var_idx,
+    system_integrator;
+    parameter_df =
+        nothing,
+    change_in_parameter_dict =
+        nothing,
+    target_parameter_sym =
+        nothing )
+
+    var_perturbed_value =
+        var_normal_value * pertubation_factor
+        
+    system_integrator.p.generic_model_dynamics_para[
+        var_idx] =
+            var_perturbed_value
+
+    add_tstop!(
+        system_integrator,
+        pertubation_tstop)
+
+    if parameter_df != nothing
+
+        push!(
+            parameter_df,
+            tuple(
+                [[system_integrator.t];
+                 system_integrator.p.generic_model_dynamics_para]...))
+        
+    end
+
+    if (change_in_parameter_dict != nothing) && (
+        target_parameter_sym != nothing)
+        
+        push!(change_in_parameter_dict[:t],
+              system_integrator.t)
+        
+        push!(change_in_parameter_dict[
+            target_parameter_sym],
+              var_perturbed_value)
+
+    end
+    
+    step!(system_integrator)
+    
+    system_sol =
+        system_integrator.sol
+
+    if (change_in_parameter_dict != nothing) && (
+        target_parameter_sym != nothing)
+        
+        push!(change_in_parameter_dict[:t],
+              system_integrator.t)
+
+        intg_model_dynamics_para =
+            getproperty(
+                system_integrator.p,
+                :generic_model_dynamics_para)
+        
+        push!(change_in_parameter_dict[
+            target_parameter_sym],
+              intg_model_dynamics_para[var_idx] )
+
+        # system_integrator.p.generic_model_dynamics_para[ var_idx]
+        
+    end
+
+    
+    return nothing
+
+end
+
+
+function a_parameter_pertubation!(
+    var_normal_value,
+    pertubation,
+    var_idx,
+    system_integrator;
+    by_factor = true,
+    parameter_df =
+        nothing,
+    change_in_parameter_dict =
+        nothing,
+    target_parameter_sym =
+        nothing )
+
+    if by_factor == true
+        var_perturbed_value =
+            var_normal_value * pertubation
+    else
+        
+        var_perturbed_value =
+            var_normal_value + pertubation
+        
+    end
+        
+    system_integrator.p.generic_model_dynamics_para[
+        var_idx] =
+            var_perturbed_value
+
+    if parameter_df != nothing
+
+        push!(
+            parameter_df,
+            tuple(
+                [[system_integrator.t];
+                 system_integrator.p.generic_model_dynamics_para]...))
+        
+    end
+
+
+    if (change_in_parameter_dict != nothing) && (
+        target_parameter_sym != nothing)
+        
+        push!(change_in_parameter_dict[:t],
+              system_integrator.t)
+        
+        push!(change_in_parameter_dict[
+            target_parameter_sym],
+              var_perturbed_value)
+
+    end
+    
+    return nothing
+
+end
+
+
+function a_parameter_pertubation_and_step!(
+    var_normal_value,
+    pertubation_factor,
+    pertubation_tstop,
+    var_idx,
+    system_integrator;
+    by_factor = true,
+    parameter_df = nothing,
+    change_in_parameter_dict =
+        nothing,
+    target_parameter_sym =
+        nothing )
+
+    if by_factor == true
+        
+        var_perturbed_value =
+            var_normal_value * pertubation
+    else
+        
+        var_perturbed_value =
+            var_normal_value + pertubation
+        
+    end
+        
+    system_integrator.p.generic_model_dynamics_para[
+        var_idx] =
+            var_perturbed_value
+
+    if parameter_df != nothing
+
+        push!(
+            parameter_df,
+            tuple(
+                [[system_integrator.t];
+                 system_integrator.p.generic_model_dynamics_para]...))
+        
+    end
+
+
+    if (change_in_parameter_dict != nothing) && (
+        target_parameter_sym != nothing)
+        
+        push!(change_in_parameter_dict[:t],
+              system_integrator.t)
+        
+        push!(change_in_parameter_dict[
+            target_parameter_sym],
+              var_perturbed_value)
+
+    end
+    
+    add_tstop!(system_integrator,
+               pertubation_tstop)
+    
+    step!(system_integrator)
+
+end
+
+
+# ------------------------------------------------------
+
+
+function get_P_or_Q_idx_in_generic_model_dynamics_para(
+    bus_no_or_bus_name,
+    # generic_model_dynamics_para,
+    P_or_Q_or_Pll_or_Qll_sym;
+    loc_load_exist,
+    dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+    dyn_pf_fun_kwd_n2s_idxs,
+    dyn_pf_fun_kwd_net_idxs)
+    
+    (;dyn_ω_ref_Idx,
+     dyn_v_ref_Idx,
+     dyn_p_order_Idx,
+     dyn_Png_Idx,
+     dyn_Qng_Idx,
+     dyn_Pll_Idx,
+     dyn_Qll_Idx ) =
+         NamedTupleTools.select(
+             dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+             (:dyn_ω_ref_Idx,
+              :dyn_v_ref_Idx,
+              :dyn_p_order_Idx,
+              :dyn_Png_Idx,
+              :dyn_Qng_Idx,
+              :dyn_Pll_Idx,
+              :dyn_Qll_Idx))
+    
+   (;
+    n2s_gens_idx,
+    n2s_non_gens_idx,
+    n2s_gens_with_loc_load_idxs,
+    ) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_n2s_idxs,
+            (:n2s_gens_idx,
+             :n2s_non_gens_idx,
+             :n2s_gens_with_loc_load_idxs))
+
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     gens_nodes_with_loc_loads_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              :gens_nodes_with_loc_loads_idx))
+
+    if typeof(bus_no_or_bus_name) == Int64
+        
+        bus_no = bus_no_or_bus_name
+        
+    elseif typeof(bus_no_or_bus_name) == String
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(bus_no_or_bus_name), "bus")[2])
+        
+    elseif typeof(bus_no_or_bus_name) == Symbol
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(String(bus_no_or_bus_name)),
+                  "bus")[2])
+    else
+
+        throw("Unusable bus_no_or_bus_name $(bus_no_or_bus_name). bus_no_or_bus_name can either be an int64, string or symbold")
+                
+    end
+    
+
+    if (P_or_Q_or_Pll_or_Qll_sym == :P &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_Png_Idx[
+            n2s_non_gens_idx[bus_no]]
+        
+    elseif  (P_or_Q_or_Pll_or_Qll_sym == :Q &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_Qng_Idx[
+            n2s_non_gens_idx[bus_no]]
+        
+    elseif  (P_or_Q_or_Pll_or_Qll_sym == :Pll &&
+        loc_load_exist == true &&
+        bus_no ∈ gens_nodes_with_loc_loads_idx)
+
+        return dyn_Pll_Idx[
+                n2s_gens_with_loc_load_idxs[bus_no]]
+        
+    elseif  (P_or_Q_or_Pll_or_Qll_sym == :Qll &&
+        loc_load_exist == true &&
+        bus_no ∈ gens_nodes_with_loc_loads_idx)
+
+        return dyn_Qll_Idx[
+            n2s_gens_with_loc_load_idxs[bus_no]]
+
+    elseif (P_or_Q_or_Pll_or_Qll_sym == :ω_ref &&
+        bus_no ∈ gens_nodes_idx)
+
+        return dyn_ω_ref_Idx[
+            n2s_gens_idx[bus_no]]
+
+    elseif (P_or_Q_or_Pll_or_Qll_sym == :v_ref &&
+        bus_no ∈ gens_nodes_idx)
+
+        return dyn_v_ref_Idx[
+            n2s_gens_idx[bus_no]]
+        
+    elseif (P_or_Q_or_Pll_or_Qll_sym == :p_order &&
+        bus_no ∈ gens_nodes_idx)
+
+        return dyn_p_order_Idx[
+            n2s_gens_idx[bus_no]]                
+            
+    else
+
+        return nothing
+        
+    end
+
+end
+
+
+function get_idx_in_Pg_Qg_Png_Qng_Pll_Qll_para(
+    bus_no_or_bus_name,
+    # generic_model_dynamics_para,    
+    Pg_or_Qg_or_Png_or_Qng_or_Pll_or_Qll_sym;
+    loc_load_exist,
+    Pg_Qg_Png_Qng_Pll_Qll_Idx,
+    dyn_pf_fun_kwd_n2s_idxs,
+    dyn_pf_fun_kwd_net_idxs)
+    
+    (;dyn_P_gens_Idxs,
+     dyn_Q_gens_Idxs,
+     dyn_P_non_gens_Idxs,
+     dyn_Q_non_gens_Idxs,
+     dyn_P_gens_loc_load_Idxs,
+     dyn_Q_gens_loc_load_Idxs) =
+         NamedTupleTools.select(
+             Pg_Qg_Png_Qng_Pll_Qll_Idx,
+             (:dyn_P_gens_Idxs,
+              :dyn_Q_gens_Idxs,
+              :dyn_P_non_gens_Idxs,
+              :dyn_Q_non_gens_Idxs,
+              :dyn_P_gens_loc_load_Idxs,
+              :dyn_Q_gens_loc_load_Idxs))    
+
+    (;
+    n2s_gens_idx,
+    n2s_non_gens_idx,
+    n2s_gens_with_loc_load_idxs,
+    ) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_n2s_idxs,
+            (:n2s_gens_idx,
+             :n2s_non_gens_idx,
+             :n2s_gens_with_loc_load_idxs))
+
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     gens_nodes_with_loc_loads_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              :gens_nodes_with_loc_loads_idx))
+
+    if typeof(bus_no_or_bus_name) == Int64
+        
+        bus_no = bus_no_or_bus_name
+        
+    elseif typeof(bus_no_or_bus_name) == String
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(bus_no_or_bus_name), "bus")[2])
+        
+    elseif typeof(bus_no_or_bus_name) == Symbol
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(String(bus_no_or_bus_name)),
+                  "bus")[2])
+    else
+
+        throw("Unusable bus_no_or_bus_name $(bus_no_or_bus_name). bus_no_or_bus_name can either be an int64, string or symbold")
+                
+    end
+    
+
+
+    if (Pg_or_Qg_or_Png_or_Qng_or_Pll_or_Qll_sym == :Pg && bus_no ∈ gens_nodes_idx)
+
+        return dyn_P_gens_Idxs[
+            n2s_gens_idx[bus_no]]
+
+    
+    elseif (Pg_or_Qg_or_Png_or_Qng_or_Pll_or_Qll_sym == :Qg &&
+        bus_no ∈ gens_nodes_idx)
+
+        return dyn_Q_gens_Idxs[
+            n2s_gens_idx[bus_no]]
+        
+    elseif (Pg_or_Qg_or_Png_or_Qng_or_Pll_or_Qll_sym == :Png &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_P_non_gens_Idxs[
+            n2s_non_gens_idx[bus_no]]
+        
+    elseif (Pg_or_Qg_or_Png_or_Qng_or_Pll_or_Qll_sym == :Qng &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_Q_non_gens_Idxs[
+            n2s_non_gens_idx[bus_no]]
+        
+    elseif (loc_load_exist == true &&
+        Pg_or_Qg_or_Png_or_Qng_or_Pll_or_Qll_sym == :Pll &&        
+        bus_no ∈ gens_nodes_with_loc_loads_idx)
+
+        return dyn_P_gens_loc_load_Idxs[
+                n2s_gens_with_loc_load_idxs[bus_no]]
+        
+    elseif (loc_load_exist == true &&
+        Pg_or_Qg_or_Png_or_Qng_or_Pll_or_Qll_sym == :Qll &&        
+        bus_no ∈ gens_nodes_with_loc_loads_idx)
+
+        return dyn_Q_gens_loc_load_Idxs[
+            n2s_gens_with_loc_load_idxs[bus_no]]
+            
+    else
+
+        return nothing
+        
+    end
+
+end
+
+
+
+function get_idx_in_Pg_inj_Qg_inj_Png_Qng_para(
+    bus_no_or_bus_name,
+    # generic_model_dynamics_para,
+    Pg_or_Qg_or_Png_or_Qng_sym;
+    loc_load_exist,
+    Pg_Qg_Png_Qng_Pll_Qll_Idx,
+    dyn_pf_fun_kwd_n2s_idxs,
+    dyn_pf_fun_kwd_net_idxs)
+    
+    (;dyn_P_gens_Idxs,
+     dyn_Q_gens_Idxs,
+     dyn_P_non_gens_Idxs,
+     dyn_Q_non_gens_Idxs) =
+         NamedTupleTools.select(
+             Pg_Qg_Png_Qng_Pll_Qll_Idx,
+             (:dyn_P_gens_Idxs,
+              :dyn_Q_gens_Idxs,
+              :dyn_P_non_gens_Idxs,
+              :dyn_Q_non_gens_Idxs))    
+
+    (;
+    n2s_gens_idx,
+    n2s_non_gens_idx) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_n2s_idxs,
+            (:n2s_gens_idx,
+             :n2s_non_gens_idx))
+
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx))
+
+    if typeof(bus_no_or_bus_name) == Int64
+        
+        bus_no = bus_no_or_bus_name
+        
+    elseif typeof(bus_no_or_bus_name) == String
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(bus_no_or_bus_name), "bus")[2])
+        
+    elseif typeof(bus_no_or_bus_name) == Symbol
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(String(bus_no_or_bus_name)),
+                  "bus")[2])
+    else
+
+        throw("Unusable bus_no_or_bus_name $(bus_no_or_bus_name). bus_no_or_bus_name can either be an int64, string or symbold")
+                
+    end
+    
+
+
+    if (Pg_or_Qg_or_Png_or_Qng_sym == :Pg &&
+        bus_no ∈ gens_nodes_idx)
+
+        return dyn_P_gens_Idxs[
+            n2s_gens_idx[bus_no]]
+
+    
+    elseif (Pg_or_Qg_or_Png_or_Qng_sym == :Qg &&
+        bus_no ∈ gens_nodes_idx)
+
+        return dyn_Q_gens_Idxs[
+            n2s_gens_idx[bus_no]]
+        
+    elseif (Pg_or_Qg_or_Png_or_Qng_sym == :Png &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_P_non_gens_Idxs[
+            n2s_non_gens_idx[bus_no]]
+        
+    elseif  (Pg_or_Qg_or_Png_or_Qng_sym == :Qng &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_Q_non_gens_Idxs[
+            n2s_non_gens_idx[bus_no]]        
+            
+    else
+
+        return nothing
+        
+    end
+
+end
+
+
+function get_idx_in_Pg_inj_Png_Qng_para(
+    bus_no_or_bus_name,
+    # generic_model_dynamics_para,
+    Pg_or_Png_or_Qng_sym;
+    loc_load_exist,
+    Pg_Png_Qng_Idx,
+    dyn_pf_fun_kwd_n2s_idxs,
+    dyn_pf_fun_kwd_net_idxs)
+    
+    (;dyn_P_gens_Idxs,
+     dyn_P_non_gens_Idxs,
+     dyn_Q_non_gens_Idxs) =
+         NamedTupleTools.select(
+             Pg_Png_Qng_Idx,
+             (:dyn_P_gens_Idxs,
+              :dyn_P_non_gens_Idxs,
+              :dyn_Q_non_gens_Idxs))    
+
+    (;
+    n2s_gens_idx,
+    n2s_non_gens_idx) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_n2s_idxs,
+            (:n2s_gens_idx,
+             :n2s_non_gens_idx))
+
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx))
+
+    if typeof(bus_no_or_bus_name) == Int64
+        
+        bus_no = bus_no_or_bus_name
+        
+    elseif typeof(bus_no_or_bus_name) == String
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(bus_no_or_bus_name), "bus")[2])
+        
+    elseif typeof(bus_no_or_bus_name) == Symbol
+
+        bus_no = parse(
+            Int64,
+            split(lowercase(String(bus_no_or_bus_name)),
+                  "bus")[2])
+    else
+
+        throw("Unusable bus_no_or_bus_name $(bus_no_or_bus_name). bus_no_or_bus_name can either be an int64, string or symbold")
+                
+    end
+    
+
+
+    if (Pg_or_Png_or_Qng_sym == :Pg &&
+        bus_no ∈ gens_nodes_idx)
+
+        return dyn_P_gens_Idxs[
+            n2s_gens_idx[bus_no]]
+
+        
+    elseif (Pg_or_Png_or_Qng_sym == :Png &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_P_non_gens_Idxs[
+            n2s_non_gens_idx[bus_no]]
+        
+    elseif  (Pg_or_Png_or_Qng_sym == :Qng &&
+        bus_no ∈ non_gens_nodes_idx)
+
+        return dyn_Q_non_gens_Idxs[
+            n2s_non_gens_idx[bus_no]]        
+            
+    else
+
+        return nothing
+        
+    end
+
+end
+
+
+# ------------------------------------------------------
+
+function get_generic_network_fault_pertubation_by_cb(
+    ;case_name = "case9",
+    timespan   = 10.0,
+    
+    on_fault_time = 5.0,
+    clear_fault_time = 5.1,
+    
+    list_fault_point_from_node_a = [0.3],
+    list_fault_resistance = [0.001],
+    list_no_line_circuit =  [1],
+
+    list_edges_to_have_fault = [ 8 ],
+    clear_fault_selection_list = [1],
+    
+    basekV = 1.0,    
+    use_pu_in_PQ = true,
+    line_data_in_pu = true,
+
+    with_faults =
+        false,
+    use_state_in_on_clear_fault =
+        false,
+    return_extended_results =
+        false,
+        
+    json_net_data_by_components_file =
+        nothing,
+    components_libs_dir =
+        nothing,
+    data_dir =
+        nothing,
+    list_network_status =
+        nothing )
+
+    #----------------------------------
+    
+    # if components_libs_dir == nothing
+
+    #     components_libs_dir =
+    #         joinpath(@__DIR__,"..","..",
+    #                  "src",
+    #                  "components-lib")
+    # end
+    
+
+    # if data_dir == nothing
+
+    #     data_dir =
+    #         joinpath(@__DIR__,"..","..",
+    #                  "src","data-dir",
+    #                  "converted_data" )
+        
+    # end
+    
+    # json_case_dir =
+    #     joinpath( data_dir, case_name, "json")
+
+    # if json_net_data_by_components_file == nothing
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  "net_data_by_components_file.json")
+    # else
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  json_net_data_by_components_file)
+
+    # end
+    
+    if (components_libs_dir == "") || (
+        components_libs_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        src_dir =
+            joinpath( package_dir, "src")
+        
+        components_libs_dir =
+            joinpath(
+                src_dir,
+                "components-lib")
+
+    end
+    
+    if (data_dir == "") || (data_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+        
+        data_dir =
+            joinpath( package_dir, "data")
+
+
+    end
+
+    case_data_dir =
+        joinpath( data_dir,
+                  "converted-data",
+                  case_name,)
+    
+    json_case_dir =
+        joinpath(case_data_dir,
+                  "json")
+
+    
+    if (json_net_data_by_components_file == "") || (
+        json_net_data_by_components_file == nothing)
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                "net_data_by_components_file.json")
+    else
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                json_net_data_by_components_file)
+
+    end
+
+
+    #---------------------------------------------------
+    # Simulation Period
+    #---------------------------------------------------
+
+    time_final = timespan
+
+    dt = 0.0001
+
+    Δt = 1.0 / 2^(4)
+
+    tspan = (0.0, timespan)
+
+    sim_timespan  = (0.0, timespan)
+
+    plot_timespan = (0.0, timespan)
+
+    #---------------------------------------------------
+    ## solvers and settings
+    #---------------------------------------------------
+
+    use_init_u0 = false
+
+    use_nlsolve = false
+
+    pf_alg = NewtonRaphson()
+
+    #---------------------------------------------------
+
+    ode_alg = Rodas4()
+
+    # ode_alg = ImplicitMidpoint()
+
+    dae_alg = IDA()
+
+    abstol = 1e-12
+
+    reltol = 1e-12
+    
+    #---------------------------------------------------
+    # status parameters and data
+    #---------------------------------------------------
+
+    if list_network_status == nothing
+    
+        list_network_status =
+            [:pre_fault_state,
+             :fault_state,
+             :post_fault_state ]
+        
+    end
+
+    dict_status_steady_state_data =
+        Dict{Symbol, NamedTuple }()
+
+    for a_system_status in list_network_status
+
+        dict_status_steady_state_data[a_system_status] =
+            get_a_status_steady_state_data(
+                a_system_status;
+                with_faults = true,
+                # case_name = "case9",
+                net_data_by_components_file =
+                    net_data_by_components_file,
+                components_libs_dir =
+                    components_libs_dir,
+
+                timespan      = timespan,
+                on_fault_time = on_fault_time,
+                clear_fault_time = clear_fault_time,    
+
+                list_fault_point_from_node_a =
+                    list_fault_point_from_node_a,
+                list_fault_resistance =
+                    list_fault_resistance,
+                list_no_line_circuit =
+                    list_no_line_circuit,
+
+                list_edges_to_have_fault =
+                    list_edges_to_have_fault,
+                clear_fault_selection_list =
+                    clear_fault_selection_list,
+
+                basekV =
+                    basekV,    
+                use_pu_in_PQ =
+                    use_pu_in_PQ,
+                line_data_in_pu =
+                    line_data_in_pu )
+
+    end
+
+    status_steady_state_data =
+        NamedTupleTools.namedtuple(
+            dict_status_steady_state_data)
+
+
+    #---------------------------------------------------
+    ## ODE_gens_plants_dynamics_fun!
+    #---------------------------------------------------
+
+    (;state_vars_idx,
+     ωref0_vref0_porder0_id_iq_vh_Idx,
+     generic_gens_para,
+     generic_avrs_para,
+     generic_govs_para,
+     vec_comp_states_Idx,
+     comps_dyn_funs,
+     comps_output_funs,
+
+     comps_callback_paras_funs,
+
+     ode_comps_dyn_funs,
+     dae_comps_dyn_funs,
+
+     state_labels,
+     algebraic_vars_labels,
+     network_vars_labels,
+
+     plants_states_syms,
+     generic_state_sym, 
+     algebraic_state_sym,
+     model_syms,
+
+     nodes_names,
+     gens_nodes_names,
+     non_gens_nodes_names,
+     SM_gens_nodes_names,
+     SC_gens_nodes_names,
+
+     model_mass_matrix,     
+     model_bool_dae_vars,
+
+     ode_gens_mass_matrix,
+     ode_gens_bool_dae_vars,
+
+     plants_cb_paras_kwd_para
+     ) =
+         NamedTupleTools.select(
+             get_status_steady_state_parameters(
+                 net_data_by_components_file;
+                 components_libs_dir =
+                     components_libs_dir,
+                 basekV = basekV,    
+                 use_pu_in_PQ = use_pu_in_PQ,
+                 line_data_in_pu = line_data_in_pu,
+
+                 use_init_u0 = use_init_u0,    
+                 use_nlsolve = use_nlsolve,
+
+                 pf_alg = NewtonRaphson(),    
+                 abstol = 1e-12,    
+                          reltol = 1e-12,
+
+                 on_fault_time = on_fault_time,
+                 clear_fault_time =
+                     clear_fault_time,       
+                 list_fault_point_from_node_a =
+                     list_fault_point_from_node_a,
+                 list_fault_resistance =
+                     list_fault_resistance,
+                 list_no_line_circuit =
+                     list_no_line_circuit,
+                 list_edges_to_have_fault =
+                     list_edges_to_have_fault, 
+                 clear_fault_selection_list =
+                     clear_fault_selection_list,
+
+                 with_faults =
+                     with_faults),
+             (:state_vars_idx,
+              :ωref0_vref0_porder0_id_iq_vh_Idx,
+              :generic_gens_para,
+              :generic_avrs_para,
+              :generic_govs_para,
+              :vec_comp_states_Idx,
+              :comps_dyn_funs,
+              :comps_output_funs,
+
+              :comps_callback_paras_funs,          
+
+              :ode_comps_dyn_funs,
+              :dae_comps_dyn_funs,
+
+              :state_labels,
+              :algebraic_vars_labels,
+              :network_vars_labels,
+
+              :plants_states_syms,
+              :generic_state_sym, 
+              :algebraic_state_sym,
+              :model_syms,
+
+              :nodes_names,
+              :gens_nodes_names,
+              :non_gens_nodes_names,
+              :SM_gens_nodes_names,
+              :SC_gens_nodes_names,
+
+              :model_mass_matrix,     
+              :model_bool_dae_vars,
+
+              :ode_gens_mass_matrix,
+              :ode_gens_bool_dae_vars,
+
+              :plants_cb_paras_kwd_para))
+
+    #--------------------------------------
+
+    (;ωref0_Idx,
+     vref0_Idx,
+     porder0_Idx,
+     id_Idx,
+     iq_Idx,
+     vh_Idx) =
+         NamedTupleTools.select(
+             ωref0_vref0_porder0_id_iq_vh_Idx ,
+        (:ωref0_Idx,
+         :vref0_Idx,
+         :porder0_Idx,
+         :id_Idx,
+         :iq_Idx,
+         :vh_Idx))
+
+    #--------------------------------------
+
+    pre_fault_Yint =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :Yint)
+
+    fault_Yint =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :fault_state),
+                :dynamic_status_paras),
+            :dyn_Yint)
+
+
+    post_fault_Yint =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :post_fault_state),
+                :dynamic_status_paras),
+            :dyn_Yint)
+
+    #--------------------------------------
+
+    gens_vh =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :gens_vh)
+
+    
+    gens_θh =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :gens_θh)
+
+    
+    pf_P_gens =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :pf_P_gens)
+
+    
+    pf_Q_gens =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :pf_Q_gens)
+
+
+    X_d_dash =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :X_d_dash)
+
+    Ig = (pf_P_gens - im * pf_Q_gens) ./ (
+        gens_vh .* exp.(-im * gens_θh))
+
+    E_gen = gens_vh .* exp.(im * gens_θh) .+ (
+        im * X_d_dash .* Ig)
+
+    E = abs.( E_gen )
+
+    δ = angle.( E_gen )
+
+    Pe_pre_fault_order =
+        get_Pe_inm( δ, E, pre_fault_Yint )
+
+    Pe_fault_order =
+        get_Pe_inm( δ, E, fault_Yint )
+
+    Pe_post_fault_order =
+        get_Pe_inm( δ, E, post_fault_Yint)
+
+    # @show  Pe_pre_fault_order
+    
+    # @show  Pe_fault_order
+    
+    # @show  Pe_post_fault_order
+
+    #--------------------------------------
+    
+    pre_fault_u0_model_states_init =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :plants_states_init)
+
+    fault_u0_model_states_init =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :fault_state),
+                :dynamic_status_paras),
+            :dyn_plants_states_init)
+
+    post_fault_u0_model_states_init =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :post_fault_state),
+                 :dynamic_status_paras),
+            :dyn_plants_states_init)
+
+    clear_fault_states =
+        copy(post_fault_u0_model_states_init)
+    
+    #--------------------------------------
+
+    pre_fault_model_dynamics_para =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :ωref0_vref0_porder0_id_iq_vh)
+
+    fault_model_dynamics_para =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :fault_state),
+                :dynamic_status_paras),
+            :ωref0_vref0_porder0_id_iq_vh)
+
+    post_fault_model_dynamics_para =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :post_fault_state),
+                :dynamic_status_paras),
+            :ωref0_vref0_porder0_id_iq_vh)
+
+    pre_fault_model_para =
+        copy(pre_fault_model_dynamics_para)
+
+    fault_model_para =
+        copy(fault_model_dynamics_para)
+    
+    clear_fault_model_para =
+        copy(post_fault_model_dynamics_para)
+        
+    # @show pre_fault_model_para[porder0_Idx]
+    
+    # @show fault_model_para[porder0_Idx]
+    
+    # @show clear_fault_model_para[porder0_Idx]
+    
+    #--------------------------------------
+
+    # @show map(x-> round.(x; digits = 4),
+    #           pre_fault_Yint )
+
+    # @show map(x-> round.(x; digits = 4),
+    #           fault_Yint )
+
+    # @show map(x-> round.(x; digits = 4),
+    #           post_fault_Yint )
+    
+    #--------------------------------------
+    # states callbacks
+    #--------------------------------------
+
+    plants_cb_paras_kwd_para =
+        (generic_gens_para ,
+         generic_avrs_para,
+         generic_govs_para,
+         comps_callback_paras_funs )
+
+    (plants_cb_paras_switches,
+     list_selected_plants_state_event_cb_paras,
+     list_selected_plants_state_affect_cb_paras,
+
+     avrs_govs_cb_sw,
+     avrs_govs_cb_sw_Idx ) =
+         NamedTupleTools.select(
+             plants_generic_model_callback_paras_func(
+                 state_vars_idx,
+                 plants_states_syms;
+                 kwd_para =
+                     plants_cb_paras_kwd_para),
+             (:plants_cb_paras_switches,
+              :list_selected_plants_state_event_cb_paras,
+              :list_selected_plants_state_affect_cb_paras,
+
+              :plants_avr_gov_cb_para_sw_in_plant,
+              :plants_avr_gov_cb_para_sw_idx_in_plant))
+
+    cb_states = cb_fun_make_state_callbacks(
+        list_selected_plants_state_event_cb_paras,
+        list_selected_plants_state_affect_cb_paras )
+    
+    #--------------------------------------
+    
+    gens_plants_generic_model_kwd_para =
+        (; state_vars_idx,
+
+         ωref0_vref0_porder0_id_iq_vh_Idx,
+
+         generic_gens_para,
+         generic_avrs_para,
+         generic_govs_para,
+
+         vec_comp_states_Idx,
+
+         avrs_govs_cb_sw,
+         avrs_govs_cb_sw_Idx,
+
+         ode_comps_dyn_funs,
+         comps_output_funs,
+
+         ωs)        
+    #--------------------------------------
+    # model init and parameters
+    #--------------------------------------
+
+    model_dynamics_fun! =
+        ode_gens_plants_generic_model_wt_cb_state_func!
+        # ode_cb_test_gens_plants_generic_model_func!
+
+    u0_model_states_init =
+        pre_fault_u0_model_states_init
+        # copy(pre_fault_u0_model_states_init)
+
+
+    model_dynamics_para =
+        (;pre_fault_model_dynamics_para,
+         plants_cb_paras_switches)
+        # copy(pre_fault_model_dynamics_para)
+
+    model_dynamics_kwd_para =
+        gens_plants_generic_model_kwd_para
+
+    model_syms =
+        generic_state_sym
+
+    model_mass_matrix =
+        ode_gens_mass_matrix
+
+    #--------------------------------------
+
+    δ_idx_in_state =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    model_syms,
+                 nodes_name =
+                     gens_nodes_names,
+                 vars = [:δ] ))]
+    
+    ω_idx_in_state =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    model_syms,
+                nodes_name = gens_nodes_names,
+            vars = [:ω] ))]
+
+    #--------------------------------------
+    # Integrator Model simulation
+    #--------------------------------------
+    
+    system_function = ODEFunction(
+        (dx,x,p,t) ->
+            model_dynamics_fun!(
+                dx, x,
+                model_dynamics_para,
+                t;
+                kwd_para =
+                    model_dynamics_kwd_para);
+        syms =
+            model_syms,
+            mass_matrix =
+                model_mass_matrix )
+
+     system_prob = ODEProblem(
+        system_function,
+        u0_model_states_init,
+        sim_timespan,
+         model_dynamics_para,
+     callback = cb_states)
+     
+    #--------------------------------------
+    # faults callbacks
+    #--------------------------------------
+
+    cb_on_fault = DiscreteCallback(
+        (u, t, integrator) ->
+            on_fault_condition(
+                u,
+                t,
+                integrator,
+                on_fault_time ),
+
+        (integrator) ->
+            on_fault_wt_model_dynamics_para_affect!(
+                integrator,
+                Pe_fault_order,
+                porder0_Idx); 
+        save_positions=(true,true) )
+
+    
+    
+    cb_clear_fault = DiscreteCallback(
+        (u, t, integrator) ->
+            clear_fault_condition(
+                u,
+                t,
+                integrator,
+                clear_fault_time ),
+
+        (integrator) ->
+            clear_fault_wt_model_dynamics_para_affect!(
+                integrator,
+                post_fault_model_dynamics_para );
+        save_positions=(true,true) )
+
+    
+    cb_clear_fault_by_p_order_idx = DiscreteCallback(
+        (u, t, integrator) ->
+            clear_fault_condition(
+                u,
+                t,
+                integrator,
+                clear_fault_time ),
+
+        (integrator) ->
+            clear_fault_wt_model_dynamics_para_affect!(
+                integrator,
+                Pe_post_fault_order,
+                porder0_Idx);
+        save_positions=(true,true) )
+    
+    # --------------------------------------
+
+    cb_faults_post_clear =
+        CallbackSet( cb_on_fault,
+        cb_clear_fault)
+
+    tstop_faults_post_clear =
+        [on_fault_time,
+         clear_fault_time]
+
+    #--------------------------------------
+    # Model simulation
+    #--------------------------------------
+    
+    system_sol =
+        DifferentialEquations.solve(
+            system_prob,            
+            ode_alg,
+            callback = cb_faults_post_clear,
+            tstops = tstop_faults_post_clear,
+            advance_to_tstop = true,
+            abstol = abstol,
+            reltol = reltol )
+
+    return return_extended_results == false ?
+        (;system_sol,
+         model_syms,
+         gens_nodes_names,
+         SM_gens_nodes_names,
+         non_gens_nodes_names,
+         sim_timespan ) : (
+             ;system_sol,
+             model_syms,
+             gens_nodes_names,
+             SM_gens_nodes_names,
+             non_gens_nodes_names,
+             sim_timespan,
+             
+             generic_state_sym,
+             algebraic_state_sym,
+
+             pre_fault_Yint,
+             fault_Yint,
+             post_fault_Yint,
+
+             gens_vh, gens_θh,
+             pf_P_gens, pf_Q_gens,
+             X_d_dash,
+             Ig,  E, δ,
+             Pe_pre_fault_order,
+             Pe_fault_order,
+             Pe_post_fault_order, 
+             status_steady_state_data )
+    
+end
+
+
+
+function get_generic_network_fault_pertubation(
+    ;case_name = "case9",
+    timespan   = 10.0,
+    
+    on_fault_time = 5.0,
+    clear_fault_time = 5.1,
+    
+    list_fault_point_from_node_a = [0.3],
+    list_fault_resistance = [0.001],
+    list_no_line_circuit =  [1],
+
+    list_edges_to_have_fault = [ 8 ],
+    clear_fault_selection_list = [1],
+    
+    basekV = 1.0,    
+    use_pu_in_PQ = true,
+    line_data_in_pu = true,
+
+    with_faults =
+        false,
+    use_state_in_on_clear_fault =
+        false,
+    return_extended_results =
+        false,
+        
+    json_net_data_by_components_file =
+        nothing,
+    components_libs_dir =
+        nothing,
+    data_dir =
+        nothing,
+    list_network_status = nothing,
+    
+    use_init_u0 = false,
+
+    use_nlsolve = false,
+
+    dt = 0.0001,
+
+    Δt = 1.0 / 2^(4),
+
+    pf_alg = NewtonRaphson(),
+
+    ode_alg = Rodas4(),
+
+    # ode_alg = ImplicitMidpoint()
+
+    dae_alg = IDA(),
+
+    abstol = 1e-12,
+
+    reltol = 1e-12 )
+
+    #----------------------------------
+    
+    # if components_libs_dir == nothing
+
+    #     components_libs_dir =
+    #         joinpath(@__DIR__,"..","..",
+    #                  "src",
+    #                  "components-lib")
+    # end
+    
+
+    # if data_dir == nothing
+
+    #     data_dir =
+    #         joinpath(@__DIR__,"..","..",
+    #                  "src","data-dir",
+    #                  "converted_data" )
+        
+    # end
+    
+    # json_case_dir =
+    #     joinpath( data_dir, case_name, "json")
+
+    # if json_net_data_by_components_file == nothing
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  "net_data_by_components_file.json")
+    # else
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  json_net_data_by_components_file)
+
+    # end
+    
+    if (components_libs_dir == "") || (
+        components_libs_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        src_dir =
+            joinpath( package_dir, "src")
+        
+        components_libs_dir =
+            joinpath(
+                src_dir,
+                "components-lib")
+
+    end
+    
+    if (data_dir == "") || (data_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+        
+        data_dir =
+            joinpath( package_dir, "data")
+
+
+    end
+
+    case_data_dir =
+        joinpath( data_dir,
+                  "converted-data",
+                  case_name,)
+    
+    json_case_dir =
+        joinpath(case_data_dir,
+                  "json")
+
+    
+    if (json_net_data_by_components_file == "") || (
+        json_net_data_by_components_file == nothing)
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                "net_data_by_components_file.json")
+    else
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                json_net_data_by_components_file)
+
+    end
+
+
+    #---------------------------------------------------
+    # Simulation Period
+    #---------------------------------------------------
+
+    time_final = timespan
+
+    # dt = 0.0001
+
+    # Δt = 1.0 / 2^(4)
+
+    tspan = (0.0, timespan)
+
+    sim_timespan  = (0.0, timespan)
+
+    plot_timespan = (0.0, timespan)
+
+    #---------------------------------------------------
+    ## solvers and settings
+    #---------------------------------------------------
+    
+    # use_init_u0 = false
+
+    # use_nlsolve = false
+
+    # pf_alg = NewtonRaphson()
+
+    #---------------------------------------------------
+
+    # ode_alg = Rodas4()
+
+    # # ode_alg = ImplicitMidpoint()
+
+    # dae_alg = IDA()
+
+    # abstol = 1e-12
+
+    # reltol = 1e-12
+    
+    #---------------------------------------------------
+    # status parameters and data
+    #---------------------------------------------------
+
+    if list_network_status == nothing
+    
+        list_network_status =
+            [:pre_fault_state,
+             :fault_state,
+             :post_fault_state]        
+    end
+
+    dict_status_steady_state_data =
+        Dict{Symbol, NamedTuple }()
+
+    for a_system_status in list_network_status
+
+        dict_status_steady_state_data[a_system_status] =
+            get_a_status_steady_state_data(
+                a_system_status;
+                with_faults = true,
+                # case_name = "case9",
+                net_data_by_components_file =
+                    net_data_by_components_file,
+                components_libs_dir =
+                    components_libs_dir,
+
+                timespan      = timespan,
+                on_fault_time = on_fault_time,
+                clear_fault_time = clear_fault_time,    
+
+                list_fault_point_from_node_a =
+                    list_fault_point_from_node_a,
+                list_fault_resistance =
+                    list_fault_resistance,
+                list_no_line_circuit =
+                    list_no_line_circuit,
+
+                list_edges_to_have_fault =
+                    list_edges_to_have_fault,
+                clear_fault_selection_list =
+                    clear_fault_selection_list,
+
+                basekV = basekV,    
+                use_pu_in_PQ =
+                    use_pu_in_PQ,
+                line_data_in_pu =
+                    line_data_in_pu)
+
+    end
+
+    status_steady_state_data =
+        NamedTupleTools.namedtuple(
+            dict_status_steady_state_data)
+
+
+    #---------------------------------------------------
+    ## ODE_gens_plants_dynamics_fun!
+    #---------------------------------------------------
+
+    (;state_vars_idx,
+     ωref0_vref0_porder0_id_iq_vh_Idx,
+     generic_gens_para,
+     generic_avrs_para,
+     generic_govs_para,
+     vec_comp_states_Idx,
+     comps_dyn_funs,
+     comps_output_funs,
+
+     comps_callback_paras_funs,
+
+     ode_comps_dyn_funs,
+     dae_comps_dyn_funs,
+
+     state_labels,
+     algebraic_vars_labels,
+     network_vars_labels,
+
+     plants_states_syms,
+     generic_state_sym, 
+     algebraic_state_sym,
+     model_syms,
+
+     nodes_names,
+     gens_nodes_names,
+     non_gens_nodes_names,
+     SM_gens_nodes_names,
+     SC_gens_nodes_names,
+
+     model_mass_matrix,     
+     model_bool_dae_vars,
+
+     ode_gens_mass_matrix,
+     ode_gens_bool_dae_vars,
+
+     plants_cb_paras_kwd_para
+     ) =
+         NamedTupleTools.select(
+             get_status_steady_state_parameters(
+                 net_data_by_components_file;
+                 components_libs_dir =
+                     components_libs_dir,
+                 basekV = basekV,    
+                 use_pu_in_PQ = use_pu_in_PQ,
+                 line_data_in_pu = line_data_in_pu,
+
+                 use_init_u0 = use_init_u0,    
+                 use_nlsolve = use_nlsolve,
+
+                 pf_alg = NewtonRaphson(),    
+                 abstol = 1e-12,    
+                          reltol = 1e-12,
+
+                 on_fault_time = on_fault_time,
+                 clear_fault_time =
+                     clear_fault_time,       
+                 list_fault_point_from_node_a =
+                     list_fault_point_from_node_a,
+                 list_fault_resistance =
+                     list_fault_resistance,
+                 list_no_line_circuit =
+                     list_no_line_circuit,
+                 list_edges_to_have_fault =
+                     list_edges_to_have_fault, 
+                 clear_fault_selection_list =
+                     clear_fault_selection_list,
+
+                 with_faults =
+                     with_faults),
+             (:state_vars_idx,
+              :ωref0_vref0_porder0_id_iq_vh_Idx,
+              :generic_gens_para,
+              :generic_avrs_para,
+              :generic_govs_para,
+              :vec_comp_states_Idx,
+              :comps_dyn_funs,
+              :comps_output_funs,
+
+              :comps_callback_paras_funs,          
+
+              :ode_comps_dyn_funs,
+              :dae_comps_dyn_funs,
+
+              :state_labels,
+              :algebraic_vars_labels,
+              :network_vars_labels,
+
+              :plants_states_syms,
+              :generic_state_sym, 
+              :algebraic_state_sym,
+              :model_syms,
+
+              :nodes_names,
+              :gens_nodes_names,
+              :non_gens_nodes_names,
+              :SM_gens_nodes_names,
+              :SC_gens_nodes_names,
+
+              :model_mass_matrix,     
+              :model_bool_dae_vars,
+
+              :ode_gens_mass_matrix,
+              :ode_gens_bool_dae_vars,
+
+              :plants_cb_paras_kwd_para))
+
+        #--------------------------------------
+
+    (;ωref0_Idx,
+     vref0_Idx,
+     porder0_Idx,
+     id_Idx,
+     iq_Idx,
+     vh_Idx) =
+         NamedTupleTools.select(
+             ωref0_vref0_porder0_id_iq_vh_Idx ,
+        (:ωref0_Idx,
+         :vref0_Idx,
+         :porder0_Idx,
+         :id_Idx,
+         :iq_Idx,
+         :vh_Idx))
+
+    #--------------------------------------
+
+    pre_fault_Yint =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :Yint)
+
+    fault_Yint =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :fault_state),
+                :dynamic_status_paras),
+            :dyn_Yint)
+
+
+    post_fault_Yint =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :post_fault_state),
+                :dynamic_status_paras),
+            :dyn_Yint)
+
+    #--------------------------------------
+    #--------------------------------------
+    
+    gens_vh =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :gens_vh)
+
+    
+    gens_θh =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :gens_θh)
+
+    
+    pf_P_gens =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :pf_P_gens)
+
+    
+    pf_Q_gens =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :pf_Q_gens)
+
+    
+    X_d_dash =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :X_d_dash)
+
+    Ig = (pf_P_gens - im * pf_Q_gens) ./ (
+        gens_vh .* exp.(-im * gens_θh))
+
+    E_gen = gens_vh .* exp.(im * gens_θh) .+ (
+        im * X_d_dash .* Ig)
+
+    E = abs.( E_gen )
+
+    δ = angle.( E_gen )
+
+    Pe_pre_fault_order =
+        get_Pe_inm( δ, E, pre_fault_Yint )
+
+    Pe_fault_order =
+        get_Pe_inm( δ, E, fault_Yint )
+
+    Pe_post_fault_order =
+        get_Pe_inm( δ, E, post_fault_Yint)
+
+    # @show  Pe_pre_fault_order
+    
+    # @show  Pe_fault_order
+    
+    # @show  Pe_post_fault_order
+    
+    #--------------------------------------
+    
+    pre_fault_u0_model_states_init =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :plants_states_init)
+
+    fault_u0_model_states_init =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :fault_state),
+                :dynamic_status_paras),
+            :dyn_plants_states_init)
+
+    post_fault_u0_model_states_init =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :post_fault_state),
+                 :dynamic_status_paras),
+            :dyn_plants_states_init)
+
+    clear_fault_states =
+        copy(post_fault_u0_model_states_init)
+    
+    #--------------------------------------
+
+    pre_fault_model_dynamics_para =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),
+            :ωref0_vref0_porder0_id_iq_vh)
+
+    fault_model_dynamics_para =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :fault_state),
+                :dynamic_status_paras),
+            :ωref0_vref0_porder0_id_iq_vh)
+
+    post_fault_model_dynamics_para =
+        getproperty(
+            getproperty(
+                getproperty(
+                    status_steady_state_data,
+                    :post_fault_state),
+                :dynamic_status_paras),
+            :ωref0_vref0_porder0_id_iq_vh)
+
+    pre_fault_model_para =
+        copy(pre_fault_model_dynamics_para)
+
+    fault_model_para =
+        copy(fault_model_dynamics_para)
+    
+    clear_fault_model_para =
+        copy(post_fault_model_dynamics_para)
+        
+    # @show pre_fault_model_para[porder0_Idx]
+    
+    # @show fault_model_para[porder0_Idx]
+    
+    # @show clear_fault_model_para[porder0_Idx]
+    
+    #--------------------------------------
+
+    # @show map(x-> round.(x; digits = 4),
+    #           pre_fault_Yint )
+
+    # @show map(x-> round.(x; digits = 4),
+    #           fault_Yint )
+
+    # @show map(x-> round.(x; digits = 4),
+    #           post_fault_Yint )
+    
+    #--------------------------------------
+    # states callbacks
+    #--------------------------------------
+
+    plants_cb_paras_kwd_para =
+        (generic_gens_para ,
+         generic_avrs_para,
+         generic_govs_para,
+         comps_callback_paras_funs )
+
+    (plants_cb_paras_switches,
+     list_selected_plants_state_event_cb_paras,
+     list_selected_plants_state_affect_cb_paras,
+
+     avrs_govs_cb_sw,
+     avrs_govs_cb_sw_Idx ) =
+         NamedTupleTools.select(
+             plants_generic_model_callback_paras_func(
+                 state_vars_idx,
+                 plants_states_syms;
+                 kwd_para =
+                     plants_cb_paras_kwd_para),
+             (:plants_cb_paras_switches,
+              :list_selected_plants_state_event_cb_paras,
+              :list_selected_plants_state_affect_cb_paras,
+
+              :plants_avr_gov_cb_para_sw_in_plant,
+              :plants_avr_gov_cb_para_sw_idx_in_plant))
+
+    cb_states = cb_fun_make_state_callbacks(
+        list_selected_plants_state_event_cb_paras,
+        list_selected_plants_state_affect_cb_paras )
+    
+    #--------------------------------------
+    
+    gens_plants_generic_model_kwd_para =
+        (; state_vars_idx,
+
+         ωref0_vref0_porder0_id_iq_vh_Idx,
+
+         generic_gens_para,
+         generic_avrs_para,
+         generic_govs_para,
+
+         vec_comp_states_Idx,
+
+         avrs_govs_cb_sw,
+         avrs_govs_cb_sw_Idx,
+
+         # comps_dyn_funs,
+         ode_comps_dyn_funs,
+         comps_output_funs,
+
+         ωs)
+    
+    
+    #--------------------------------------
+    # model init and parameters
+    #--------------------------------------
+
+    model_dynamics_fun! =
+        # ode_gens_plants_generic_model_func!
+        ode_cb_test_gens_plants_generic_model_func!
+
+    u0_model_states_init =
+        copy(pre_fault_u0_model_states_init)
+
+
+    model_dynamics_para =
+        copy(pre_fault_model_dynamics_para)
+        # post_fault_model_dynamics_para
+
+    model_dynamics_kwd_para =
+        gens_plants_generic_model_kwd_para
+
+    model_syms =
+        generic_state_sym
+
+    model_mass_matrix =
+        ode_gens_mass_matrix
+
+    #--------------------------------------
+
+    δ_idx_in_state =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    model_syms,
+                 nodes_name =
+                     gens_nodes_names,
+                 vars = [:δ] ))]
+    
+    ω_idx_in_state =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    model_syms,
+                nodes_name = gens_nodes_names,
+            vars = [:ω] ))]
+
+
+    #--------------------------------------
+    # Integrator Model simulation
+    #--------------------------------------
+    
+    system_function = ODEFunction(
+        (dx,x,p,t) ->
+            model_dynamics_fun!(
+                dx, x,
+                model_dynamics_para,
+                t;
+                kwd_para =
+                    model_dynamics_kwd_para);
+        syms =
+            model_syms,
+            mass_matrix =
+                model_mass_matrix )
+
+     system_prob = ODEProblem(
+        system_function,
+        u0_model_states_init,
+        sim_timespan,
+         model_dynamics_para,
+     callback = cb_states )
+
+     
+    #--------------------------------------
+    # faults callbacks
+    #--------------------------------------
+
+    cb_on_fault = DiscreteCallback(
+        (u, t, integrator) ->
+            on_fault_condition(
+                u,
+                t,
+                integrator,
+                on_fault_time ),
+
+        (integrator) ->
+            on_fault_wt_model_dynamics_para_affect!(
+                integrator,
+                Pe_fault_order,
+                porder0_Idx); 
+        save_positions=(true,true) )
+
+    
+    
+    cb_clear_fault = DiscreteCallback(
+        (u, t, integrator) ->
+            clear_fault_condition(
+                u,
+                t,
+                integrator,
+                clear_fault_time ),
+
+        (integrator) ->
+            clear_fault_wt_model_dynamics_para_affect!(
+                integrator,
+                post_fault_model_dynamics_para );
+        save_positions=(true,true) )
+
+    
+    # cb_clear_fault = DiscreteCallback(
+    #     (u, t, integrator) ->
+    #         clear_fault_condition(
+    #             u,
+    #             t,
+    #             integrator,
+    #             clear_fault_time ),
+
+    #     (integrator) ->
+    #         clear_fault_wt_model_dynamics_para_affect!(
+    #             integrator,
+    #             Pe_post_fault_order,
+    #             porder0_Idx);
+    #     save_positions=(true,true) )
+    
+    # --------------------------------------
+
+    cb_faults_post_clear =
+        CallbackSet(
+            cb_on_fault,
+            cb_clear_fault)
+
+    tstop_faults_post_clear =
+        [on_fault_time,
+         clear_fault_time]
+
+    #--------------------------------------
+    # Model simulation
+    #--------------------------------------
+    
+    system_sol =
+        DifferentialEquations.solve(
+            system_prob,            
+            ode_alg,
+            # ImplicitMidpoint(),
+            # dt = dt,
+            callback = cb_faults_post_clear,
+            tstops = tstop_faults_post_clear,
+            advance_to_tstop = true,
+            abstol = abstol,
+            reltol = reltol )
+
+    return return_extended_results == false ?
+        (;system_sol,
+         model_syms,
+         gens_nodes_names,
+         SM_gens_nodes_names,
+         non_gens_nodes_names,
+         sim_timespan ) : (
+             ;system_sol,
+             model_syms,
+             gens_nodes_names,
+             SM_gens_nodes_names,
+             non_gens_nodes_names,
+             sim_timespan,
+
+             # pre_fault_ntuple_t_δ_ω,
+             # pre_clear_ntuple_t_δ_ω,
+             # post_clear_30_cyles_ntuple_t_δ_ω,
+             
+             generic_state_sym,
+             algebraic_state_sym,
+
+             pre_fault_Yint,
+             fault_Yint,
+             post_fault_Yint,
+             status_steady_state_data)
+    
+end
+
+# ------------------------------------------------------
+
+function get_network_fault_pertubation_by_inm_model(
+    ;case_name = "case9",
+    timespan   = 10.0,
+    
+    on_fault_time = 5.0,
+    clear_fault_time = 5.1,
+    
+    list_fault_point_from_node_a = [0.3],
+    list_fault_resistance = [0.001],
+    list_no_line_circuit =  [1],
+
+    list_edges_to_have_fault = [ 8 ],
+    clear_fault_selection_list = [1],
+    
+    basekV          = 1.0,    
+    use_pu_in_PQ    = true,
+    line_data_in_pu = true,
+
+    with_faults =
+        false,
+    use_state_in_on_clear_fault =
+        false,
+    return_extended_results =
+        false,
+        
+    json_net_data_by_components_file =
+        nothing,
+    components_libs_dir =
+        nothing,
+    data_dir =
+        nothing,
+    list_network_status =
+        nothing,
+    
+    use_init_u0 = false,
+
+    use_nlsolve = false,
+
+    dt = 0.0001,
+
+    Δt = 1.0 / 2^(4),
+
+    pf_alg = NewtonRaphson(),
+
+    ode_alg = Rodas4(),
+
+    # ode_alg = ImplicitMidpoint()
+
+    dae_alg = IDA(),
+
+    abstol = 1e-12,
+
+    reltol = 1e-12 )
+
+    #----------------------------------
+    
+    # if components_libs_dir == nothing
+
+    #     components_libs_dir =
+    #         joinpath(@__DIR__,"..","..","src",
+    #                  "components-lib")
+    # end
+    
+
+    # if data_dir == nothing
+
+    #     data_dir =
+    #         joinpath(@__DIR__,"..","..",
+    #                  "src","data-dir",
+    #                  "converted_data" )
+        
+    # end
+    
+    # json_case_dir =
+    #     joinpath( data_dir, case_name, "json")
+
+    # if json_net_data_by_components_file == nothing
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  "net_data_by_components_file.json")
+    # else
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  json_net_data_by_components_file)
+
+    # end
+
+    
+    if (components_libs_dir == "") || (
+        components_libs_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        src_dir =
+            joinpath( package_dir, "src")
+        
+        components_libs_dir =
+            joinpath(
+                src_dir,
+                "components-lib")
+
+    end
+    
+    if (data_dir == "") || (data_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+        
+        data_dir =
+            joinpath( package_dir, "data")
+
+
+    end
+
+    case_data_dir =
+        joinpath( data_dir,
+                  "converted-data",
+                  case_name,)
+    
+    json_case_dir =
+        joinpath(case_data_dir,
+                  "json")
+
+    
+    if (json_net_data_by_components_file == "") || (
+        json_net_data_by_components_file == nothing)
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                "net_data_by_components_file.json")
+    else
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                json_net_data_by_components_file)
+
+    end
+
+    #---------------------------------------------------
+    # Simulation Period
+    #---------------------------------------------------
+
+    time_final    = timespan
+
+    tspan         = (0.0, timespan)
+
+    sim_timespan  = (0.0, timespan)
+
+    plot_timespan = (0.0, timespan)
+
+    #---------------------------------------------------
+    #---------------------------------------------------
+
+    # fault_status =
+    #     (no_fault = 0,
+    #      on_fault = 1,
+    #      clear_fault = 2,
+    #      partial_clear_fault = 3)
+
+    # system_fault_status =
+    #     [ fault_status.no_fault]
+
+    #---------------------------------------------------
+    # status parameters and data
+    #---------------------------------------------------
+
+    if list_network_status == nothing
+    
+        list_network_status =
+            [:pre_fault_state,
+             :fault_state,
+             :post_fault_state ]
+
+    end
+
+
+    (;gens_nodes_idx,
+     u0_model_states_init,
+     model_syms,
+     model_mass_matrix,
+
+     ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+     generic_system_dynamics_wt_fault_kwd_para,
+
+     gens_nodes_names,
+     SM_gens_nodes_names,
+     non_gens_nodes_names,
+
+     cb_states,
+     cb_faults,
+     cb_faults_no_resize,
+
+     fault_nodes_idx,
+
+     state_labels,
+     algebraic_vars_labels,
+
+     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll,
+     dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
+
+     post_sta_PQ,
+
+     vh,
+     θh,
+     gens_i_d,
+     gens_i_q,
+
+     algebraic_generic_model_wt_fault_sol_kwd_para,
+
+     loc_load_exist,
+
+     # P_non_gens,
+     # Q_non_gens, 
+     # P_g_loc_load,
+     # Q_g_loc_load,
+
+     Ybr_cal_and_edges_orientation) =
+         NamedTupleTools.select(
+             get_system_simulation_parameters_wt_faults(
+                 net_data_by_components_file;
+                 components_libs_dir =
+                     components_libs_dir,
+                basekV = basekV,    
+                use_pu_in_PQ = use_pu_in_PQ,
+                line_data_in_pu = line_data_in_pu,
+                use_init_u0 = use_init_u0,
+                use_nlsolve = use_nlsolve,
+
+                pf_alg = pf_alg,
+
+                abstol = abstol,
+                reltol = reltol,
+
+                on_fault_time = on_fault_time,
+                clear_fault_time = clear_fault_time,
+
+                list_fault_point_from_node_a =
+                    list_fault_point_from_node_a,
+
+                list_fault_resistance =
+                    list_fault_resistance,
+
+                list_no_line_circuit =
+                    list_no_line_circuit,
+
+                list_edges_to_have_fault =
+                    list_edges_to_have_fault,
+
+                clear_fault_selection_list =
+                    clear_fault_selection_list,
+             with_faults =
+                     with_faults),
+             (:gens_nodes_idx,
+              :u0_model_states_init,
+              :model_syms,
+              :model_mass_matrix,
+
+              :ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+              :generic_system_dynamics_wt_fault_kwd_para,
+
+              :gens_nodes_names,
+              :SM_gens_nodes_names,
+              :non_gens_nodes_names,
+
+              :cb_states,
+              :cb_faults,
+              :cb_faults_no_resize,
+
+              :fault_nodes_idx,
+
+              :state_labels,
+              :algebraic_vars_labels,
+
+              :δ_ed_dash_eq_dash_Png_Qng_Pll_Qll,
+              :dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
+
+              :post_sta_PQ,
+
+              :vh,
+              :θh,
+              :gens_i_d,
+              :gens_i_q,
+
+              :algebraic_generic_model_wt_fault_sol_kwd_para,
+              :loc_load_exist,          
+
+              :Ybr_cal_and_edges_orientation ))
+
+
+    (;pf_P_gens,
+     pf_Q_gens,
+     P_non_gens,
+     Q_non_gens,
+     P_g_loc_load,
+     Q_g_loc_load) =
+         NamedTupleTools.select(
+             post_sta_PQ,
+             (:pf_P_gens,
+              :pf_Q_gens,
+              :P_non_gens,
+              :Q_non_gens,
+              :P_g_loc_load,
+              :Q_g_loc_load ) )
+
+
+
+    # (pf_P_gens,
+    #  pf_Q_gens,
+    #  vh,
+    #  θh,
+    #  gens_vh,
+    #  gens_θh) =
+    #     NamedTupleTools.select(
+    #         generic_results_pf_sta_red_sol,
+    #         (:pf_P_gens,
+    #          :pf_Q_gens,
+    #          :vh,
+    #          :θh,
+    #          :gens_vh,
+    #          :gens_θh ) )
+
+    (;loc_load_exist,
+     dyn_pf_vh_θh_id_iq_vhf_θhf_Idx,
+     dyn_pf_vh_vhf_θh_θhf_id_iq_Idx,
+
+     dyn_pf_fun_kwd_n2s_idxs,
+     dyn_pf_fun_kwd_net_idxs,
+
+     Ynet_wt_nodes_idx_wt_adjacent_nodes,
+     cleared_selected_lines_faults_net_para,
+
+     pf_generic_gens_para,
+     ode_plants_kwd_para) =
+        NamedTupleTools.select(
+        generic_system_dynamics_wt_fault_kwd_para,
+        (:loc_load_exist,
+         :dyn_pf_vh_θh_id_iq_vhf_θhf_Idx,
+         :dyn_pf_vh_vhf_θh_θhf_id_iq_Idx,
+
+         :dyn_pf_fun_kwd_n2s_idxs,
+         :dyn_pf_fun_kwd_net_idxs,
+
+         :Ynet_wt_nodes_idx_wt_adjacent_nodes,
+         :cleared_selected_lines_faults_net_para,
+
+         :pf_generic_gens_para,
+         :ode_plants_kwd_para))
+
+
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     gens_nodes_with_loc_loads_idx,
+     all_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :all_nodes_idx))
+
+    list_network_status =
+        [:pre_fault_state,
+         :fault_state,
+         :post_fault_state ]
+
+    dict_status_Yint_Yred =
+        Dict{Symbol, NamedTuple }()
+
+    for a_system_status in list_network_status
+
+        dict_status_Yint_Yred[a_system_status] =
+            get_a_status_Yint_Yred(
+            ;
+            # pre_fault_state = true,
+            # fault_state = false,
+            # post_fault_state = false,
+
+            system_status = a_system_status,
+
+            case_name = case_name,
+            timespan      = timespan ,
+            on_fault_time = on_fault_time,
+            clear_fault_time = clear_fault_time,
+
+            with_faults = false,
+
+                list_fault_point_from_node_a =
+                    list_fault_point_from_node_a,
+                list_fault_resistance =
+                    list_fault_resistance,
+                list_no_line_circuit =
+                    list_no_line_circuit,
+
+                list_edges_to_have_fault =
+                    list_edges_to_have_fault,
+                clear_fault_selection_list =
+                    clear_fault_selection_list,
+
+            basekV = basekV ,    
+            use_pu_in_PQ = use_pu_in_PQ,
+            line_data_in_pu = line_data_in_pu,
+            json_net_data_by_components_file =
+                json_net_data_by_components_file)
+    end
+
+    status_Yint_and_Yred_matrices =
+        NamedTupleTools.namedtuple(
+            dict_status_Yint_Yred)
+
+    (;pre_fault_state,
+     fault_state,
+     post_fault_state) =
+         NamedTupleTools.select(
+             status_Yint_and_Yred_matrices,
+             (:pre_fault_state,
+              :fault_state,
+              :post_fault_state))
+
+    pre_fault_state_Yint =
+        getproperty(
+            pre_fault_state,
+            :Y_internal_nodes)
+
+
+    fault_state_Yint =
+        getproperty(
+            fault_state,
+            :Y_internal_nodes)
+
+
+
+    post_fault_state_Yint =
+        getproperty(
+            post_fault_state,
+            :Y_internal_nodes)
+
+    gens_vh = vh[gens_nodes_idx]
+
+    gens_θh = θh[gens_nodes_idx] 
+
+    #----------------------------------------    
+    #----------------------------------------    
+
+    selected_gens_paras_by_vec =
+        get_selected_vec_nt_to_vec_vec(
+            getproperty(
+                ode_plants_kwd_para,
+                :generic_gens_para),
+            nothing;
+            selections = (:D, :H, :xℓ, :X_d_dash),
+            vec_datatype =
+                Float64 )
+
+    (gens_H,
+     gens_D,
+     X_d_dash) =
+        NamedTupleTools.select(
+            selected_gens_paras_by_vec,
+            (:H,
+             :D,
+             :X_d_dash))
+
+
+    nt_init_inm =
+        get_init_gens_classical_model(
+            gens_vh,
+            gens_θh,
+            pf_P_gens,
+            pf_Q_gens,
+            X_d_dash)
+
+    (gens_δ,
+     gens_E) =
+        NamedTupleTools.select(
+            get_selected_vec_nt_to_vec_vec(
+                nt_init_inm, nothing;
+                selections = (:δ, :E)),
+                (:δ, :E) )
+
+    init_inm_δ =
+        get_selected_vec_nt_to_vec_vec(
+            nt_init_inm,
+            nothing;
+            selections = (:δ, ) )
+
+    (
+     gens_Tm,
+     gens_i_d,
+     gens_i_q ) =
+        get_selected_vec_nt_to_vec_vec(
+            nt_init_inm,
+            nothing;
+            selections =
+                (:Tm, :i_d, :i_q ) )
+
+
+    state_vars_syms_inm =
+        [:δ, :ω ]
+
+    ode_inm_state_sym =
+        generate_labels_by_nodes_idxs_and_vars(
+            gens_nodes_idx,
+            state_vars_syms_inm;
+            label_prefix = "bus" )
+
+    state_vars_idx =
+      get_idxs_in_flattened_by_nodes_idx_wt_vars_syms(
+            state_vars_syms_inm,
+            gens_nodes_idx )
+
+    #--------------------------
+
+    Pe_inm_pre_fault_state =
+        get_Pe_inm( gens_δ, gens_E, pre_fault_state_Yint )
+
+
+    Pe_inm_fault_state =
+        get_Pe_inm( gens_δ, gens_E, fault_state_Yint )
+
+
+    Pe_inm_post_fault_state =
+        get_Pe_inm( gens_δ, gens_E, post_fault_state_Yint)
+
+
+    #----------------------------------------
+    # Dynamic simulation
+    #----------------------------------------
+
+    """
+
+    Gint = real.(pre_fault_state_Yint)
+
+    Bint = imag.(pre_fault_state_Yint)
+
+    """
+
+    #---------------------------------------------------
+    # init
+    #---------------------------------------------------
+
+    state_init_inm =
+        get_state_init_classical_model(
+            init_inm_δ,
+            ωs)
+
+    #---------------------------------------------------
+    ## using an integrator by Pe
+    #---------------------------------------------------
+
+
+    nodes_names =
+        ["bus$(idx)"
+         for idx in all_nodes_idx ]
+
+    gens_nodes_names =
+        nodes_names[gens_nodes_idx]
+
+    #---------------------------------------------------
+
+    ω_idx_in_sol =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    ode_inm_state_sym,
+                nodes_name = gens_nodes_names,
+            vars = [:ω] ))]
+
+
+    δ_idx_in_sol =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    ode_inm_state_sym,
+                 nodes_name =
+                     gens_nodes_names,
+            vars = [:δ] ))]
+
+    #---------------------------------------------------
+
+    ode_inm_fun! = ode_gens_inm_swing!
+
+
+    Pe_inm_pre_fault_state =
+        get_Pe_inm( gens_δ, gens_E,
+                    real.(pre_fault_state_Yint),
+                    imag.(pre_fault_state_Yint) )
+
+    Pe_inm_fault_state =
+        get_Pe_inm( gens_δ, gens_E,
+                    real.(fault_state_Yint),
+                    imag.(fault_state_Yint))
+
+    Pe_inm_post_fault_state =
+        get_Pe_inm( gens_δ, gens_E,
+                    real.(post_fault_state_Yint),
+                    imag.(post_fault_state_Yint) )
+
+
+    Pe = Pe_inm_pre_fault_state
+
+    Δω_prefault = zeros(length(Pe))
+
+
+    ΔPe_per_gen_pre_to_fault = Pe_inm_fault_state -
+        Pe_inm_pre_fault_state
+
+    ΔPe_pre_to_fault = sum( ΔPe_per_gen_pre_to_fault )
+
+
+    ΔPe_per_gen_fault_to_post = Pe_inm_post_fault_state -
+        Pe_inm_fault_state
+
+    ΔPe_fault_to_post = sum( ΔPe_per_gen_fault_to_post )
+
+
+    # gens_Rp_pu =
+    #     [0.20802246703713934,
+    #      0.3905527696614445,
+    #      0.5537725038617006]
+
+    # Rpu = gens_Rp_pu
+
+    Rpu = 0.05 .* ones( length(Pe) )
+
+    βpu = sum( inv.( Rpu ) )
+
+    Δfpu_post_fault =  -1/βpu * ΔPe 
+
+    Δf_post_fault  = Δfpu_post_fault * freq
+
+    Δω_post_fault =  Δf_post_fault * 2 * pi
+
+    Δgens_Pe = Δfpu_post_fault .* -inv.(Rpu)
+
+    #-------------------------------
+
+    Δω = Δω_prefault
+
+    gens_Tm = copy(Pe)
+
+    ode_gens_inm_para =
+        (;Δω,
+         gens_Tm,
+         Pe)
+
+    gens_D = copy(gens_D_old)
+
+    # gens_D = 0.01 .* copy(gens_D)
+
+    ode_gens_inm_kwd_para =
+        (gens_H,
+         gens_D,
+         ωs,
+         state_vars_idx )
+
+    system_integrator =
+        DifferentialEquations.init(
+            ODEProblem(
+                ODEFunction(
+                    (dx,x,p,t) ->
+                        ode_inm_fun!(
+                            dx, x,
+                            ode_gens_inm_para, t;
+                            kwd_para =
+                                ode_gens_inm_kwd_para);
+                    syms =
+                        ode_inm_state_sym ),
+                state_init_inm,
+                sim_timespan,
+                ode_gens_inm_para ),
+            ode_alg,
+            tstops = [ time_final ],
+            abstol = abstol,
+            reltol = reltol,
+            # dt = dt,
+            advance_to_tstop = true )
+
+    ####
+
+
+    add_tstop!(system_integrator,
+               on_fault_time - 0.010 )
+
+    DifferentialEquations.step!(
+        system_integrator)
+
+    ω_t1 = (system_integrator.t,
+            system_integrator(
+        system_integrator.t)[
+            ω_idx_in_sol])
+
+    δ_t1 = (system_integrator.t,
+            system_integrator(
+        system_integrator.t)[
+            δ_idx_in_sol])
+
+    # step 1: fault
+
+
+    add_tstop!(system_integrator,
+               on_fault_time )
+
+    system_integrator.p.Pe .=
+        Pe_inm_fault_state
+
+    DifferentialEquations.step!(
+        system_integrator)
+
+    ω_t2 = (system_integrator.t, system_integrator(
+        system_integrator.t )[
+            ω_idx_in_sol])
+
+    δ_t2 = (system_integrator.t, system_integrator(
+        system_integrator.t)[
+            δ_idx_in_sol])
+
+    # step 3: post fault
+
+    add_tstop!(system_integrator,
+               clear_fault_time)
+
+    system_integrator.p.Pe .=
+        Pe_inm_post_fault_state
+
+    DifferentialEquations.step!(
+        system_integrator)
+
+    ω_t3 = (system_integrator.t, system_integrator(
+        system_integrator.t)[
+            ω_idx_in_sol])
+
+    δ_t3 = (system_integrator.t, system_integrator(
+        system_integrator.t)[
+            δ_idx_in_sol])
+
+
+    add_tstop!(system_integrator,
+               clear_fault_time + 0.5 )
+
+    system_integrator.p.gens_Tm .=
+        Pe_inm_post_fault_state
+
+    DifferentialEquations.step!(
+        system_integrator)
+
+    ω_t4 = (system_integrator.t,
+            system_integrator(
+        system_integrator.t)[
+            ω_idx_in_sol])
+
+    δ_t4 = (system_integrator.t,
+            system_integrator(
+        system_integrator.t)[
+            δ_idx_in_sol])
+
+
+    add_tstop!(system_integrator,
+               clear_fault_time + 4.0 )
+
+    DifferentialEquations.step!(
+        system_integrator)
+
+    ω_t5 = (system_integrator.t, system_integrator(
+        system_integrator.t)[
+            ω_idx_in_sol])
+
+    δ_t5 = (system_integrator.t, system_integrator(
+        system_integrator.t)[
+            δ_idx_in_sol])
+
+    # system_integrator.p.Δω .=
+    #     Δω_post_fault
+
+    # system_integrator.p.Δω .=
+    #     Δomega
+
+    # DifferentialEquations.step!(
+    #     system_integrator)
+
+    # finalise
+
+    DifferentialEquations.solve!(
+        system_integrator)
+
+    system_sol =
+        system_integrator.sol
+
+
+    plt1 = plot(system_sol)
+
+
+    plot_gens_δ_ω =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                system_sol,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:δ, :ω ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+
+    plot_gens_δ =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                system_sol,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:δ ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+    plot_gens_ω =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                system_sol,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:ω ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+
+    #-------------------------------
+
+    omega_final = (system_sol[end])[ ω_idx_in_sol ]
+
+    Δomega = omega_final .- ωs
+
+    Δomega_pu = Δomega ./ωs 
+
+    gens_inv_R = -(ΔPe_per_gen ./ Δomega_pu)
+
+    gens_Rpu = inv.(gens_inv_R)
+
+    # gens_Rp =
+    #     [0.20802246703713934,
+    #      0.3905527696614445,
+    #      0.5537725038617006]
+
+    
+end
+ 
+
+#---------------------------------------------------
+## using an integrator by Yint
+#---------------------------------------------------
+
+# inm_model_syms = ode_inm_state_sym
+
+function get_net_fault_pertubation_by_Yint( )
+
+    list_network_status =
+        [:pre_fault_state,
+         :fault_state,
+         :post_fault_state ]
+
+    dict_status_Yint_Yred =
+        Dict{Symbol, NamedTuple }()
+
+    for a_system_status in list_network_status
+
+        dict_status_Yint_Yred[a_system_status] =
+            get_a_status_Yint_Yred(
+            ;
+            # pre_fault_state = true,
+            # fault_state = false,
+            # post_fault_state = false,
+
+            system_status = a_system_status,
+
+            case_name = case_name,
+            timespan      = 20.0,
+            on_fault_time = 9.0,
+            clear_fault_time = 9.001,
+
+            with_faults = false,
+
+            list_fault_point_from_node_a = [0.3],
+            list_fault_resistance = [0.001],
+            list_no_line_circuit =  [1],
+
+            list_edges_to_have_fault = [ 2 ],
+            clear_fault_selection_list = [1],
+
+            basekV = basekV ,    
+            use_pu_in_PQ = use_pu_in_PQ,
+            line_data_in_pu = line_data_in_pu,
+            json_net_data_by_components_file =
+                json_net_data_by_components_file)
+    end
+
+    status_Yint_and_Yred_matrices =
+        NamedTupleTools.namedtuple(
+            dict_status_Yint_Yred)
+
+    (;pre_fault_state,
+     fault_state,
+     post_fault_state) =
+         NamedTupleTools.select(
+             status_Yint_and_Yred_matrices,
+             (:pre_fault_state,
+              :fault_state,
+              :post_fault_state))
+
+    pre_fault_state_Yint =
+        getproperty(
+            pre_fault_state,
+            :Y_internal_nodes)
+
+
+    fault_state_Yint =
+        getproperty(
+            fault_state,
+            :Y_internal_nodes)
+
+    post_fault_state_Yint =
+        getproperty(
+            post_fault_state,
+            :Y_internal_nodes)
+
+    gens_vh = vh[gens_nodes_idx]
+
+    gens_θh = θh[gens_nodes_idx] 
+
+    #----------------------------------------    
+    #----------------------------------------    
+
+    selected_gens_paras_by_vec =
+        get_selected_vec_nt_to_vec_vec(
+            getproperty(
+                ode_plants_kwd_para,
+                :generic_gens_para),
+            nothing;
+            selections = (:D, :H, :xℓ, :X_d_dash),
+            vec_datatype =
+                Float64 )
+
+    (gens_H,
+     gens_D,
+     X_d_dash) =
+        NamedTupleTools.select(
+            selected_gens_paras_by_vec,
+            (:H,
+             :D,
+             :X_d_dash))
+
+
+    nt_init_inm =
+        get_init_gens_classical_model(
+            gens_vh,
+            gens_θh,
+            pf_P_gens,
+            pf_Q_gens,
+            X_d_dash)
+
+    (gens_δ,
+     gens_E) =
+        NamedTupleTools.select(
+            get_selected_vec_nt_to_vec_vec(
+                nt_init_inm, nothing;
+                selections = (:δ, :E)),
+                (:δ, :E) )
+
+    init_inm_δ =
+        get_selected_vec_nt_to_vec_vec(
+            nt_init_inm,
+            nothing;
+            selections = (:δ, ) )
+
+    (
+     gens_Tm,
+     gens_i_d,
+     gens_i_q ) =
+        get_selected_vec_nt_to_vec_vec(
+            nt_init_inm,
+            nothing;
+            selections =
+                (:Tm, :i_d, :i_q ) )
+
+
+    state_vars_syms_inm =
+        [:δ, :ω ]
+
+    ode_inm_state_sym =
+        generate_labels_by_nodes_idxs_and_vars(
+            gens_nodes_idx,
+            state_vars_syms_inm;
+            label_prefix = "bus" )
+
+    state_vars_idx =
+      get_idxs_in_flattened_by_nodes_idx_wt_vars_syms(
+            state_vars_syms_inm,
+            gens_nodes_idx )
+
+    #--------------------------
+
+    Pe_inm_pre_fault_state =
+        get_Pe_inm( gens_δ, gens_E, pre_fault_state_Yint )
+
+
+    Pe_inm_fault_state =
+        get_Pe_inm( gens_δ, gens_E, fault_state_Yint )
+
+
+    Pe_inm_post_fault_state =
+        get_Pe_inm( gens_δ, gens_E, post_fault_state_Yint)
+
+
+    #----------------------------------------
+    # Dynamic simulation
+    #----------------------------------------
+
+    """
+
+    Gint = real.(pre_fault_state_Yint)
+
+    Bint = imag.(pre_fault_state_Yint)
+
+    """
+
+    #---------------------------------------------------
+    # init
+    #---------------------------------------------------
+
+    state_init_inm =
+        get_state_init_classical_model(
+            init_inm_δ,
+            ωs)
+
+    #---------------------------------------------------
+    ## using an integrator by Pe
+    #---------------------------------------------------
+
+
+    nodes_names =
+        ["bus$(idx)"
+         for idx in all_nodes_idx ]
+
+    gens_nodes_names =
+        nodes_names[gens_nodes_idx]
+
+
+    ω_idx_in_sol =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    ode_inm_state_sym,
+                nodes_name = gens_nodes_names,
+            vars = [:ω] ))]
+
+
+    δ_idx_in_sol =
+        [idx for idx in first.(
+             get_nodes_state_algb_vars_indices_in_system(
+                ; network_vars_labels =
+                    ode_inm_state_sym,
+                 nodes_name =
+                     gens_nodes_names,
+            vars = [:δ] ))]
+
+
+
+    ode_inm_Yint_fun! =
+    ode_gens_inm_by_Yint_swing!
+
+
+    Yint =
+        pre_fault_state_Yint
+
+    ode_gens_inm_Yint_para =
+        (;gens_δ,
+         gens_E,
+         gens_Tm,
+         Yint)
+
+    gens_para =
+        (gens_H,
+         X_d_dash )
+
+    ode_gens_inm_Yint_kwd_para =
+        (ωs,
+         gens_para,         
+         state_vars_idx,
+         gens_nodes_idx)
+
+
+    system_integrator =
+        DifferentialEquations.init(
+            ODEProblem(
+                ODEFunction(
+                    (dx,x,p,t) ->
+                        ode_inm_Yint_fun!(
+                            dx, x,
+                            ode_gens_inm_Yint_para, t;
+                            kwd_para =
+                                ode_gens_inm_Yint_kwd_para);
+                    syms =
+                        ode_inm_state_sym ),
+                state_init_inm,
+                sim_timespan,
+                ode_gens_inm_Yint_para ),
+            ode_alg,
+            tstops = [ time_final ],
+            abstol = abstol,
+            reltol = reltol,
+            advance_to_tstop = true )
+
+    # step 1: pre fault
+
+    add_tstop!(system_integrator,
+               on_fault_time )
+
+    DifferentialEquations.step!(
+        system_integrator)
+
+    # step 2: fault
+
+
+    system_integrator.p.Yint .=
+        fault_state_Yint
+
+    add_tstop!(system_integrator,
+               clear_fault_time)
+
+    DifferentialEquations.step!(
+        system_integrator)
+
+    # step 3: post fault
+
+    system_integrator.p.Yint .=
+        post_fault_state_Yint
+
+    DifferentialEquations.solve!(
+        system_integrator)
+
+    system_sol =
+        system_integrator.sol
+
+
+    nodes_names =
+        ["bus$(n2s_all_nodes_idx[idx])"
+         for idx in all_nodes_idx ]
+
+    gens_nodes_names =
+        nodes_names[gens_nodes_idx]
+
+
+    plot_gens_δ_ω =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                system_sol,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:δ, :ω ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+
+    plot_gens_δ =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                system_sol,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:δ ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+    plot_gens_ω =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                system_sol,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:ω ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+
+    # --------------------------
+    # --------------------------
+
+    ode_sol_inm =
+        DifferentialEquations.solve(
+            ODEProblem(
+                ODEFunction(
+                    (dx,x,p,t) ->
+                        ode_inm_fun!(
+                            dx, x,
+                            ode_gens_inm_para, t;
+                            kwd_para =
+                                ode_gens_inm_kwd_para);
+                    syms =
+                        ode_inm_state_sym ),
+                state_init_inm,
+                sim_timespan,
+                ode_gens_inm_para ),
+            ode_alg,
+            abstol = abstol,
+            reltol = reltol )
+
+    nodes_names =
+        ["bus$(n2s_all_nodes_idx[idx])"
+         for idx in all_nodes_idx ]
+
+    gens_nodes_names =
+        nodes_names[gens_nodes_idx]
+
+
+    plot_gens_δ_ω =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                ode_sol_inm,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:δ, :ω ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+
+    plot_gens_δ =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                ode_sol_inm,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:δ ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+    plot_gens_ω =
+        make_plot_of_buses_vars_and_norm_ω_if_in_vars(
+            ;sol =
+                ode_sol_inm,
+            network_vars_labels =
+                ode_inm_state_sym,
+            nodes_name = gens_nodes_names,
+            vars = [:ω ],
+            tspan = sim_timespan,
+            fmt = :png)
+
+    
+end
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+
+function get_line_loss_outage_wt_or_no_ref_adjs(
+    outage_type,
+    line_outage_time,
+    generation_adjustment_time;
+    case_name = "case9",
+
+    json_net_data_by_components_file =
+        nothing,
+    components_libs_dir =
+        nothing,
+    data_dir =
+        nothing,
+    
+    with_faults =
+        false,
+    
+    timespan = 20.0,    
+    on_fault_time = 10.0,
+    clear_fault_time = 10.5,
+    
+    list_fault_point_from_node_a = [0.3],
+    list_fault_resistance = [0.001],
+    list_no_line_circuit = [1],
+
+    list_edges_to_have_fault = [ 8 ],
+    clear_fault_selection_list = [1],
+    
+    basekV = 1.0,    
+    use_pu_in_PQ = true,
+    line_data_in_pu = true,
+    list_network_status =
+        nothing,
+    
+    use_init_u0 = false,
+
+    use_nlsolve = false,
+
+    dt = 0.0001,
+
+    Δt = 1.0 / 2^(4),
+
+    pf_alg = NewtonRaphson(),
+
+    ode_alg = Rodas4(),
+
+    # ode_alg = ImplicitMidpoint()
+
+    dae_alg = IDA(),
+
+    abstol = 1e-12,
+
+    reltol = 1e-12 )
+
+    #----------------------------------
+    
+    # if components_libs_dir == nothing
+
+    #     components_libs_dir =
+    #         joinpath(@__DIR__,"..","..",
+    #                  "src",
+    #                  "components-lib")
+    # end
+    
+
+    # if data_dir == nothing
+
+    #     data_dir =
+    #         joinpath(@__DIR__,"..","..",
+    #                  "src","data-dir",
+    #                  "converted_data" )
+        
+    # end
+    
+    # json_case_dir =
+    #     joinpath( data_dir, case_name, "json")
+
+    # if json_net_data_by_components_file == nothing
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  "net_data_by_components_file.json")
+    # else
+
+    #     net_data_by_components_file =
+    #         joinpath(json_case_dir,
+    #                  json_net_data_by_components_file)
+
+    # end
+
+        
+    if (components_libs_dir == "") || (
+        components_libs_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        src_dir =
+            joinpath( package_dir, "src")
+        
+        components_libs_dir =
+            joinpath(
+                src_dir,
+                "components-lib")
+
+    end
+    
+    if (data_dir == "") || (data_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+        
+        data_dir =
+            joinpath( package_dir, "data")
+
+
+    end
+
+    case_data_dir =
+        joinpath( data_dir,
+                  "converted-data",
+                  case_name,)
+    
+    json_case_dir =
+        joinpath(case_data_dir,
+                  "json")
+
+    
+    if (json_net_data_by_components_file == "") || (
+        json_net_data_by_components_file == nothing)
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                "net_data_by_components_file.json")
+    else
+
+        net_data_by_components_file =
+            joinpath(
+                json_case_dir,
+                json_net_data_by_components_file)
+
+    end
+
+    #---------------------------------------------------
+    # Simulation Period
+    #---------------------------------------------------
+
+    time_final = timespan
+
+    # dt = 0.0001
+
+    # Δt = 1.0 / 2^(4)
+
+    tspan = (0.0, timespan)
+
+    sim_timespan  = (0.0, timespan)
+
+    plot_timespan = (0.0, timespan)
+
+    #---------------------------------------------------
+    ## solvers and settings
+    #---------------------------------------------------
+
+    # use_init_u0 = false
+
+    # use_nlsolve = false
+
+    # pf_alg = NewtonRaphson()
+
+    # #---------------------------------------------------
+
+    # ode_alg = Rodas4()
+
+    # # ode_alg = ImplicitMidpoint()
+
+    # dae_alg = IDA()
+
+    # abstol = 1e-12
+
+    # reltol = 1e-12
+
+    #---------------------------------------------------
+
+    ntuple_status_steady_state_data =
+        get_ntuple_status_steady_state_data(
+            ;with_faults =
+                with_faults,
+            net_data_by_components_file =
+                net_data_by_components_file,
+            components_libs_dir =
+                components_libs_dir,
+
+            timespan =
+                timespan,
+            on_fault_time =
+                on_fault_time,
+            clear_fault_time =
+                clear_fault_time,
+
+            list_fault_point_from_node_a =
+                list_fault_point_from_node_a,
+            list_fault_resistance =
+                list_fault_resistance,
+            list_no_line_circuit =
+                list_no_line_circuit,
+
+            list_edges_to_have_fault =
+                list_edges_to_have_fault,
+            clear_fault_selection_list =
+                clear_fault_selection_list,
+
+            basekV =
+                basekV,    
+            use_pu_in_PQ =
+                use_pu_in_PQ,
+            line_data_in_pu =
+                line_data_in_pu,
+            list_network_status =
+                list_network_status)
+
+        #---------------------------------------------------
+
+    return get_line_loss_outage_wt_or_no_ref_adjs(
+        outage_type,
+        ntuple_status_steady_state_data,
+        line_outage_time,
+        generation_adjustment_time;
+        sim_timespan =
+            sim_timespan,    
+        dae_alg =
+            dae_alg,
+        abstol  =
+            abstol,
+        reltol  =
+            reltol )
+    
+end
+
+
+function get_line_loss_outage_wt_or_no_ref_adjs(
+    outage_type,
+    
+    on_fault_time,
+    clear_fault_time,
+    
+    line_outage_time,
+    generation_adjustment_time,
+    
+    net_data_by_components_file;
+
+    timespan = 20.0,    
+    
+    with_faults =
+        false,    
+    
+    components_libs_dir =
+        nothing,
+    
+    data_dir =
+        nothing,
+        
+    list_fault_point_from_node_a = [0.3],
+    list_fault_resistance = [0.001],
+    list_no_line_circuit  = [1],
+
+    list_edges_to_have_fault   = [ 8 ],
+    clear_fault_selection_list = [1],
+    
+    basekV          = 1.0,    
+    use_pu_in_PQ    = true,
+    line_data_in_pu = true,
+
+    use_init_u0 = false,
+    use_nlsolve = false,
+    
+    list_network_status =
+        nothing,
+
+    pf_alg  = NewtonRaphson(),
+    ode_alg = Rodas4(),
+    dae_alg = IDA(),
+
+    abstol = 1e-12,
+    reltol = 1e-12,
+
+    dt = 0.0001,
+    Δt = 1.0 / 2^(4) )
+
+    #---------------------------------------------------
+    # Simulation Period
+    #---------------------------------------------------
+
+    time_final    = timespan
+
+    tspan         = (0.0, timespan)
+
+    sim_timespan  = (0.0, timespan)
+
+    plot_timespan = (0.0, timespan)
+
+    #---------------------------------------------------
+    ## solvers and settings
+    #---------------------------------------------------
+
+    ntuple_status_steady_state_data =
+        get_ntuple_status_steady_state_data(
+            ;with_faults =
+                with_faults,
+            net_data_by_components_file =
+                net_data_by_components_file,
+            components_libs_dir =
+                components_libs_dir,
+
+            timespan =
+                timespan,
+            on_fault_time =
+                on_fault_time,
+            clear_fault_time =
+                clear_fault_time,
+
+            list_fault_point_from_node_a =
+                list_fault_point_from_node_a,
+            list_fault_resistance =
+                list_fault_resistance,
+            list_no_line_circuit =
+                list_no_line_circuit,
+
+            list_edges_to_have_fault =
+                list_edges_to_have_fault,
+            clear_fault_selection_list =
+                clear_fault_selection_list,
+
+            basekV =
+                basekV,    
+            use_pu_in_PQ =
+                use_pu_in_PQ,
+            line_data_in_pu =
+                line_data_in_pu,
+            list_network_status =
+                list_network_status )
+
+        #---------------------------------------------------
+
+    return get_line_loss_outage_wt_or_no_ref_adjs(
+        outage_type,
+        ntuple_status_steady_state_data,
+        line_outage_time,
+        generation_adjustment_time;
+        sim_timespan =
+            sim_timespan,    
+        dae_alg =
+            dae_alg,
+        abstol  =
+            abstol,
+        reltol  =
+            reltol )
+    
+end
+
+
+function get_line_loss_outage_wt_or_no_ref_adjs(
+    outage_type,
+    ntuple_status_steady_state_data,
+    line_outage_time,
+    generation_adjustment_time;
+    # :line_outage_wt_pref_adjs
+    # :line_outage_wt_vpref_adjs
+    # outage_type = :line_outage,
+    sim_timespan = (0.0, 20),    
+    dae_alg = IDA(),
+    abstol  = 1e-12,
+    reltol  = 1e-12 )
+
+    (;state_labels,
+     algebraic_vars_labels,
+     
+     dyn_pf_fun_kwd_n2s_idxs,
+     dyn_pf_fun_kwd_net_idxs,
+
+     system_fault_status,
+     generic_system_dynamics_wt_fault_kwd_para,
+     on_fault_net_para,
+     cleared_selected_lines_faults_net_para,
+
+     ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+
+     model_bool_dae_vars_wt_fault,
+     model_syms_wt_fault,         
+     u0_model_states_init_wt_fault,
+
+     cb_states,
+     plants_cb_paras_switches,
+
+     nodes_names,
+     gens_nodes_names,
+     non_gens_nodes_names,
+     SM_gens_nodes_names,
+     SC_gens_nodes_names,
+
+     ωref0_vref0_porder0_id_iq_vh_Idx,
+     dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
+
+     dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+
+     edges_r,
+     edges_x,
+     edges_b,
+     edges_ratio,
+     edges_angle,
+     edges_type,
+     Gs,
+     Bs,
+     Ybr_cal_and_edges_orientation,
+     Ynet_wt_nodes_idx_wt_adjacent_nodes) =
+        NamedTupleTools.select(
+            getproperty(
+                getproperty(
+                    ntuple_status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),        
+            (:state_labels,
+             :algebraic_vars_labels,
+             :dyn_pf_fun_kwd_n2s_idxs,
+             :dyn_pf_fun_kwd_net_idxs,
+             
+             :system_fault_status,
+             :generic_system_dynamics_wt_fault_kwd_para,
+             :on_fault_net_para,
+             :cleared_selected_lines_faults_net_para,
+
+             :ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+
+             :model_bool_dae_vars_wt_fault,
+             :model_syms_wt_fault,         
+             :u0_model_states_init_wt_fault,
+
+             :cb_states,
+             :plants_cb_paras_switches,
+
+             :nodes_names,
+             :gens_nodes_names,
+             :non_gens_nodes_names,
+             :SM_gens_nodes_names,
+             :SC_gens_nodes_names,
+
+             :ωref0_vref0_porder0_id_iq_vh_Idx,
+             :dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
+
+             :dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+
+             :edges_r,
+             :edges_x,
+             :edges_b,
+             :edges_ratio,
+             :edges_angle,
+             :edges_type,
+             :Gs,
+             :Bs,
+             :Ybr_cal_and_edges_orientation,
+             :Ynet_wt_nodes_idx_wt_adjacent_nodes))
+
+    #----------------------------------------
+
+    # po := post_outage
+    
+    (po_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,) =
+        NamedTupleTools.select(
+            getproperty(
+                getproperty(
+                    ntuple_status_steady_state_data,
+                    :post_fault_state),
+                :dynamic_status_paras),
+            (:ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,))
+
+    #----------------------------------------
+    #----------------------------------------
+
+    (Ynet, ) =
+         NamedTupleTools.select(
+        Ynet_wt_nodes_idx_wt_adjacent_nodes,
+             (:Ynet, ) )
+
+    #----------------------------------------
+
+    (fault_Ynet,
+     post_fault_Ynet) =
+        NamedTupleTools.select(
+        cleared_selected_lines_faults_net_para,
+            (:pre_clear_fault_Ynet,
+             :post_clear_fault_Ynet, ))
+
+    #----------------------------------------
+    (;dyn_ω_ref_Idx,
+     dyn_v_ref_Idx,
+     dyn_p_order_Idx,
+     dyn_Png_Idx,
+     dyn_Qng_Idx,
+     dyn_Pll_Idx,
+     dyn_Qll_Idx ) =
+         NamedTupleTools.select(
+             dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+             (:dyn_ω_ref_Idx,
+              :dyn_v_ref_Idx,
+              :dyn_p_order_Idx,
+              :dyn_Png_Idx,
+              :dyn_Qng_Idx,
+              :dyn_Pll_Idx,
+              :dyn_Qll_Idx))
+
+    #---------------------------------------
+
+    @show system_fault_status
+    
+    if system_fault_status[1] != 0
+
+        system_fault_status[1] = 0
+        
+    end
+    
+    #---------------------------------------
+    #---------------------------------------
+    # line loss with only porder_adj
+    #---------------------------------------
+    #---------------------------------------
+        
+    cb_line_outage = DiscreteCallback(
+        (u, t, integrator) ->
+            on_line_outage_condition(
+                u, t, integrator,
+                line_outage_time),
+
+       on_line_outage_affect!;
+        save_positions=(true, true),
+        initializealg =
+            ShampineCollocationInit() )
+
+    cb_outage_set =
+        CallbackSet(cb_line_outage,)
+
+    tstop_outage =
+        [line_outage_time]
+
+    
+    if outage_type == :line_outage_wt_pref_adjs
+
+        gens_porder_adj =
+            po_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+                dyn_p_order_Idx]
+
+        cb_gens_porder_adjustment = DiscreteCallback(
+            (u, t, integrator) ->
+                on_generation_adjustment_condition(
+                    u, t, integrator,
+                    generation_adjustment_time),
+
+            (integrator) ->
+                on_generation_adjustment_affect!(
+                    integrator,
+                    gens_porder_adj,
+                    dyn_p_order_Idx );
+            save_positions=(true, true),
+            initializealg =
+                ShampineCollocationInit() )
+
+
+        cb_outage_set =
+            CallbackSet(cb_line_outage,
+            cb_gens_porder_adjustment)
+
+        tstop_outage =
+            [line_outage_time,
+             generation_adjustment_time]
+
+        
+    elseif outage_type == :line_outage_wt_vpref_adjs
+
+        vref_and_porder_Idx =
+            [ dyn_v_ref_Idx; dyn_p_order_Idx]
+
+        vref_and_porder_adj =
+            po_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+                vref_and_porder_Idx]
+        
+        cb_vref_and_porder_adj = DiscreteCallback(
+            (u, t, integrator) ->
+                on_generation_adjustment_condition(
+                    u, t, integrator,
+                    generation_adjustment_time),
+
+            (integrator) ->
+                on_generation_adjustment_affect!(
+                integrator,
+                vref_and_porder_adj,
+                vref_and_porder_Idx);
+            save_positions=(true, true),
+            initializealg =
+                ShampineCollocationInit() )
+
+        cb_outage_set =
+            CallbackSet(cb_line_outage,
+            cb_vref_and_porder_adj)
+
+        tstop_outage =
+            [line_outage_time,
+             generation_adjustment_time]
+        
+    else # :line_outage
+
+        nothing
+    end
+    
+    #---------------------------------------
+
+    generic_model_dynamics_para =
+        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll
+
+    model_dynamics_para =
+        (;generic_model_dynamics_para,
+         Ynet,
+         fault_Ynet,
+         post_fault_Ynet,
+         system_fault_status,
+         plants_cb_paras_switches)
+
+    model_dynamics_kwd_para =
+        generic_system_dynamics_wt_fault_kwd_para
+
+    #----------------------------------------
+
+    model_bool_dae_vars =
+        model_bool_dae_vars_wt_fault
+
+    model_syms =
+        model_syms_wt_fault
+
+    u0_model_states_init =
+        u0_model_states_init_wt_fault
+
+    #----------------------------------------
+
+    du0_model_states_init =
+        zeros( length( u0_model_states_init ))
+
+    res = similar( u0_model_states_init )
+
+    #----------------------------------------
+    
+    system_dynamics_fun! =
+        line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+
+    #----------------------------------------
+    
+    system_sol =
+        DifferentialEquations.solve(
+            DAEProblem(
+        DAEFunction(
+            (res, dx, x, p, t) ->
+                system_dynamics_fun!(
+                    res, dx, x,
+                    model_dynamics_para,
+                    t;
+                    kwd_para =
+                        model_dynamics_kwd_para);
+            syms =
+                model_syms),
+                du0_model_states_init,
+                u0_model_states_init,
+                sim_timespan,
+                model_dynamics_para,
+                differential_vars =
+                    model_bool_dae_vars,
+                callback =
+                    cb_states),
+            dae_alg,
+            callback =
+                cb_outage_set,
+            tstops =
+                tstop_outage,
+            abstol = abstol,
+            reltol = reltol )
+
+    return (;system_sol,
+            model_syms,
+            gens_nodes_names,
+            SM_gens_nodes_names,
+            non_gens_nodes_names,
+            sim_timespan,
+
+            state_labels,
+            algebraic_vars_labels,
+     
+            dyn_pf_fun_kwd_n2s_idxs,
+            dyn_pf_fun_kwd_net_idxs,
+
+            edges_r,
+            edges_x,
+            edges_b,
+            edges_ratio,
+            edges_angle,
+            edges_type,
+            Gs,
+            Bs,
+            Ybr_cal_and_edges_orientation,
+            Ynet_wt_nodes_idx_wt_adjacent_nodes,
+            ntuple_status_steady_state_data )    
+end
+
+
+
+# ------------------------------------------------------
+# ------------------------------------------------------

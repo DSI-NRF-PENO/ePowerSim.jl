@@ -1,0 +1,771 @@
+# ####################################################
+# using Pkg
+# PowerSystemsCoSim_folder = joinpath(@__DIR__,"../..")
+# cd(PowerSystemsCoSim_folder)
+# Pkg.activate(PowerSystemsCoSim_folder)
+
+
+#---------------------------------------------------
+# global settings
+#---------------------------------------------------
+
+freq = 60
+
+Ωb = 2 * pi * freq
+
+ωs = Ωb 
+
+ω_ref0 = ωs
+
+#---------------------------------------------------
+
+#---------------------------------------------------
+
+using Pkg
+
+using ePowerSim
+
+
+#---------------------------------------------------
+
+package_dir = pkgdir(ePowerSim)
+
+
+data =
+    joinpath( package_dir, "data")
+
+data_dir = joinpath(data,
+             "converted-data")
+src_dir =
+    joinpath(package_dir, "src")
+
+components_libs_dir =
+    joinpath(src_dir,
+             "components-lib")
+
+script_dir = @__DIR__
+
+
+# using PDMats
+
+#---------------------------------------------------
+## simulation case
+#---------------------------------------------------
+
+# case_name = "case14"
+
+case_name = "case9"
+
+timespan  = 50.0
+
+sim_type  = "Ynet-network-pertubation"
+
+json_net_data_by_components_file =
+    "net-static-data-avr-sauer-gov-sauer.json"
+
+#---------------------------------------------------
+
+# function sim_network_Ynet_pertubation(
+#     ;case_name,
+#     timespan,
+#     sim_type,
+#     json_net_data_by_components_file)
+
+
+#     cd(script_dir)
+
+#     results_dir =
+#         joinpath(
+#             script_dir,
+#             "results",
+#             sim_type)
+
+#     if !(isdir(results_dir))
+
+#         mkpath(results_dir)
+
+#     end
+
+#     figure_dir =
+#         joinpath(
+#             script_dir,
+#             "figure",
+#             sim_type)
+
+#     if !(isdir(figure_dir))
+
+#         mkpath(figure_dir)
+
+#     end
+
+
+#     # json_net_data_by_components_file =
+#     #     "net-static-data-avr-sauer-gov-sauer.json"
+
+
+#     components_libs_dir =
+#         joinpath(script_dir,"..","..","src",
+#                  "components-lib")
+
+#     data_dir =
+#         joinpath(
+#             script_dir,
+#             "..","..","src",
+#             "data-dir",
+#             "converted_data" )
+
+#     json_case_dir =
+#         joinpath(
+#             data_dir,
+#             case_name,
+#             "json")
+
+#     if json_net_data_by_components_file == nothing
+
+#         net_data_by_components_file =
+#             joinpath(
+#                 json_case_dir,
+#                 "net_data_by_components_file.json")
+#     else
+
+#         net_data_by_components_file =
+#             joinpath(
+#                 json_case_dir,
+#                 json_net_data_by_components_file)
+
+#     end
+
+#     sd_dynamics_sim_csv_filename =
+#         joinpath(
+#             results_dir,
+#             "$(case_name)-" *
+#                 "$(sim_type)-" *
+#                 "sim-sd-dynamics.csv")
+
+#     #---------------------------------------------------
+#     ## system fault states
+#     #---------------------------------------------------
+
+
+#     """
+
+#     # Possible system_status
+
+#     system_status = :pre_fault_state,
+#     system_status = :fault_state
+#     system_status = :post_fault_state
+
+#     """
+
+#     #---------------------------------------------------
+#     ## fault data
+#     #---------------------------------------------------
+
+#     on_fault_time = 9.0
+#     clear_fault_time = 9.04
+#     with_faults = false
+
+#     list_fault_point_from_node_a = [0.01]
+#     list_fault_resistance = [0.001]
+#     list_no_line_circuit =  [1]
+
+#     list_edges_to_have_fault = [ 8 ]
+#     clear_fault_selection_list = [1]
+
+#     #---------------------------------------------------
+#     # base setting and some booleans 
+#     #---------------------------------------------------
+
+#     basekV = 1.0
+
+#     use_pu_in_PQ = true
+
+#     line_data_in_pu = true
+
+#     #---------------------------------------------------
+#     # Simulation Period
+#     #---------------------------------------------------
+
+#     time_start    = 0.0
+
+#     time_final    = timespan
+
+#     dt            = 0.0001
+
+#     Δt            = 1.0 / 2^(4)
+
+#     tspan         = (0.0, timespan)
+
+#     sim_timespan  = (0.0, timespan)
+
+#     plot_timespan = (0.0, timespan)
+
+#     #---------------------------------------------------
+#     ## solvers and settings
+#     #---------------------------------------------------
+
+#     use_init_u0 = false
+
+#     use_nlsolve = false
+
+#     pf_alg      = NewtonRaphson()
+
+#     #---------------------------------------------------
+
+#     ode_alg       = Rodas4()
+
+#     # ode_alg       = ImplicitMidpoint()
+
+#     dae_alg       = IDA()
+
+#     abstol        = 1e-12
+
+#     reltol        = 1e-12
+
+#     #---------------------------------------------------
+#     ## ntuple_status_steady_state_data
+#     #---------------------------------------------------
+
+#     ntuple_status_steady_state_data =
+#         get_ntuple_status_steady_state_data(
+#         ;with_faults = with_faults,
+#         net_data_by_components_file =
+#             net_data_by_components_file,
+#         components_libs_dir =
+#             components_libs_dir,
+
+#             timespan =
+#                 timespan,
+#             on_fault_time =
+#                 on_fault_time,
+#             clear_fault_time =
+#                 clear_fault_time,
+
+#             list_fault_point_from_node_a =
+#                 list_fault_point_from_node_a,
+#             list_fault_resistance =
+#                 list_fault_resistance,
+#             list_no_line_circuit =
+#                 list_no_line_circuit,
+
+#             list_edges_to_have_fault =
+#                 list_edges_to_have_fault,
+#             clear_fault_selection_list =
+#                 clear_fault_selection_list,
+
+#             basekV =
+#                 basekV,    
+#             use_pu_in_PQ =
+#                 use_pu_in_PQ,
+#             line_data_in_pu =
+#                 line_data_in_pu)
+
+
+#     (s_pf_P_gens,
+#      s_pf_Q_gens,
+#      s_vh,
+#      s_θh,
+#      s_gens_vh,
+#      s_gens_θh,
+#      s_gens_id,
+#      s_gens_iq,
+
+#      s_gens_mag_E,
+#      s_gens_ang_E,
+#      s_post_sta_PQ,
+#      s_Yred,
+#      s_Yint,
+
+#      s_ω_ref, s_v_ref, s_p_order,
+#      s_gens_i_d, s_gens_i_q,
+
+#      s_flat_vh_flat_θh_id_iq_u0,
+#      s_flat_vh_flat_θh_id_iq_vfh_θfh,
+#      s_gens_δ,
+#      s_gens_ed_dash,
+#      s_gens_eq_dash) =
+#          NamedTupleTools.select(
+#             getproperty(
+#                 getproperty(
+#                     ntuple_status_steady_state_data,
+#                     :pre_fault_state),
+#                 :static_prefault_paras),
+#             (:pf_P_gens,
+#              :pf_Q_gens,
+#              :vh,
+#              :θh,
+#              :gens_vh,
+#              :gens_θh,
+#              :gens_id,
+#              :gens_iq,
+
+#              :gens_mag_E,
+#              :gens_ang_E,
+#              :post_sta_PQ,
+#              :Yred,
+#              :Yint,
+
+#              :ω_ref, :v_ref, :p_order,
+#              :gens_i_d, :gens_i_q,
+
+#              :flat_vh_flat_θh_id_iq_u0,
+#              :flat_vh_flat_θh_id_iq_vfh_θfh,
+#              :gens_δ,
+#              :gens_ed_dash,
+#              :gens_eq_dash ) )
+
+
+#     (f_dyn_pf_P_gens,
+#      f_dyn_pf_Q_gens,
+#      f_dyn_vh,
+#      f_dyn_θh,
+#      f_dyn_gens_vh,
+#      f_dyn_gens_θh,
+#      f_dyn_gens_id,
+#      f_dyn_gens_iq,
+#      f_dyn_gens_mag_E,
+#      f_dyn_gens_ang_E,
+#      f_post_dyn_PQ,
+#      f_dyn_Yred,
+#      f_dyn_Yint,
+#      f_flat_vh_flat_θh_id_iq_vfh_θfh,
+#      f_dyn_gens_δ,
+#      f_dyn_gens_ed_dash,
+#      f_dyn_gens_eq_dash) =
+#          NamedTupleTools.select(
+#             getproperty(
+#                 getproperty(
+#                     ntuple_status_steady_state_data,
+#                     :fault_state),
+#                 :dynamic_status_paras),
+#             (:dyn_pf_P_gens,
+#              :dyn_pf_Q_gens,
+#              :dyn_vh,
+#              :dyn_θh,
+#              :dyn_gens_vh,
+#              :dyn_gens_θh,
+#              :dyn_gens_id,
+#              :dyn_gens_iq,
+#              :dyn_gens_mag_E,
+#              :dyn_gens_ang_E,
+#              :post_dyn_PQ,
+#              :dyn_Yred, :dyn_Yint,
+#              :flat_vh_flat_θh_id_iq_vfh_θfh,
+#              :dyn_gens_δ,
+#              :dyn_gens_ed_dash,
+#              :dyn_gens_eq_dash ) )
+
+#     #----------------------------------------
+
+#     (p_dyn_pf_P_gens,
+#      p_dyn_pf_Q_gens,
+#      p_dyn_vh,
+#      p_dyn_θh,
+#      p_dyn_gens_vh,
+#      p_dyn_gens_θh,
+#      p_dyn_gens_id,
+#      p_dyn_gens_iq,
+#      p_dyn_gens_mag_E,
+#      p_dyn_gens_ang_E,
+#      p_post_dyn_PQ,
+#      p_dyn_Yred,
+#      p_dyn_Yint,
+#      p_flat_vh_flat_θh_id_iq_vfh_θfh,
+#      p_dyn_gens_δ,
+#      p_dyn_gens_ed_dash,
+#      p_dyn_gens_eq_dash) =
+#          NamedTupleTools.select(
+#             getproperty(
+#                 getproperty(
+#                     ntuple_status_steady_state_data,
+#                     :post_fault_state),
+#                 :dynamic_status_paras),
+#             (:dyn_pf_P_gens,
+#              :dyn_pf_Q_gens,
+#              :dyn_vh,
+#              :dyn_θh,
+#              :dyn_gens_vh,
+#              :dyn_gens_θh,
+#              :dyn_gens_id,
+#              :dyn_gens_iq,
+#              :dyn_gens_mag_E,
+#              :dyn_gens_ang_E,
+#              :post_dyn_PQ,
+#              :dyn_Yred, :dyn_Yint,
+#              :flat_vh_flat_θh_id_iq_vfh_θfh,
+#              :dyn_gens_δ,
+#              :dyn_gens_ed_dash,
+#              :dyn_gens_eq_dash) )
+
+#     #----------------------------------------
+#     #----------------------------------------
+
+#     # static_prefault_paras =
+#     #     getproperty(
+#     #         getproperty(
+#     #             ntuple_status_steady_state_data,
+#     #             :pre_fault_state),
+#     #             :static_prefault_paras)
+
+#     fault_paras =
+#         getproperty(
+#             getproperty(
+#                 ntuple_status_steady_state_data,
+#                 :fault_state),
+#             :dynamic_status_paras)
+
+#     post_fault_paras =
+#         getproperty(
+#             getproperty(
+#                 ntuple_status_steady_state_data,
+#                 :post_fault_state),
+#             :dynamic_status_paras)
+
+#     (;system_fault_status,
+#      generic_system_dynamics_wt_fault_kwd_para,
+#      Ynet_wt_nodes_idx_wt_adjacent_nodes,
+#      on_fault_net_para,
+#      cleared_selected_lines_faults_net_para,
+
+#      model_bool_dae_vars_wt_fault,
+#      model_syms_wt_fault,         
+#      u0_model_states_init_wt_fault,
+
+#      nodes_names,
+#      gens_nodes_names,
+#      non_gens_nodes_names,
+#      SM_gens_nodes_names,
+#      SC_gens_nodes_names) =
+#         NamedTupleTools.select(
+#             getproperty(
+#                 getproperty(
+#                     ntuple_status_steady_state_data,
+#                     :pre_fault_state),
+#                 :static_prefault_paras),        
+#             (:system_fault_status,
+#              :generic_system_dynamics_wt_fault_kwd_para,
+#              :Ynet_wt_nodes_idx_wt_adjacent_nodes,
+#              :on_fault_net_para,
+#              :cleared_selected_lines_faults_net_para,
+
+#              :model_bool_dae_vars_wt_fault,
+#              :model_syms_wt_fault,         
+#              :u0_model_states_init_wt_fault,
+
+#              :nodes_names,
+#              :gens_nodes_names,
+#              :non_gens_nodes_names,
+#              :SM_gens_nodes_names,
+#              :SC_gens_nodes_names))
+
+#     #----------------------------------------
+
+#     (Ynet, ) =
+#          NamedTupleTools.select(
+#         Ynet_wt_nodes_idx_wt_adjacent_nodes,
+#              (:Ynet, ) )
+
+#     #----------------------------------------
+
+#     (faulty_Ynet,
+#      faulty_nodes_idx_with_adjacent_nodes_idx) =
+#         NamedTupleTools.select(
+#         on_fault_net_para,
+#             (:faulty_Ynet,
+#              :faulty_nodes_idx_with_adjacent_nodes_idx))
+
+#     (fault_Ynet,
+#      post_fault_Ynet) =
+#         NamedTupleTools.select(
+#         cleared_selected_lines_faults_net_para,
+#             (:pre_clear_fault_Ynet,
+#              :post_clear_fault_Ynet,))
+
+#     mismatch_faulty_fault_Ynet =
+#         map(x -> round.(x; digits=4),
+#             [t1_array - t2_array
+#              for (t1_array, t2_array) in
+#                  zip(faulty_Ynet,
+#                      fault_Ynet)])
+
+#     t_Ynet =
+#         map(x -> round.(x; digits=4),
+#             Ynet)
+
+#     t_faulty_Ynet =
+#         map(x -> round.(x; digits=4),
+#             faulty_Ynet)
+
+#     t_post_fault_Ynet =
+#         map(x -> round.(x; digits=4),
+#             post_fault_Ynet)
+
+#     #----------------------------------------
+#     # DAE system dyamanics simulation
+#     #----------------------------------------
+
+#     cb_on_fault = DiscreteCallback(
+#         (u, t, integrator) ->
+#             on_fault_condition(
+#                 u, t, integrator,
+#                 on_fault_time),
+
+#         on_fault_Ynet_affect!; 
+#         save_positions=(true,true),
+#         initializealg =
+#             ShampineCollocationInit() )
+
+#     cb_clear_fault = DiscreteCallback(
+#         (u, t, integrator) ->
+#             clear_fault_condition(
+#                 u, t, integrator,
+#                 clear_fault_time),
+
+#        clear_fault_Ynet_affect!;
+#         save_positions=(true,true),
+#         initializealg =
+#             ShampineCollocationInit())
+
+#     #--------------------------------------
+
+#     cb_faults = CallbackSet(
+#         cb_on_fault,
+#         cb_clear_fault)
+
+#     #----------------------------------------
+
+#     model_dynamics_para =
+#         (;ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+#          Ynet,
+#          fault_Ynet,
+#          post_fault_Ynet,
+#          system_fault_status )          
+
+#     model_dynamics_kwd_para =
+#         generic_system_dynamics_wt_fault_kwd_para
+
+#     system_dynamics_fun! =
+#         Ynet_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+
+#     #----------------------------------------
+
+#     model_bool_dae_vars =
+#         model_bool_dae_vars_wt_fault
+
+#     model_syms =
+#         model_syms_wt_fault
+
+#     u0_model_states_init =
+#         u0_model_states_init_wt_fault
+
+#     #----------------------------------------
+
+#     du0_model_states_init =
+#         zeros(length(u0_model_states_init))
+
+#     res = similar(u0_model_states_init)
+
+#     #----------------------------------------
+
+#     faults_and_clear_times =
+#         [on_fault_time,
+#          clear_fault_time]
+
+#     #----------------------------------------
+
+#     system_sol =
+#         DifferentialEquations.solve(
+#             DAEProblem(
+#         DAEFunction(
+#         (res, dx, x, p, t) ->
+#             system_dynamics_fun!(
+#                 res, dx, x,
+#                 model_dynamics_para,
+#                 t;
+#                 kwd_para =
+#                     model_dynamics_kwd_para);
+#         syms =
+#             model_syms),
+#         du0_model_states_init,
+#         u0_model_states_init,
+#         sim_timespan,
+#         model_dynamics_para,
+#         differential_vars =
+#             model_bool_dae_vars ),
+#             dae_alg,
+#             callback = cb_faults,
+#             tstops = faults_and_clear_times,
+#             abstol = abstol,
+#             reltol = reltol )
+
+
+# end
+
+# #---------------------------------------------------
+# #---------------------------------------------------
+
+# sim_network_Ynet_pertubation(
+#     ;case_name,
+#     timespan,
+#     sim_type,
+#     json_net_data_by_components_file)
+
+
+
+
+
+
+
+
+
+#---------------------------------------------------
+# case model 
+#---------------------------------------------------
+
+# fault_status =
+#     (no_fault = 0,
+#      on_fault = 1,
+#      clear_fault = 2,
+#      partial_clear_fault = 3)
+
+# system_fault_status =
+#     [ fault_status.no_fault]
+
+#---------------------------------------------------
+
+# list_network_status = list_system_status =
+#     [:pre_fault_state,
+#      :fault_state,
+#      :post_fault_state]
+
+#     list_network_status = 
+#         [:pre_fault_state,
+#          :fault_state,
+#          :post_fault_state ]
+
+
+# dict_status_steady_state_data =
+#     Dict{Symbol, NamedTuple }()
+
+# for a_system_status in list_network_status
+
+#     dict_status_steady_state_data[a_system_status] =
+#         get_a_status_steady_state_data(
+#             a_system_status;
+#             with_faults = true,
+#             # case_name = "case9",
+#             net_data_by_components_file =
+#                 net_data_by_components_file,
+#             components_libs_dir =
+#                 components_libs_dir,
+
+#             timespan      = timespan,
+#             on_fault_time = on_fault_time,
+#             clear_fault_time = clear_fault_time,    
+
+#             list_fault_point_from_node_a =
+#                 list_fault_point_from_node_a,
+#             list_fault_resistance =
+#                 list_fault_resistance,
+#             list_no_line_circuit =
+#                 list_no_line_circuit,
+
+#             list_edges_to_have_fault =
+#                 list_edges_to_have_fault,
+#             clear_fault_selection_list =
+#                 clear_fault_selection_list,
+
+#             basekV = basekV,    
+#             use_pu_in_PQ =
+#                 use_pu_in_PQ,
+#             line_data_in_pu =
+#                 line_data_in_pu)
+
+# end
+
+# status_steady_state_data =
+#     NamedTupleTools.namedtuple(
+#         dict_status_steady_state_data)
+
+
+
+# timespan   = 50
+
+
+# generic_network_fault_pertubation_plot =
+#     get_guick_group_vars_plots_dae_or_ode_sol(
+#         ;include_v_θ_plot =
+#             false,
+#          sim_timespan =
+#              (0, timespan),
+#          get_generic_network_fault_pertubation(
+#              ;case_name = "case9",
+#              timespan   = timespan,
+
+#              on_fault_time = 5.0,
+#              clear_fault_time = 7.0,
+
+#              list_fault_point_from_node_a = [0.3],
+#              list_fault_resistance = [0.001],
+#              list_no_line_circuit =  [1],
+
+#              list_edges_to_have_fault = [ 8 ],
+#              clear_fault_selection_list = [1],
+
+#              basekV = 1.0,    
+#              use_pu_in_PQ = true,
+#              line_data_in_pu = true,
+
+#              with_faults =
+#                  false,
+#              use_state_in_on_clear_fault =
+#                  false,
+#              return_extended_results =
+#                  false,
+
+#              json_net_data_by_components_file =
+#                  json_net_data_by_components_file,
+#              components_libs_dir =
+#                  components_libs_dir,
+#              data_dir =
+#                  data_dir )...)
+
+
+# save_network_pertubation_sim_plot(
+#     "case9";
+#     sim_timespan = (0, timespan),
+#     figure_dir,
+#     sim_type = "network-pertubation",
+#     line_in_fault_name = "line-8",
+#     get_generic_network_fault_pertubation_by_cb(
+#              ;case_name = "case9",
+#              timespan   = timespan,
+
+#              on_fault_time = 5.0,
+#              clear_fault_time = 7.0,
+
+#              list_fault_point_from_node_a = [0.3],
+#              list_fault_resistance = [0.001],
+#              list_no_line_circuit =  [1],
+
+#              list_edges_to_have_fault = [ 8 ],
+#              clear_fault_selection_list = [1],
+
+#              basekV = 1.0,    
+#              use_pu_in_PQ = true,
+#              line_data_in_pu = true,
+
+#              with_faults =
+#                  false,
+#              use_state_in_on_clear_fault =
+#                  false,
+#              return_extended_results =
+#                  false,
+
+#              json_net_data_by_components_file =
+#                  json_net_data_by_components_file,
+#              components_libs_dir =
+#                  components_libs_dir,
+#              data_dir =
+#                  data_dir )...)
+

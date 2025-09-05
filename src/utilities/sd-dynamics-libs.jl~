@@ -1,0 +1,1674 @@
+# (C) 2024 Power, Energy, Networks and Optimisation Research Group, Unisa, authors and contributors (see AUTHORS file)
+# Licensed under GNU GPL v3 (see LICENSE file)
+
+# AA Yusuff : yusufaa@unisa.ac.za
+
+# Sauer: section 6.4:  pg 135 - 136, 6.121 - 6.123
+
+####################################################
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+
+
+"""
+`get_dynamic_components_parameters_libs_from_json`
+
+Returns parameters of dynamic devices in the
+package parameters library.
+
+The function is a dual of
+`create_dynamic_components_parameters_libs_json`requires,
+
+"""
+function get_dynamic_components_parameters_libs_from_json(
+    ;components_libs_dir = "")
+
+    #--------------------------------------
+
+    if components_libs_dir == ""
+
+        components_libs_dir =
+            joinpath(@__DIR__,"..","..","src",
+                     "components-lib" )
+    end
+        
+    #--------------------------------------
+    #--------------------------------------
+
+    sub_components_strings =
+        ["avrs", "govs",  "pss",
+         "gens", "loads", "lines"]
+
+    (avrs_libs_dir,
+     govs_libs_dir,
+     pss_libs_dir,
+     gens_libs_dir,
+     loads_libs_dir,
+     lines_libs_dir) =
+         get_sub_components_libs_dir(
+             components_libs_dir,
+             sub_components_strings )
+    
+    #--------------------------------------
+
+    components_files_string =
+        ["avrs-libs",  "govs-libs",
+         "pss-libs",   "gens-libs",
+         "loads-libs", "lines-libs" ]
+
+    (avrs_type_libs_file_json,
+     govs_type_libs_file_json,
+     pss_type_libs_file_json,
+     gens_type_libs_file_json,
+     loads_type_libs_file_json,
+     lines_type_libs_file_json) =
+        get_sub_components_libs_files(
+            components_libs_dir,
+            components_files_string;
+            ext = "json" )
+
+    #--------------------------------------
+
+    parameters_libs_files_strings =
+        ["avrs-parameters-libs",
+         "govs-parameters-libs",
+         "pss-parameters-libs",
+         "gens-dyn-parameters-libs"]
+
+    (avrs_parameters_libs_file_json,
+     govs_parameters_libs_file_json,
+     pss_parameters_libs_file_json,
+     gens_dyn_parameters_libs_file_json ) =
+        get_sub_components_libs_files(
+            components_libs_dir,
+            parameters_libs_files_strings;
+            ext = "json" )
+
+    #--------------------------------------
+
+    # gov_json_data_file =
+    #     joinpath(json_data_dir,
+    #              "dict_gov_nt_params.json") 
+
+    # avr_json_data_file =
+    #     joinpath(json_data_dir,
+    #              "dict_avr_nt_params.json") 
+
+    # gens_nt_dynamic_params_json_data_file =
+    #     joinpath(json_data_dir,
+    #              "gens_nt_dynamic_params.json") 
+
+    # sym_gens_dynamic_params_json_data_file =
+    #     joinpath(json_data_dir,
+    #              "sym_gens_dynamic_params.json") 
+
+    # dict_gens_dyn_nt_params_json_data_file =
+    #     joinpath(json_data_dir,
+    #              "dict_gens_dyn_nt_params.json") 
+    
+    #--------------------------------------
+    
+    dict_plants_gen_sym_type =
+        get_abstract_type_dict_subtypes(
+            SdGenPlant )
+
+    dict_gen_sym_type =
+        get_abstract_type_dict_subtypes(
+            SdGen )
+
+    dict_gov_sym_type =
+        get_abstract_type_dict_subtypes(
+            SdGov )
+
+    dict_avr_sym_type =
+        get_abstract_type_dict_subtypes(
+            SdAvr )
+
+    dict_pss_sym_type =
+        get_abstract_type_dict_subtypes(
+            SdPss )
+    
+    #--------------------------------------
+    
+    dict_gens_dyn_nt_params =
+        get_dict_nt_params_from_json_lib_file(
+            gens_dyn_parameters_libs_file_json )    
+    
+    dict_gov_nt_params =
+        get_dict_nt_params_from_json_lib_file(
+            govs_parameters_libs_file_json)
+    
+    dict_avr_nt_params =
+        get_dict_nt_params_from_json_lib_file(
+            avrs_parameters_libs_file_json)
+    
+    dict_pss_nt_params =
+        get_dict_nt_params_from_json_lib_file(
+            pss_parameters_libs_file_json)
+    
+    #--------------------------------------
+    #--------------------------------------
+
+    return (;dict_plants_gen_sym_type,
+            
+            dict_gen_sym_type,
+            dict_gens_dyn_nt_params,
+
+            dict_gov_sym_type,
+            dict_gov_nt_params,
+
+            dict_avr_sym_type,
+            dict_avr_nt_params,
+
+            dict_pss_sym_type,
+            dict_pss_nt_params)
+
+end
+
+
+#--------------------------------------
+
+"""
+Creation of parameters for dynamic device requires,
+providing a descriptive symbolic name for the device
+sybolic name and naming a parameters set of the device
+using a specific notation.
+
+Creation of a device such as an automatic voltage regualtor
+from Sauer and Pai texbook can easily be done by naming the
+device `:avr_t1_cb_sauer`. The naming convention for the name of a
+ parameter set is `symbolic_name__number_param`, e.g
+`:avr_t1_cb_sauer__1_param`.
+
+The rationale for the design pattern is to split the name
+of each parameter set by "__". This will give two substrings
+ "symbolic_name", and  "number_param".
+
+The first substring is the name of a specific component, hence the
+device typeof a parameter set can easily be infered.
+
+Parameter sets are stored in a dictionary using the symbolic
+name of parameter set as the key and parameter set in
+form of a named tuple as the value.
+
+`Dict(symbolic_name__number_param =>
+      parameter_set_namedtuple )`
+
+A specific example is as follows:
+
+    avr_t1_cb_sauer__1_param =
+        (V_R_max = 5.2,  V_R_min = -4.16, 
+         Ka      = 20,    Ta     = 0.2,
+         Kf      = 0.063, Tf     = 0.35,
+         Ke      = 1.0,   Te     = 0.314,
+         Tr      = 0.001, Ae     = 0.0039,
+         Be      = 1.555)
+
+
+    avr_t1_cb_sauer__2_param =
+        (V_R_max = 5.0,  V_R_min = -5.0,    
+          Ka     = 20,     Ta    = 0.2,
+          Kf     = 0.063,  Tf    = 0.35,
+          Ke     = 1.0,    Te    = 0.314,
+          Tr     = 0.001,  Ae    = 0.0039,
+          Be     = 1.555)
+
+`Dict(:avr_t1_cb_sauer__1_param =>
+       avr_t1_cb_sauer__1_param,
+      :avr_t1_cb_sauer__2_param =>
+       avr_t1_cb_sauer__2_param)`
+
+ These symbolic names of parameters set and its parameters set
+are subsequently added to the appropriate lists in component
+parameters library. In the case of avrs, these lists
+are `avr_nt_params_names` and `avr_nt_params` respectively. 
+
+"""
+
+
+#---------------------------------------------------
+
+"""
+`create_dynamic_components_parameters_libs_json`
+
+Creates a json file that contains parameters of dynamic models of
+generators, automatic-voltage regulator, governors, powers
+sytems stabiliers in some appropriate folders under
+`components_libs_dir`.
+
+
+Assistant functions:
+
+ `get_sub_components_libs_dir`: 
+ `get_sub_components_libs_files`
+
+ `create_generators_dynamic_parameters_lib`
+ `create_gov_parameters_lib`
+ `create_avr_parameters_lib`
+ `create_pss_parameters_lib`
+
+"""
+function create_dynamic_components_parameters_libs_json(
+    ;components_libs_dir = "",
+    freq = 60)
+
+    #--------------------------------------
+
+    if components_libs_dir == ""
+
+        components_libs_dir =
+            joinpath(@__DIR__,"..","..","src",
+                     "components-lib" )
+    end
+        
+    #--------------------------------------
+
+    sub_components_strings =
+        ["avrs", "govs",  "pss",
+         "gens", "loads", "lines"]
+
+    (avrs_libs_dir,
+     govs_libs_dir,
+     pss_libs_dir,
+     gens_libs_dir,
+     loads_libs_dir,
+     lines_libs_dir) =
+         get_sub_components_libs_dir(
+             components_libs_dir,
+             sub_components_strings )
+    
+    #--------------------------------------
+
+    components_files_string =
+        ["avrs-libs",  "govs-libs",
+         "pss-libs",   "gens-libs",
+         "loads-libs", "lines-libs" ]
+
+    (avrs_type_libs_file_json,
+     govs_type_libs_file_json,
+     pss_type_libs_file_json,
+     gens_type_libs_file_json,
+     loads_type_libs_file_json,
+     lines_type_libs_file_json) =
+        get_sub_components_libs_files(
+            components_libs_dir,
+            components_files_string;
+            ext = "json" )
+
+    #--------------------------------------
+
+    parameters_libs_files_strings =
+        ["avrs-parameters-libs",
+         "govs-parameters-libs",
+         "pss-parameters-libs",
+         "gens-dyn-parameters-libs"
+         ]
+
+    (avrs_parameters_libs_file_json,
+     govs_parameters_libs_file_json,
+     pss_parameters_libs_file_json,
+     gens_dyn_parameters_libs_file_json
+     ) =
+        get_sub_components_libs_files(
+            components_libs_dir,
+            parameters_libs_files_strings;
+            ext = "json" )
+
+    #--------------------------------------
+
+    create_generators_dynamic_parameters_lib(
+    ; type_file = gens_dyn_parameters_libs_file_json,
+        freq = freq)
+
+    
+    create_gov_parameters_lib(
+        ; type_file =
+            govs_parameters_libs_file_json )
+
+    create_avr_parameters_lib(
+        ; type_file = avrs_parameters_libs_file_json )
+
+    create_pss_parameters_lib(
+        ; type_file = pss_parameters_libs_file_json )
+
+
+    # #--------------------------------------
+    # # Read back the library
+    # #--------------------------------------
+    
+    # dict_gens_dyn_nt_params =
+    #     get_dict_nt_params_from_json_lib_file(
+    #         gens_dyn_parameters_libs_file_json )    
+    
+    # dict_gov_nt_params =
+    #     get_dict_nt_params_from_json_lib_file(
+    #         govs_parameters_libs_file_json)
+    
+    # dict_avr_nt_params =
+    #     get_dict_nt_params_from_json_lib_file(
+    #         avrs_parameters_libs_file_json)
+    
+    # dict_pss_nt_params =
+    #     get_dict_nt_params_from_json_lib_file(
+    #         pss_parameters_libs_file_json)
+    
+    #--------------------------------------
+    
+end
+
+#--------------------------------------
+# Gens
+#--------------------------------------
+
+"""
+`create_generators_dynamic_parameters_lib`
+
+Crerates a json file that contains parameters of dynamic models of
+generators. Values of some parameters of some generators are already
+defined in the function. This can be extended by adding parameters
+values and symbolic name of the generator type.
+
+It creates a dictionary that associates the symbolic name of a
+generator type with its dyanamic parameters. The dictionary is
+subsequently written to a json file for persistence.
+
+"""
+function create_generators_dynamic_parameters_lib(
+    ;type_file = gens_dyn_parameters_libs_file_json,
+    freq = 60)
+    
+    freq = freq
+    Ωb   = 2 * pi * freq
+    ωs   = 2 * pi * freq # 1.0
+
+    sauer_H1 = 23.64
+    sauer_H2 = 6.4
+    sauer_H3 = 3.01
+
+    sauer_M1 = 2*sauer_H1 / ωs
+    sauer_M2 = 2*sauer_H2 / ωs
+    sauer_M3 = 2*sauer_H3 / ωs
+
+    # See the last sentence on page 165
+
+    sauer_D1 = 0.1 * sauer_M1 # D1 = 0.01254
+    sauer_D2 = 0.2 * sauer_M2 # D2 = 0.00679
+    sauer_D3 = 0.3 * sauer_M3 # D3 = 0.00479
+
+    #--------------------------------------
+    # IEEE Bus 5
+    #--------------------------------------
+
+    gen_static_paras_ieee_5 =
+        [(Bus="bus1", P=0.845,vh=1.02, Y_n=0.0),
+         (Bus="bus4", P=1.0, vh=1.05, Y_n=0.5,) ]
+
+    gen_dynamic_paras_ieee_5 =
+        [(D = 2.0, H = 6.54, Ωb = Ωb, ωs = ωs,
+          ra = 0.0031, xℓ  = 0.0, X_d = 1.05, X_q = 0.98,
+          X_d_dash  = 0.185, X_q_dash  = 0.36,
+          X_d_2dash = 0.13, X_q_2dash = 0.13,
+          T_d_dash  = 6.1, T_q_dash  = 0.3,
+          T_d_2dash = 0.04, T_q_2dash = 0.099) ]
+
+
+    sym_gen_dynamic_paras_ieee_5 =
+        [:gen_dynamic_paras_ieee_5]
+
+
+    gen_static_paras_ieee_9 =
+        [(Bus="bus1", P = 0.716, vh = 1.04,  Y_n = 0.0),
+         (Bus="bus2", P = 1.63,  vh = 1.025, Y_n = 0.0),
+         (Bus="bus3", P = 0.85,  vh = 1.025, Y_n = 0.0 )
+         ]
+
+
+    gen_dynamic_paras_ieee_9 =
+        [(D = 0.01254, H = 23.64, Ωb = 314.159, ωs = ωs,
+          ra = 0.0000, xℓ = 0.01460,
+          X_d = 0.146, X_q = 0.0969,
+          X_d_dash  = 0.0608, X_q_dash  = 0.0969,
+          X_d_2dash = 0.06, X_q_2dash = 0.06,
+          T_d_dash  = 8.96, T_q_dash  = 0.31,
+          T_d_2dash = 0.01, T_q_2dash  = 0.01),
+
+         (D = 0.00679, H = 6.4, Ωb = 314.159, ωs = ωs,
+          ra = 0.0000, xℓ = 0.08958,
+          X_d = 0.8958, X_q = 0.8645,
+          X_d_dash = 0.1198, X_q_dash = 0.1969,
+          X_d_2dash = 0.11, X_q_2dash = 0.11,
+          T_d_dash  = 6.0, T_q_dash = 0.535,
+          T_d_2dash = 0.01, T_q_2dash = 0.01),
+
+         (D  = 0.00479, H = 3.01, Ωb = 314.159, ωs = ωs,
+          ra = 0.0000, xℓ = 0.13125,
+          X_d = 1.3125, X_q = 1.2578,
+          X_d_dash = 0.1813, X_q_dash = 0.25,
+          X_d_2dash = 0.18, X_q_2dash = 0.18,
+          T_d_dash = 5.89, T_q_dash = 0.60,
+          T_d_2dash = 0.01, T_q_2dash = 0.01),
+
+         (D = 0.0, H = 23.64, Ωb = 314.159, ωs = ωs,
+          ra = 0.000125, xℓ = 0.01460,
+          X_d = 0.146, X_q = 0.1,
+          X_d_dash = 0.0608, X_q_dash = 0.0969,
+          X_d_2dash = 0.06, X_q_2dash = 0.06,
+          T_d_dash = 8.96, T_q_dash = 0.31,
+          T_d_2dash = 0.01, T_q_2dash  = 0.01),
+
+         (D = 0.0, H = 6.4, Ωb = 314.159, ωs = ωs,
+          ra = 0.000125, xℓ = 0.08958,
+          X_d = 0.8958, X_q = 0.8645,
+          X_d_dash = 0.1198, X_q_dash = 0.1969,
+          X_d_2dash = 0.11, X_q_2dash = 0.11,
+          T_d_dash = 6.0, T_q_dash  = 0.535,
+          T_d_2dash = 0.01, T_q_2dash = 0.01),
+
+         (D = 0.0, H = 3.01, Ωb = 314.159, ωs = ωs, ra = 0.000125,
+          xℓ  = 0.13125, X_d = 1.3125, X_q = 1.2578,
+          X_d_dash = 0.1813, X_q_dash  = 0.25,
+          X_d_2dash = 0.18, X_q_2dash = 0.18,
+          T_d_dash = 5.89, T_q_dash = 0.60,
+          T_d_2dash = 0.01, T_q_2dash = 0.01)
+         ]
+
+
+    sym_gen_dynamic_paras_ieee_9 =
+        [:gen_dynamic_paras_ieee_9_sauer_1,
+         :gen_dynamic_paras_ieee_9_sauer_2,
+         :gen_dynamic_paras_ieee_9_sauer_3,
+         
+         :gen_dynamic_paras_ieee_9_rscad_1,
+         :gen_dynamic_paras_ieee_9_rscad_2,
+         :gen_dynamic_paras_ieee_9_rscad_3]
+
+
+    gen_static_paras_ieee_14 =
+        [(Bus="bus1", P = 2.324, vh = 1.06,  Y_n = 0.0),
+         (Bus="bus2", P = 0.4,   vh = 1.045, Y_n = 0.0),
+         (Bus="bus3", P = 0.0,   vh = 1.01,  Y_n = 0.0),
+         (Bus="bus6", P = 0.0,   vh = 1.07,  Y_n = 0.0),
+         (Bus="bus8", P = 0.0,   vh = 1.09,  Y_n = 0.0)
+         ]
+
+    gen_dynamic_paras_ieee_14 =
+        [(D = 0.0, H = 3.41, Ωb = Ωb, ωs = ωs,
+          xℓ = 0.1450, ra = 0.000125,
+          X_d = 1.7241, X_d_dash = 0.2586,
+          X_d_2dash = 0.2029, T_d_dash = 3.8260,
+          T_d_2dash = 0.0225, X_q = 1.6587,
+          X_q_dash = 0.4524, X_q_2dash = 0.2029,
+          T_q_dash = 0.5084, T_q_2dash = 0.0225),
+
+         (D = 0.0, H = 5.148, Ωb = Ωb, ωs = ωs,
+          xℓ = 0.2396, ra = 0,
+          X_d = 0.8979, X_d_dash = 0.2995, X_d_2dash = 0.23,
+          T_d_dash = 7.4, T_d_2dash = 0.03,
+          X_q = 0.646, X_q_dash = 0.646, X_q_2dash = 0.4,
+          T_q_dash = 0.3, T_q_2dash = 0.033),
+
+         (D = 0.0, H = 6.54, Ωb = Ωb, ωs = ωs, xℓ = 0.0, ra = 0.0031,
+          X_d = 1.05, X_d_dash = 0.185, X_d_2dash = 0.13,
+          T_d_dash = 6.1, T_d_2dash = 0.04, X_q = 0.98,
+          X_q_dash = 0.36, X_q_2dash = 0.13,
+          T_q_dash = 0.3, T_q_2dash = 0.099),
+
+         (D = 2.0, H = 5.06, Ωb = Ωb, ωs = ωs, xℓ = 0.134,
+          ra = 0.0041, X_d = 1.25, X_d_dash = 0.232,
+          X_d_2dash = 0.12, T_d_dash = 4.75, T_d_2dash = 0.06,
+          X_q = 1.22, X_q_dash = 0.715, X_q_2dash = 0.12,
+          T_q_dash = 1.5, T_q_2dash = 0.21) ]
+
+
+    sym_gen_dynamic_paras_ieee_14 =
+        [:gen_dynamic_paras_ieee_14_a,
+         :gen_dynamic_paras_ieee_14_b,
+         :gen_dynamic_paras_ieee_14_c,
+         :gen_dynamic_paras_ieee_14_d ]
+
+    #--------------------------------------
+
+    gens_nt_dynamic_params =
+        [gen_dynamic_paras_ieee_5;
+         gen_dynamic_paras_ieee_9;
+         gen_dynamic_paras_ieee_14 ]
+
+    sym_gens_dynamic_params =
+        [sym_gen_dynamic_paras_ieee_5;
+         sym_gen_dynamic_paras_ieee_9;
+         sym_gen_dynamic_paras_ieee_14]
+
+    dict_gens_dyn_nt_params =
+        Dict{Symbol, NamedTuple}(
+            a_sym => a_nt_para_to_dict
+            for (a_sym, a_nt_para_to_dict) in
+                zip(sym_gens_dynamic_params,
+                    gens_nt_dynamic_params ))
+
+    #--------------------------------------
+
+    json_dict_gens_dyn_nt_params =
+        JSON.json(dict_gens_dyn_nt_params)
+
+    #--------------------------------------
+    # write
+    #--------------------------------------
+
+    open(type_file, "w") do io
+        JSON3.pretty(io, json_dict_gens_dyn_nt_params)
+    end
+
+    #--------------------------------------
+    
+end
+
+#--------------------------------------
+# gov
+#--------------------------------------
+
+
+"""
+`create_gov_parameters_lib`
+
+Crerates a json file that contains parameters of dynamic models of
+governors. Values of some parameters of some governors are already
+defined in the function. This can be extended by adding parameters
+values and symbolic name of the governor type.
+
+It creates a dictionary that associates the symbolic name of a
+governor type with its dyanamic parameters. The dictionary is
+subsequently written to a json file for persistence.
+
+"""
+function create_gov_parameters_lib(
+    ;type_file =
+        govs_parameters_libs_file_json )
+    
+    #--------------------------------------
+    # gov_ieee_tgov1_cb
+
+    gov_ieee_tgov1_cb__overby_param =
+        (T1    = 0.2,
+         T2    = 2.39,
+         T3    = 7.0,
+         Dt    = 0.0,
+         p_min = -5.0,
+         p_max = 5.0,
+         R     = 0.05)
+
+    gov_ieee_tgov1_cb__sauer_param =
+        (T1    = 0.2,
+         T2    = 2.1,
+         T3    = 7.0,
+         Dt    = 0.0,
+         p_min = -5.0,
+         p_max = 5.0,
+         R     = 0.05)    
+
+    gov_ieee_tgov1_cb__rscad_param =
+        (T1    = 0.49,
+         T2    = 2.1,
+         T3    = 7.0,
+         Dt    = 0.0,
+         p_min = 0.0,
+         p_max = 15.0,
+         R     = 0.05)     
+
+    gov_ieee_tgov1_cb__a_param =
+        (T1    = 0.05,
+         T2    = 2.1,
+         T3    = 7.0,
+         Dt    = 0.0,
+         p_min = -5.0,
+         p_max = 5.0,
+         R     = 0.05)
+
+    gov_ieee_tgov1_cb__param =
+        (T1    = 0.49,
+         T2    = 2.1,
+         T3    = 7.0,
+         Dt    = 0.0,
+         p_min = 0.0,
+         p_max = 15.0,
+         R     = 0.05)
+
+    gov_ieee_tgov1_cb__1_param =
+        (T1    = 0.49,
+         T2    = 2.1,
+         T3    = 7.0,
+         Dt    = 0.0,
+         p_min = 0.0,
+         p_max = 15.0,
+         R     = 0.05)     
+
+    gov_ieee_tgov1_cb__3_param =
+        (T1    = 0.05,
+         T2    = 2.1,
+         T3    = 7.0,
+         Dt    = 0.0,
+         p_min = -5.0,
+         p_max = 5.0,
+         R     = 0.05)
+
+    # gov_t0_cb, gov_t1_cb, 
+
+    gov_t1_cb__millano_param =
+        (T3    = 0.0,
+         T4    = 0.0,
+         T5    = 50.0,
+         Tc    = 0.45,
+         Ts    = 0.1,
+         p_max = 1.2,
+         p_min = 0.3,
+         R     = 0.02 )
+
+    gov_t1_cb__1_param =
+        (T3    = 0.0,
+         T4    = 0.0,
+         T5    = 50.0,
+         Tc    = 0.45,
+         Ts    = 0.1,
+         p_max = 2.2,
+         p_min = 0.1,
+         R     = 0.02)
+
+
+    gov_t1_cb__ieee_5_param =
+        (T3    = 0.0,
+         T4    = 0.0,
+         T5    = 50.0,
+         Tc    = 0.45,
+         Ts    = 0.1,
+         p_max = 1.2,
+         p_min = 0.3,
+         R     = 0.02)
+
+
+    # gov_t1_cb_sauer
+
+    gov_t1_cb_sauer__1_param =
+        (Tc    = 0.4,
+         Ts    = 0.2,
+         p_max = 2.2,
+         p_min = 0.1,
+         R     = 0.02)
+    
+
+    # gov_t1_cb_sauer__2_param =
+    #     (R     = 0.02,
+    #      Ts    = 0.2,
+    #      Tc    = 0.4,
+    #      p_max = 2.2,
+    #      p_min = 0.1 )        
+
+    #--------------------------------------
+
+    # gov_nt_params_names, gov_nt_params =  @macro_get_list_items_name_and_value [gov_ieee_tgov1_cb__overby_param,
+    #      gov_ieee_tgov1_cb__sauer_param,
+    #      gov_ieee_tgov1_cb__rscad_param,
+    #      gov_ieee_tgov1_cb__a_param,
+    #      gov_ieee_tgov1_cb__param,
+    #      gov_ieee_tgov1_cb__1_param,
+    #      gov_ieee_tgov1_cb__3_param,
+    #      gov_t1_cb__millano_param,
+    #      gov_t1_cb__1_param,
+    #      gov_t1_cb_sauer__1_param,
+    #        gov_t1_cb__ieee_5_param]
+
+    gov_nt_params =
+        [gov_ieee_tgov1_cb__overby_param,
+         gov_ieee_tgov1_cb__sauer_param,
+         gov_ieee_tgov1_cb__rscad_param,
+         gov_ieee_tgov1_cb__a_param,
+         gov_ieee_tgov1_cb__param,
+         gov_ieee_tgov1_cb__1_param,
+         gov_ieee_tgov1_cb__3_param,
+         gov_t1_cb__millano_param,
+         gov_t1_cb__1_param,
+         gov_t1_cb_sauer__1_param,
+         gov_t1_cb__ieee_5_param]
+    
+    gov_nt_params_names =
+        [:gov_ieee_tgov1_cb__overby_param,
+         :gov_ieee_tgov1_cb__sauer_param,
+         :gov_ieee_tgov1_cb__rscad_param,
+         :gov_ieee_tgov1_cb__a_param,
+         :gov_ieee_tgov1_cb__param,
+         :gov_ieee_tgov1_cb__1_param,
+         :gov_ieee_tgov1_cb__3_param,
+         :gov_t1_cb__millano_param,
+         :gov_t1_cb__1_param,
+         :gov_t1_cb_sauer__1_param,
+         :gov_t1_cb__ieee_5_param]
+
+
+    #--------------------------------------
+
+    dict_gov_nt_params = Dict{Symbol, NamedTuple}(
+        a_sym => a_nt_para_to_dict
+        for (a_sym, a_nt_para_to_dict) in
+            zip(gov_nt_params_names,
+                gov_nt_params))
+    
+    #--------------------------------------
+
+    json_dict_gov_nt_params =
+        JSON.json(dict_gov_nt_params)
+
+    #--------------------------------------
+    # write
+    #--------------------------------------
+
+    open(type_file, "w") do io
+        JSON3.pretty(io, json_dict_gov_nt_params)
+    end
+
+    #--------------------------------------
+    #--------------------------------------
+    
+    
+end
+
+#--------------------------------------
+# avr
+#--------------------------------------
+
+
+"""
+`create_avr_parameters_lib`
+
+Crerates a json file that contains parameters of dynamic models of
+avr. Values of some parameters of some avr are already
+defined in the function. This can be extended by adding parameters
+values and symbolic name of the avr type.
+
+It creates a dictionary that associates the symbolic name of a
+avr type with its dyanamic parameters. The dictionary is
+subsequently written to a json file for persistence.
+
+"""
+function create_avr_parameters_lib(
+    ; type_file = avrs_parameters_libs_file_json )
+    
+    #--------------------------------------
+    # avr_t0_cb, avr_t1_cb, avr_t1_cb_sauer,
+    # avr_t1_with_pss_cb
+
+    avr_t1_cb_sauer__1_param =
+        (V_R_max = 5.2,  V_R_min = -4.16, 
+         Ka      = 20.0,  Ta     = 0.2,
+         Kf      = 0.063, Tf     = 0.35,
+         Ke      = 1.0,   Te     = 0.314,
+         Tr      = 0.001, Ae     = 0.0039,
+         Be      = 1.555)
+
+
+    avr_t1_cb_sauer__2_param =
+        (V_R_max = 5.0,  V_R_min = -5.0,    
+          Ka     = 20.0,   Ta    = 0.2,
+          Kf     = 0.063,  Tf    = 0.35,
+          Ke     = 1.0,    Te    = 0.314,
+          Tr     = 0.001,  Ae    = 0.0039,
+          Be     = 1.555)
+
+    # avr_t1_cb
+
+    avr_t1_cb__rscad_param =
+        (V_R_max = 5.2,     V_R_min = -4.16, 
+         Ka      = 6.2,   Ta        = 0.05,
+         Kf      = 0.057, Tf        = 0.5,
+         Ke      = 1.0,   Te        = 0.83,
+         Tr      = 0.001, Ae        = 0.005486,
+         Be      = 1.813409)
+
+
+
+    avr_t1_cb__ieee_9_rscad_param =
+        (V_R_max = 5.0,  V_R_min = -5.0, 
+         Ka      = 20.0,  Ta      = 0.2,
+         Kf      = 0.063, Tf      = 0.35,
+         Ke      = 1.0,   Te      = 0.314,
+         Tr      = 0.001, Ae      = 0.005486,
+         Be      = 1.813409)
+
+
+
+    #S_E_max, S_E0_75max = 0.38075 ,  0.07586
+
+    avr_t1_cb__millano_1_param =
+        (V_R_max = 9.9,      V_R_min = 0.0,
+              Ka = 200.0,      Ta     = 0.02,
+              Kf = 0.0012,     Tf     = 1.0,
+              Ke = 1.0,        Te     = 0.19,
+              Tr = 0.001,      Ae     = 0.0006,
+              Be = 0.9)
+
+    # #S_E_max, S_E0_75max = 0.00377, 0.00238
+
+    avr_t1_cb__millano_2_param =
+        (V_R_max = 2.05,       V_R_min = 0.0,
+              Ka = 20.0,       Ta      = 0.02,
+              Kf = 0.001,      Tf      = 1.0,
+              Ke = 1.0,        Te      = 1.98,
+              Tr = 0.001,      Ae      = 0.0006,
+              Be = 0.9)
+
+    # #S_E_max, S_E0_75max = 0.002759, 0.00188
+
+    avr_t1_cb__millano_3_param =
+        (V_R_max = 1.7,       V_R_min = 0.0,
+              Ka = 20.0,      Ta      = 0.02,
+              Kf = 0.001,     Tf      = 1.0,
+              Ke = 1.0,       Te      = 1.98,
+              Tr = 0.001,     Ae      = 0.0006,
+              Be = 0.9)
+
+    # #S_E_max, S_E0_75max = 0.00430, 0.00263
+
+    avr_t1_cb__millano_4_param =
+        (V_R_max = 2.2,       V_R_min = 1.0,
+              Ka = 20.0,      Ta      = 0.02,
+              Kf = 0.001,     Tf      = 1.0,
+              Ke = 1.0,       Te      = 0.7,
+              Tr = 0.001,     Ae      = 0.0006,
+              Be = 0.9)
+
+    # #S_E_max, S_E0_75max = 0.004308, 0.00263
+
+    avr_t1_cb__millano_5_param =
+        (V_R_max = 2.2,       V_R_min = 0.0,
+              Ka = 20.0,      Ta      = 0.02,
+              Kf = 0.001,     Tf      = 1.0,
+              Ke = 1.0,       Te      = 0.7,
+              Tr = 0.001,     Ae      = 0.0006,
+              Be = 0.9)
+
+
+    avr_t1_cb__ieee_5_param =
+        (V_R_max = 2.05,  V_R_min = 0.0,   
+         Ka      = 20.0,  Ta      = 0.02,
+         Kf      = 0.001, Tf      = 1.0,
+         Ke      = 1.0,   Te      = 1.98,
+         Tr      = 0.001, Ae      = 0.0006,
+         Be      = 0.9)
+
+    #--------------------------------------
+
+    avr_nt_params =
+        [avr_t1_cb_sauer__1_param,
+         avr_t1_cb_sauer__2_param,
+         avr_t1_cb__rscad_param,
+         avr_t1_cb__ieee_9_rscad_param,
+         avr_t1_cb__millano_1_param,
+         avr_t1_cb__millano_2_param,
+         avr_t1_cb__millano_3_param,
+         avr_t1_cb__millano_4_param,
+         avr_t1_cb__millano_5_param,
+         avr_t1_cb__ieee_5_param]
+
+    avr_nt_params_names =
+        [:avr_t1_cb_sauer__1_param,
+         :avr_t1_cb_sauer__2_param,
+         :avr_t1_cb__rscad_param,
+         :avr_t1_cb__ieee_9_rscad_param,
+         :avr_t1_cb__millano_1_param,
+         :avr_t1_cb__millano_2_param,
+         :avr_t1_cb__millano_3_param,
+         :avr_t1_cb__millano_4_param,
+         :avr_t1_cb__millano_5_param,
+         :avr_t1_cb__ieee_5_param]
+
+    #--------------------------------------
+
+    dict_avr_nt_params = Dict{Symbol, NamedTuple}(
+        a_sym => a_nt_para_to_dict
+        for (a_sym, a_nt_para_to_dict) in
+            zip(avr_nt_params_names, avr_nt_params))
+
+
+    json_dict_avr_nt_params =
+        JSON.json(dict_avr_nt_params)
+
+    #--------------------------------------
+    # write
+    #--------------------------------------
+
+    open( type_file, "w") do io
+        # JSON3.write(io, json_dict_gov_nt_params)
+        JSON3.pretty(io, json_dict_avr_nt_params)
+    end
+
+    #--------------------------------------
+    #--------------------------------------
+    
+end
+
+#--------------------------------------
+# pss
+#--------------------------------------
+
+
+"""
+`create_pss_parameters_lib(`
+
+Crerates a json file that contains parameters of dynamic models of
+pss. Values of some parameters of some pss are already
+defined in the function. This can be extended by adding parameters
+values and symbolic name of the pss type.
+
+It creates a dictionary that associates the symbolic name of a
+pss type with its dyanamic parameters. The dictionary is
+subsequently written to a json file for persistence.
+
+"""
+function create_pss_parameters_lib(
+    ; type_file = pss_parameters_libs_file_json )
+    
+    #--------------------------------------
+    # pss_t2_cb
+    
+    pss_t2_cb__1_param  =
+        (Kw     = 5.0,    Tw     = 10.0,
+         T1     = 0.28,   T2     = 0.02,
+         T3     = 0.28,   T4     = 0.02,
+         vs_max = 0.1,    vs_min = -0.1)       
+
+    #--------------------------------------
+
+    pss_nt_params =
+        [pss_t2_cb__1_param ]
+
+    pss_nt_params_names =
+        [:pss_t2_cb__1_param ]
+
+    #--------------------------------------
+
+    dict_pss_nt_params = Dict{Symbol, NamedTuple}(
+        a_sym => a_nt_para_to_dict
+        for (a_sym, a_nt_para_to_dict) in
+            zip(pss_nt_params_names, pss_nt_params))
+
+
+    json_dict_pss_nt_params =
+        JSON.json(dict_pss_nt_params)
+
+    #--------------------------------------
+    # write
+    #--------------------------------------
+
+    open( type_file, "w") do io
+        # JSON3.write(io, json_dict_gov_nt_params)
+        JSON3.pretty(io, json_dict_pss_nt_params)
+    end
+
+    
+end
+
+
+#---------------------------------------------------
+#---------------------------------------------------
+
+"""
+`get_StructTypes_exclude_fieldnames`
+
+Returns a set of properties (fieldnames) of a structure that
+are not in non-excluded list.
+
+"""
+function get_StructTypes_exclude_fieldnames(
+    non_exclude_fieldnames, struct_type )
+
+    if typeof(non_exclude_fieldnames[1]) == Symbol
+        return Tuple(
+            setdiff(union([Set(fieldnames(a_subtype))
+                           for a_subtype in
+                               subtypes(struct_type)]...),
+                    Set( non_exclude_fieldnames )))
+    else
+        return Tuple(
+            setdiff(union([Set(fieldnames(a_subtype))
+                           for a_subtype in
+                               subtypes( SdAvr )]...),
+                    union(Set(non_exclude_fieldnames)...)))
+    end
+
+
+end
+
+
+
+function get_sub_Types_exclude_fieldnames()
+
+    
+    init_fieldnames_gov_ieee_tgov1_cb =
+        (:T1, :T2, :T3, :Dt, :p_max,
+         :p_min, :R, :comp_type)
+
+    init_fieldnames_gov_t0_cb =
+        (:T3, :T4, :T5, :Tc, :Ts, :p_max,
+         :p_min, :R, :comp_type)
+
+    init_fieldnames_gov_t1_cb_sauer =
+        (:Tc, :Ts, :p_max, :p_min, :R, :comp_type)
+
+    non_exclude_fieldnames_govs =
+        [init_fieldnames_gov_ieee_tgov1_cb,
+         init_fieldnames_gov_t0_cb,
+         init_fieldnames_gov_t1_cb_sauer]
+    
+    exclude_fieldnames_govs =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_govs, SdGov )
+    
+    #--------------------------------------
+
+    init_fieldnames_avr_t0_cb =
+        (:Ta, :Tf, :Te, :Tr, :Ka, :Ke,
+         :Kf, :V_R_max, :V_R_min, :S_E_max,
+         :S_E0_75max, :Ae, :Be, :comp_type)
+
+    init_fieldnames_avr_t1_cb_sauer =
+        (:Ta, :Tf, :Te, :Tr, :Ka, :Ke,
+         :Kf, :V_R_max, :V_R_min, :S_E_max,
+         :S_E0_75max, :Ae, :Be, :comp_type)
+
+    non_exclude_fieldnames_avrs =
+        [init_fieldnames_avr_t0_cb,
+         init_fieldnames_avr_t1_cb_sauer]
+
+    exclude_fieldnames_avrs =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_avrs, SdAvr )
+
+
+    #--------------------------------------
+    
+    non_exclude_fieldnames_non_gens = (:Bus, :name, :P, :Q, :kPL, :kQL, :Y_n, :vmax, :vmin, :Pmax, :Pmin, :Qmax, :Qmin, :comp_type, :Bus_num, :Bus_type, :loc_P, :loc_Q )
+            
+    exclude_fieldnames_non_gens =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_non_gens,
+            SdNonGen )
+
+    #--------------------------------------
+
+    non_exclude_fieldnames_gens = (:Bus, :name, :P, :D, :H, :Ωb, :ωs, :ra, :xℓ, :X_d, :X_q, :X_d_dash, :X_q_dash, :X_d_2dash, :X_q_2dash, :T_d_dash, :T_q_dash, :T_d_2dash, :T_q_2dash, :αp, :αq, :Y_n, :Q, :Sn, :vh, :θh, :vmax, :vmin, :Pmax, :Pmin, :Qmax, :Qmin, :comp_type, :Bus_num, :Bus_type)
+
+    exclude_fieldnames_gens =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_gens, SdGen )
+
+    #--------------------------------------
+
+    non_exclude_fieldnames_plants_non_gens = (:Load, :Trans, :Bus, :name,  :comp_type, :Bus_num, :Bus_type)
+            
+    exclude_fieldnames_plants_non_gen =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_plants_non_gens,
+            SdNonGenPlant )
+    
+    #--------------------------------------
+
+    non_exclude_fieldnames_plants_gens = (:Gen, :Gov, :Exc, :p_order, :v_ref, :ω_ref, :comp_type, :Bus, :name, :Bus_type, :Bus_num, :with_loc_load, :isa_slack, :isa_condenser )
+            
+    exclude_fieldnames_plants_gens =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_plants_gens,
+            SdGenPlant )
+    
+
+    return (; exclude_fieldnames_govs,
+            exclude_fieldnames_avrs,
+            exclude_fieldnames_non_gens,
+            exclude_fieldnames_gens,
+            exclude_fieldnames_plants_non_gen,
+            exclude_fieldnames_plants_gens )
+end
+
+
+#--------------------------------------
+# Test
+#--------------------------------------
+
+function drivers_and_test()
+
+    #--------------------------------------
+
+    case_name = "case9"
+    
+    components_libs_dir =
+        joinpath(@__DIR__,"..","..","src",
+                 "components-lib")
+
+    data_dir =
+        joinpath(@__DIR__,"..","..","src","data-dir",
+                 "converted_data" )
+    
+    json_case_dir =
+        joinpath( data_dir, case_name, "json")
+
+    json_Dyn_Nodes_Branches_data_file =
+        joinpath(json_case_dir,
+                 "Dyn_Nodes_Branches_data.json")
+
+    json_Dyn_Nodes_Dyn_Branches_data_by_type_file =
+        joinpath(json_case_dir,
+                 "Dyn_Nodes_Branches_data_by_type.json")
+
+    json_Dyn_Nodes_Branches_data_by_components_file =
+        joinpath(json_case_dir,
+                 "json_Dyn_Nodes_Branches_data_by_components.json")
+
+
+    net_data_by_components_file =
+        joinpath(json_case_dir,
+                 "net_data_by_components_file.json")
+    
+    #--------------------------------------
+
+    (; Dyn_Nodes, Dyn_Branches ) =
+        get_Dyn_Nodes_Dyn_Branches_by_mpc(
+            ; case_name = case_name,
+            data_dir = data_dir,
+            components_libs_dir = components_libs_dir
+        )
+    
+    #--------------------------------------
+        
+    dict_Dyn_Nodes_Branches_data =
+        get_Dyn_Nodes_Dyn_Branches_data_by_mpc(
+            ;case_name = "case9",        
+            data_dir = data_dir,
+            components_libs_dir = components_libs_dir )
+
+    
+    json_dict_Dyn_Nodes_Branches_data =
+        JSON.json( dict_Dyn_Nodes_Branches_data)
+
+
+    # write
+    open(json_Dyn_Nodes_Branches_data_file, "w") do io
+        JSON3.pretty(
+            io, json_dict_Dyn_Nodes_Branches_data)
+    end
+
+    #read
+
+    
+    #--------------------------------------
+    #--------------------------------------
+        
+    dict_net_data_by_components =
+        get_net_data_by_components_by_mpc(
+            ;case_name = "case9",        
+            data_dir = data_dir,
+            components_libs_dir =
+                components_libs_dir )
+    
+    json_net_data_by_components =
+        JSON.json( dict_net_data_by_components )
+
+    # write
+    
+    open(net_data_by_components_file, "w") do io
+        JSON3.pretty( io, json_net_data_by_components)
+    end
+    
+    
+
+    # read    
+        
+    # Nodes_Branches_data_by_components_from_json_file =
+    #     JSON3.read(json_Dyn_Nodes_Branches_data_by_components_file )
+
+    # Nodes_Branches_data_by_components = convert(
+    #     OrderedDict{Symbol, Vector},
+    #     copy(Nodes_Branches_data_by_components_from_json_file) )
+    
+    # json_plant_generators =
+    #     convert(Vector{Dict},
+    #             Nodes_Branches_data_by_components[
+    #                 :plant_generators])
+
+
+    # plant_generators_data_from_json =
+    #     get_a_plant_data_json_to_nt.(
+    #         [ namedtuple(a_comp)
+    #           for a_comp in
+    #               json_plant_generators])
+
+
+    Nodes_Branches_data_by_components = convert(
+        OrderedDict{Symbol, Vector},
+        copy(JSON3.read(net_data_by_components_file)))
+     
+    plant_generators_data_from_json =
+        get_a_gen_plant_data_json_to_nt.(
+            [ namedtuple(a_plant_data)
+              for a_plant_data in
+                  convert(Vector{Dict},
+                Nodes_Branches_data_by_components[
+                    :plant_generators])] ;
+            in_components_type_sym = true )
+
+
+    plant_loads_data_from_json =
+        get_a_non_gen_plant_data_json_to_nt.(
+            [ namedtuple(a_plant_data)
+              for a_plant_data in
+                  convert(Vector{Dict},
+                Nodes_Branches_data_by_components[
+                    :plant_loads])] ;
+            in_components_type_sym = true)
+
+
+    plant_transmission_data_from_json =
+        get_a_non_gen_plant_data_json_to_nt.(
+            [ namedtuple(a_plant_data)
+              for a_plant_data in
+                  convert(Vector{Dict},
+                Nodes_Branches_data_by_components[
+                    :plant_transmissions])];
+            in_components_type_sym = true )
+    
+    edge_data_from_json =
+        get_an_edge_data_json_to_nt.(
+            [ namedtuple(an_edge_data)
+              for an_edge_data in
+                  convert(Vector{Dict},
+                Nodes_Branches_data_by_components[
+                    :branches ])];
+            in_components_type_sym = true )
+    
+
+    # PackageCompiler.jl
+
+    (gens_plant_data_from_json,
+     loads_plant_data_from_json,
+     transmission_plant_data_from_json,
+     edge_data_from_json ) =
+         get_net_data_by_components_from_json(
+             net_data_by_components_file;
+             in_components_type_sym = false )
+    
+    #--------------------------------------
+    #--------------------------------------
+
+    """
+    list_tup = [(:a,:b), (:c,:d), (:e, :f, :i)]
+
+    list_set = [Set(a_tup) for a_tup in list_tup ]
+    
+    union_set = union(list_set...)
+
+    #--------------------------------------
+
+    plant_1 = Dyn_Nodes["bus1"]
+
+    plant_1_gen = Dyn_Nodes["bus1"].Gen
+    
+    plant_1_gov = Dyn_Nodes["bus1"].Gov
+
+    all_fieldnames_plant_1_gov =
+        fieldnames( typeof( plant_1_gov) )
+
+    json_plant_1_gov =  JSON.json( plant_1_gov )
+
+    fieldnames(typeof( plant_1_gov))
+
+    
+    all_fieldnames_gov_t1_cb_sauer =
+        fieldnames( gov_t1_cb_sauer )
+
+    init_fieldnames_gov_t1_cb_sauer =
+        (:Tc, :Ts, :p_max, :p_min, :R, :comp_type)
+
+    setdiff_fieldnames_gov_t1_cb_sauer =
+        setdiff(Set( all_fieldnames_gov_t1_cb_sauer),
+                Set( init_fieldnames_gov_t1_cb_sauer) )
+
+    exclude_fieldnames_gov_t1_cb_sauer =
+        Tuple(setdiff_fieldnames_gov_t1_cb_sauer )
+    
+    length( all_fieldnames_gov_t1_cb_sauer )    
+    length( init_fieldnames_gov_t1_cb_sauer )    
+    length( setdiff_fieldnames_gov_t1_cb_sauer )
+
+    #--------------------------------------
+
+    # Note: All govs, avrs and pss have the same
+    # exclude fieldnames
+    #     
+    # exclude_fieldnames_pss = exclude_fieldnames_gov
+    # exclude_fieldnames_avr = exclude_fieldnames_gov
+    
+    init_fieldnames_gov_t1_cb_sauer =
+        (:Tc, :Ts, :p_max, :p_min, :R, :comp_type)
+
+    exclude_fieldnames_control_devices =
+        Tuple(setdiff(
+            Set( fieldnames( gov_t1_cb_sauer )),
+            Set( init_fieldnames_gov_t1_cb_sauer) ))
+
+    """
+    #--------------------------------------
+    
+    init_fieldnames_gov_ieee_tgov1_cb =
+        (:T1, :T2, :T3, :Dt, :p_max,
+         :p_min, :R, :comp_type)
+
+    init_fieldnames_gov_t0_cb =
+        (:T3, :T4, :T5, :Tc, :Ts, :p_max,
+         :p_min, :R, :comp_type)
+
+    init_fieldnames_gov_t1_cb_sauer =
+        (:Tc, :Ts, :p_max, :p_min, :R, :comp_type)
+
+    non_exclude_fieldnames_govs =
+        [init_fieldnames_gov_ieee_tgov1_cb,
+         init_fieldnames_gov_t0_cb,
+         init_fieldnames_gov_t1_cb_sauer]
+    
+    exclude_fieldnames_govs =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_govs, SdGov )
+    
+    #--------------------------------------
+
+    init_fieldnames_avr_t0_cb =
+        (:Ta, :Tf, :Te, :Tr, :Ka, :Ke,
+         :Kf, :V_R_max, :V_R_min, :S_E_max,
+         :S_E0_75max, :Ae, :Be, :comp_type)
+
+    init_fieldnames_avr_t1_cb_sauer =
+        (:Ta, :Tf, :Te, :Tr, :Ka, :Ke,
+         :Kf, :V_R_max, :V_R_min, :S_E_max,
+         :S_E0_75max, :Ae, :Be, :comp_type)
+
+    non_exclude_fieldnames_avrs =
+        [init_fieldnames_avr_t0_cb,
+         init_fieldnames_avr_t1_cb_sauer]
+
+    exclude_fieldnames_avrs =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_avrs, SdAvr )
+
+    #--------------------------------------
+    
+    non_exclude_fieldnames_non_gens =
+        (:Bus, :name, :P, :Q, :kPL, :kQL, :Y_n, :vmax, :vmin, :Pmax, :Pmin, :Qmax, :Qmin, :comp_type, :Bus_num, :Bus_type, :loc_P, :loc_Q )
+            
+    exclude_fieldnames_non_gens =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_non_gens,
+            SdNonGen )
+
+    #--------------------------------------
+
+    non_exclude_fieldnames_gens =
+        (:Bus,
+         :name,
+         :P,
+         :D,
+         :H,
+         :Ωb,
+         :ωs,
+         :ra,
+         :xℓ,
+         :X_d,
+         :X_q,
+         :X_d_dash,
+         :X_q_dash,
+         :X_d_2dash,
+         :X_q_2dash,
+         :T_d_dash,
+         :T_q_dash,
+         :T_d_2dash,
+         :T_q_2dash,
+         :αp,
+         :αq,
+         :Y_n,
+         :Q, :Sn,
+         :vh,:θh,
+         :vmax, :vmin,
+         :Pmax, :Pmin,
+         :Qmax, :Qmin,
+         :comp_type,
+         :Bus_num,
+         :Bus_type )
+    exclude_fieldnames_gens =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_gens, SdGen )
+    
+    #--------------------------------------
+
+    non_exclude_fieldnames_plants_non_gens =
+        (:Load, :Trans, :Bus,
+         :name, :comp_type,
+         :Bus_num, :Bus_type )
+            
+    exclude_fieldnames_plants_non_gen =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_plants_non_gens,
+            SdNonGenPlant )
+    
+    #--------------------------------------
+
+    non_exclude_fieldnames_plants_gens =
+        (:Gen, :Gov, :Exc, :p_order,
+         :v_ref, :ω_ref, :comp_type,
+         :Bus, :name, :Bus_type,
+         :Bus_num, :with_loc_load,
+         :isa_slack, :isa_condenser )
+            
+    exclude_fieldnames_plants_gens =
+        get_StructTypes_exclude_fieldnames(
+            non_exclude_fieldnames_plants_gens,
+            SdGenPlant )
+    
+    #--------------------------------------
+    #--------------------------------------
+
+    tt_dict_avr_nt_params  =
+        get_dict_nt_params_from_json_lib_file(
+            avrs_parameters_libs_file_json)
+
+    #--------------------------------------
+    #--------------------------------------
+
+    " SdAvr, SdBranchElement,
+      SdGen, SdGenPlant,
+      SdGov, SdNonGen,
+      SdNonGenPlant, SdPss"
+
+    #--------------------------------------
+    
+    get_edge_y_data_by_mpc(
+        fbus, tbus, r, x, b, ratio,
+        angle, status, mpc_baseMVA )
+
+
+    t_branches =
+        get_branches_data_and_types_by_mpc(
+            mpc_branch_selected_data;
+            mpc_baseMVA=1.0 )
+
+
+    t_Dyn_Branches =
+        get_Dyn_Branches_by_mpc(
+            mpc_branch_selected_data;
+            mpc_baseMVA=1.0 )
+
+    #--------------------------------------
+    #--------------------------------------
+
+    gov_instance_from_json =
+        get_gov_instance_from_json(
+            gov_nt_params_from_file,
+            dict_gov_sym_type,
+            :gov_ieee_tgov1_cb__overby_param)
+
+    avr_instance_from_json =
+        get_avr_instance_from_json(
+            avr_nt_params_from_file,
+            dict_avr_sym_type,
+            :avr_t1_cb_sauer__1_param)
+
+    #--------------------------------------
+    #--------------------------------------
+
+    nodes_static_tup_data =
+        get_nodes_static_tup_data_by_mpc(
+            mpc_bus_selected_data,
+            mpc_gen_selected_data;
+            mpc_baseMVA=1.0)
+
+
+    nodes_dict_static_data =
+        get_nodes_dict_static_data_by_mpc(
+            mpc_bus_selected_data,
+            mpc_gen_selected_data;
+            mpc_baseMVA=1.0)
+
+    gens_nodes_static_tup_data =
+        get_gen_nodes_static_tup_data_by_mpc(
+            mpc_bus_selected_data,
+            mpc_gen_selected_data;
+            mpc_baseMVA=1.0 )
+
+    gens_nodes_dict_static_data =
+        get_gen_nodes_dict_static_data_by_mpc(
+            mpc_bus_selected_data,
+            mpc_gen_selected_data;
+            mpc_baseMVA=1.0)
+
+
+    #--------------------------------------
+
+    # gens_type_and_dym_data =
+    #     [(idx,
+    #       (dict_gen_sym_type[sym_gen_type],
+    #        dict_gens_dyn_nt_params[sym_gen_dym_para]))
+    
+    #      for (idx, sym_gen_type, sym_gen_dym_para) in
+    #          zip(dyn_gens.bus,
+    #              dyn_gens.sym_gen_type,
+    #              dyn_gens.sym_gen_dynamic_para)]
+
+    gens_type_and_dym_data =
+        get_gens_type_and_dym_data(
+            dict_gen_sym_type,
+            dict_gens_dyn_nt_params,
+            dyn_gens)
+
+    #--------------------------------------
+
+    gens_instance =
+        get_gens_instance_by_static_and_dym_data(
+            gens_type_and_dym_data,
+            gens_nodes_static_tup_data)
+
+    #--------------------------------------
+
+    # gens_plants_type_and_components_type = [
+    #     (idx,(plant_type,gen_type,isa_slack,
+    #           gov_type,avr_type)) 
+    #     for (idx,plant_type,gen_type,isa_slack,
+    #          gov_type,avr_type) in
+    #         zip(dyn_plants.bus,
+    #              dyn_plants.Plant_type,
+    #              dyn_plants.Gen,
+    #              dyn_plants.isa_slack,
+    #              dyn_plants.Gov,
+    #              dyn_plants.Exc)]
+    
+    gens_plants_type_and_components_type =
+        get_plants_type_and_components_type(
+            dyn_plants)
+
+    #--------------------------------------
+
+    gens_plant_instances =
+        get_gens_plant_instances(
+            dict_plants_gen_sym_type,
+            dict_gen_sym_type,
+            dict_gens_dyn_nt_params,
+
+            dict_gov_sym_type,
+            dict_gov_nt_params,
+
+            dict_avr_sym_type,
+            dict_avr_nt_params,
+
+            dyn_gens,
+            dyn_plants,
+
+            mpc_bus_selected_data,
+            mpc_gen_selected_data;
+            mpc_baseMVA=1.0,
+
+            p_order = 1.0,
+            v_ref = 1.0,
+            ω_ref = ωs )
+
+    #--------------------------------------
+
+    load_nodes_plant_instances =
+        get_load_nodes_plant_instances(
+            mpc_bus_selected_data;
+            mpc_baseMVA=1.0,
+            PQ_Const_I =
+                PQ_Const_I,
+            plant_PQ_Const_I =
+                plant_PQ_Const_I)
+
+    #--------------------------------------
+
+    transmission_nodes_plant_instances =
+        get_transmission_nodes_plant_instances(
+            mpc_bus_selected_data;
+            mpc_baseMVA=1.0,
+            Trans_t2_Node =
+                Trans_t2_Node,
+            plant_Transmission_t2 =
+                plant_Transmission_t2 )
+
+    #--------------------------------------
+    #--------------------------------------
+
+    Dyn_Nodes =
+        get_Dyn_Nodes_by_mpc(
+            dict_plants_gen_sym_type,
+            dict_gen_sym_type,
+            dict_gens_dyn_nt_params,
+
+            dict_gov_sym_type,
+            dict_gov_nt_params,
+
+            dict_avr_sym_type,
+            dict_avr_nt_params,
+
+            dyn_gens,
+            dyn_plants,
+
+            mpc_bus_selected_data,
+            mpc_gen_selected_data;
+            mpc_baseMVA=1.0,
+
+            p_order = 1.0,
+            v_ref = 1.0,
+            ω_ref = ωs,
+
+            PQ_Const_I = PQ_Const_I,
+            plant_PQ_Const_I = plant_PQ_Const_I,
+
+            Trans_t2_Node = Trans_t2_Node,
+            plant_Transmission_t2 =
+                plant_Transmission_t2)
+    
+end
+
+#--------------------------------------
+#--------------------------------------
+

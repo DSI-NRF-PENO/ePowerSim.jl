@@ -1,0 +1,1327 @@
+{
+    "plant_generators": [
+        {
+            "idx": 1,
+            "plant_type": "plant_cb_v6",
+            "additional_data": {
+                "isa_slack": true
+            },
+            "components_type": {
+                "gen": "SM_2axis_cb_v6"
+            },
+            "components_data": {
+                "gen": {
+                    "Bus": "bus1",
+                    "P": 0.2354,
+                    "Q": 0,
+                    "vh": 1,
+                    "vmax": 1.05,
+                    "vmin": 0.95,
+                    "Qmax": 1.5,
+                    "Qmin": -0.2,
+                    "Pmax": 0.8,
+                    "Pmin": 0,
+                    "Sn": 1.7
+                }
+            }
+        },
+        {
+            "idx": 2,
+            "plant_type": "plant_wt_loc_load_v6",
+            "additional_data": {
+                "isa_slack": false
+            },
+            "components_type": {
+                "gen": "SM_2axis_wt_loc_load_cb_v6",
+                "loc_load": "loc_Load_t1"
+            },
+            "components_data": {
+                "gen": {
+                    "Bus": "bus2",
+                    "P": 0.6097,
+                    "Q": 0,
+                    "vh": 1,
+                    "vmax": 1.1,
+                    "vmin": 0.95,
+                    "Qmax": 0.6,
+                    "Qmin": -0.2,
+                    "Pmax": 0.8,
+                    "Pmin": 0,
+                    "Sn": 1
+                },
+                "loc_load": {
+                    "Bus": "bus2",
+                    "loc_P": 0.217,
+                    "loc_Q": 0.127
+                }
+            }
+        },
+        {
+            "idx": 13,
+            "plant_type": "plant_cb_v6",
+            "additional_data": {
+                "isa_slack": false
+            },
+            "components_type": {
+                "gen": "SM_2axis_cb_v6"
+            },
+            "components_data": {
+                "gen": {
+                    "Bus": "bus13",
+                    "P": 0.2159,
+                    "Q": 0,
+                    "vh": 1,
+                    "vmax": 1.1,
+                    "vmin": 0.95,
+                    "Qmax": 0.625,
+                    "Qmin": -0.15,
+                    "Pmax": 0.5,
+                    "Pmin": 0,
+                    "Sn": 0.8003905296791061
+                }
+            }
+        },
+        {
+            "idx": 22,
+            "plant_type": "plant_cb_v6",
+            "additional_data": {
+                "isa_slack": false
+            },
+            "components_type": {
+                "gen": "SM_2axis_cb_v6"
+            },
+            "components_data": {
+                "gen": {
+                    "Bus": "bus22",
+                    "P": 0.2691,
+                    "Q": 0,
+                    "vh": 1,
+                    "vmax": 1.1,
+                    "vmin": 0.95,
+                    "Qmax": 0.48700000000000004,
+                    "Qmin": -0.15,
+                    "Pmax": 0.55,
+                    "Pmin": 0,
+                    "Sn": 0.7346216713383836
+                }
+            }
+        },
+        {
+            "idx": 23,
+            "plant_type": "plant_wt_loc_load_v6",
+            "additional_data": {
+                "isa_slack": false
+            },
+            "components_type": {
+                "gen": "SM_2axis_wt_loc_load_cb_v6",
+                "loc_load": "loc_Load_t1"
+            },
+            "components_data": {
+                "gen": {
+                    "Bus": "bus23",
+                    "P": 0.192,
+                    "Q": 0,
+                    "vh": 1,
+                    "vmax": 1.1,
+                    "vmin": 0.95,
+                    "Qmax": 0.4,
+                    "Qmin": -0.1,
+                    "Pmax": 0.3,
+                    "Pmin": 0,
+                    "Sn": 0.5
+                },
+                "loc_load": {
+                    "Bus": "bus23",
+                    "loc_P": 0.032,
+                    "loc_Q": 0.016
+                }
+            }
+        },
+        {
+            "idx": 27,
+            "plant_type": "plant_cb_v6",
+            "additional_data": {
+                "isa_slack": false
+            },
+            "components_type": {
+                "gen": "SM_2axis_cb_v6"
+            },
+            "components_data": {
+                "gen": {
+                    "Bus": "bus27",
+                    "P": 0.37,
+                    "Q": 0,
+                    "vh": 1,
+                    "vmax": 1.1,
+                    "vmin": 0.95,
+                    "Qmax": 0.447,
+                    "Qmin": -0.15,
+                    "Pmax": 0.4,
+                    "Pmin": 0,
+                    "Sn": 0.5998408122160412
+                }
+            }
+        }
+    ],
+    "plant_loads": [
+        {
+            "idx": 3,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus3",
+                    "P": 0.024,
+                    "Q": 0.012
+                }
+            }
+        },
+        {
+            "idx": 4,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus4",
+                    "P": 0.076,
+                    "Q": 0.016
+                }
+            }
+        },
+        {
+            "idx": 7,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus7",
+                    "P": 0.228,
+                    "Q": 0.109
+                }
+            }
+        },
+        {
+            "idx": 8,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus8",
+                    "P": 0.3,
+                    "Q": 0.3
+                }
+            }
+        },
+        {
+            "idx": 10,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus10",
+                    "P": 0.057999999999999996,
+                    "Q": 0.02
+                }
+            }
+        },
+        {
+            "idx": 12,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus12",
+                    "P": 0.11199999999999999,
+                    "Q": 0.075
+                }
+            }
+        },
+        {
+            "idx": 14,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus14",
+                    "P": 0.062,
+                    "Q": 0.016
+                }
+            }
+        },
+        {
+            "idx": 15,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus15",
+                    "P": 0.08199999999999999,
+                    "Q": 0.025
+                }
+            }
+        },
+        {
+            "idx": 16,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus16",
+                    "P": 0.035,
+                    "Q": 0.018000000000000002
+                }
+            }
+        },
+        {
+            "idx": 17,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus17",
+                    "P": 0.09,
+                    "Q": 0.057999999999999996
+                }
+            }
+        },
+        {
+            "idx": 18,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus18",
+                    "P": 0.032,
+                    "Q": 0.009000000000000001
+                }
+            }
+        },
+        {
+            "idx": 19,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus19",
+                    "P": 0.095,
+                    "Q": 0.034
+                }
+            }
+        },
+        {
+            "idx": 20,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus20",
+                    "P": 0.022000000000000002,
+                    "Q": 0.006999999999999999
+                }
+            }
+        },
+        {
+            "idx": 21,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus21",
+                    "P": 0.175,
+                    "Q": 0.11199999999999999
+                }
+            }
+        },
+        {
+            "idx": 24,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus24",
+                    "P": 0.087,
+                    "Q": 0.067
+                }
+            }
+        },
+        {
+            "idx": 26,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus26",
+                    "P": 0.035,
+                    "Q": 0.023
+                }
+            }
+        },
+        {
+            "idx": 29,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus29",
+                    "P": 0.024,
+                    "Q": 0.009000000000000001
+                }
+            }
+        },
+        {
+            "idx": 30,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus30",
+                    "P": 0.106,
+                    "Q": 0.019
+                }
+            }
+        }
+    ],
+    "plant_transmissions": [
+        {
+            "idx": 5,
+            "plant_type": "plant_Transmission_t2",
+            "components_type": {
+                "transmission": "Trans_t2_Node"
+            },
+            "components_data": {
+                "transmission": {
+                    "Bus": "bus5",
+                    "P": 0,
+                    "Q": 0
+                }
+            }
+        },
+        {
+            "idx": 6,
+            "plant_type": "plant_Transmission_t2",
+            "components_type": {
+                "transmission": "Trans_t2_Node"
+            },
+            "components_data": {
+                "transmission": {
+                    "Bus": "bus6",
+                    "P": 0,
+                    "Q": 0
+                }
+            }
+        },
+        {
+            "idx": 9,
+            "plant_type": "plant_Transmission_t2",
+            "components_type": {
+                "transmission": "Trans_t2_Node"
+            },
+            "components_data": {
+                "transmission": {
+                    "Bus": "bus9",
+                    "P": 0,
+                    "Q": 0
+                }
+            }
+        },
+        {
+            "idx": 11,
+            "plant_type": "plant_Transmission_t2",
+            "components_type": {
+                "transmission": "Trans_t2_Node"
+            },
+            "components_data": {
+                "transmission": {
+                    "Bus": "bus11",
+                    "P": 0,
+                    "Q": 0
+                }
+            }
+        },
+        {
+            "idx": 25,
+            "plant_type": "plant_Transmission_t2",
+            "components_type": {
+                "transmission": "Trans_t2_Node"
+            },
+            "components_data": {
+                "transmission": {
+                    "Bus": "bus25",
+                    "P": 0,
+                    "Q": 0
+                }
+            }
+        },
+        {
+            "idx": 28,
+            "plant_type": "plant_Transmission_t2",
+            "components_type": {
+                "transmission": "Trans_t2_Node"
+            },
+            "components_data": {
+                "transmission": {
+                    "Bus": "bus28",
+                    "P": 0,
+                    "Q": 0
+                }
+            }
+        }
+    ],
+    "branches": [
+        {
+            "idx": 1,
+            "components_data": {
+                "fbus": 1,
+                "tbus": 2,
+                "r": 0.02,
+                "x": 0.06,
+                "b": 0.03,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 2,
+            "components_data": {
+                "fbus": 1,
+                "tbus": 3,
+                "r": 0.05,
+                "x": 0.19,
+                "b": 0.02,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 3,
+            "components_data": {
+                "fbus": 2,
+                "tbus": 4,
+                "r": 0.06,
+                "x": 0.17,
+                "b": 0.02,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 4,
+            "components_data": {
+                "fbus": 3,
+                "tbus": 4,
+                "r": 0.01,
+                "x": 0.04,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 5,
+            "components_data": {
+                "fbus": 2,
+                "tbus": 5,
+                "r": 0.05,
+                "x": 0.2,
+                "b": 0.02,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 6,
+            "components_data": {
+                "fbus": 2,
+                "tbus": 6,
+                "r": 0.06,
+                "x": 0.18,
+                "b": 0.02,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 7,
+            "components_data": {
+                "fbus": 4,
+                "tbus": 6,
+                "r": 0.01,
+                "x": 0.04,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 8,
+            "components_data": {
+                "fbus": 5,
+                "tbus": 7,
+                "r": 0.05,
+                "x": 0.12,
+                "b": 0.01,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 9,
+            "components_data": {
+                "fbus": 6,
+                "tbus": 7,
+                "r": 0.03,
+                "x": 0.08,
+                "b": 0.01,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 10,
+            "components_data": {
+                "fbus": 6,
+                "tbus": 8,
+                "r": 0.01,
+                "x": 0.04,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 11,
+            "components_data": {
+                "fbus": 6,
+                "tbus": 9,
+                "r": 0,
+                "x": 0.21,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 12,
+            "components_data": {
+                "fbus": 6,
+                "tbus": 10,
+                "r": 0,
+                "x": 0.56,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 13,
+            "components_data": {
+                "fbus": 9,
+                "tbus": 11,
+                "r": 0,
+                "x": 0.21,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 14,
+            "components_data": {
+                "fbus": 9,
+                "tbus": 10,
+                "r": 0,
+                "x": 0.11,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 15,
+            "components_data": {
+                "fbus": 4,
+                "tbus": 12,
+                "r": 0,
+                "x": 0.26,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 16,
+            "components_data": {
+                "fbus": 12,
+                "tbus": 13,
+                "r": 0,
+                "x": 0.14,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 17,
+            "components_data": {
+                "fbus": 12,
+                "tbus": 14,
+                "r": 0.12,
+                "x": 0.26,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 18,
+            "components_data": {
+                "fbus": 12,
+                "tbus": 15,
+                "r": 0.07,
+                "x": 0.13,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 19,
+            "components_data": {
+                "fbus": 12,
+                "tbus": 16,
+                "r": 0.09,
+                "x": 0.2,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 20,
+            "components_data": {
+                "fbus": 14,
+                "tbus": 15,
+                "r": 0.22,
+                "x": 0.2,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 21,
+            "components_data": {
+                "fbus": 16,
+                "tbus": 17,
+                "r": 0.08,
+                "x": 0.19,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 22,
+            "components_data": {
+                "fbus": 15,
+                "tbus": 18,
+                "r": 0.11,
+                "x": 0.22,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 23,
+            "components_data": {
+                "fbus": 18,
+                "tbus": 19,
+                "r": 0.06,
+                "x": 0.13,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 24,
+            "components_data": {
+                "fbus": 19,
+                "tbus": 20,
+                "r": 0.03,
+                "x": 0.07,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 25,
+            "components_data": {
+                "fbus": 10,
+                "tbus": 20,
+                "r": 0.09,
+                "x": 0.21,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 26,
+            "components_data": {
+                "fbus": 10,
+                "tbus": 17,
+                "r": 0.03,
+                "x": 0.08,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 27,
+            "components_data": {
+                "fbus": 10,
+                "tbus": 21,
+                "r": 0.03,
+                "x": 0.07,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 28,
+            "components_data": {
+                "fbus": 10,
+                "tbus": 22,
+                "r": 0.07,
+                "x": 0.15,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 29,
+            "components_data": {
+                "fbus": 21,
+                "tbus": 22,
+                "r": 0.01,
+                "x": 0.02,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 30,
+            "components_data": {
+                "fbus": 15,
+                "tbus": 23,
+                "r": 0.1,
+                "x": 0.2,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 31,
+            "components_data": {
+                "fbus": 22,
+                "tbus": 24,
+                "r": 0.12,
+                "x": 0.18,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 32,
+            "components_data": {
+                "fbus": 23,
+                "tbus": 24,
+                "r": 0.13,
+                "x": 0.27,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 33,
+            "components_data": {
+                "fbus": 24,
+                "tbus": 25,
+                "r": 0.19,
+                "x": 0.33,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 34,
+            "components_data": {
+                "fbus": 25,
+                "tbus": 26,
+                "r": 0.25,
+                "x": 0.38,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 35,
+            "components_data": {
+                "fbus": 25,
+                "tbus": 27,
+                "r": 0.11,
+                "x": 0.21,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 36,
+            "components_data": {
+                "fbus": 28,
+                "tbus": 27,
+                "r": 0,
+                "x": 0.4,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 37,
+            "components_data": {
+                "fbus": 27,
+                "tbus": 29,
+                "r": 0.22,
+                "x": 0.42,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 38,
+            "components_data": {
+                "fbus": 27,
+                "tbus": 30,
+                "r": 0.32,
+                "x": 0.6,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 39,
+            "components_data": {
+                "fbus": 29,
+                "tbus": 30,
+                "r": 0.24,
+                "x": 0.45,
+                "b": 0,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 40,
+            "components_data": {
+                "fbus": 8,
+                "tbus": 28,
+                "r": 0.06,
+                "x": 0.2,
+                "b": 0.02,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 41,
+            "components_data": {
+                "fbus": 6,
+                "tbus": 28,
+                "r": 0.02,
+                "x": 0.06,
+                "b": 0.01,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        }
+    ],
+    "shunt": [
+        {
+            "shunt_idx": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30
+            ],
+            "shunt_Gs": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "shunt_Bs": [
+                0,
+                0,
+                0,
+                0,
+                0.19,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0.04,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    ],
+    "baseMVA": [
+        100
+    ],
+    "gencost": [
+        {
+            "startup": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "n": [
+                3,
+                3,
+                3,
+                3,
+                3,
+                3
+            ],
+            "shutdown": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "c_1": [
+                2,
+                1.75,
+                1,
+                3.25,
+                3,
+                3
+            ],
+            "c_0": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "cost_type": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+            ],
+            "c_n_1": [
+                0.02,
+                0.0175,
+                0.0625,
+                0.00834,
+                0.025,
+                0.025
+            ]
+        }
+    ]
+}

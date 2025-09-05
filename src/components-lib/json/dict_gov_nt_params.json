@@ -1,0 +1,92 @@
+{
+    "gov_ieee_tgov1_cb__overby_param": {
+        "T1": 0.2,
+        "T2": 2.39,
+        "T3": 7,
+        "Dt": 0,
+        "p_min": -5,
+        "p_max": 5,
+        "R": 0.05
+    },
+    "gov_ieee_tgov1_cb__sauer_param": {
+        "T1": 0.2,
+        "T2": 2.1,
+        "T3": 7,
+        "Dt": 0,
+        "p_min": -5,
+        "p_max": 5,
+        "R": 0.05
+    },
+    "gov_ieee_tgov1_cb__param": {
+        "T1": 0.49,
+        "T2": 2.1,
+        "T3": 7,
+        "Dt": 0,
+        "p_min": 0,
+        "p_max": 15,
+        "R": 0.05
+    },
+    "gov_t1_cb_sauer__1_param": {
+        "Tc": 0.4,
+        "Ts": 0.2,
+        "p_max": 2.2,
+        "p_min": 0.1,
+        "R": 0.02
+    },
+    "gov_ieee_tgov1_cb__a_param": {
+        "T1": 0.05,
+        "T2": 2.1,
+        "T3": 7,
+        "Dt": 0,
+        "p_min": -5,
+        "p_max": 5,
+        "R": 0.05
+    },
+    "gov_ieee_tgov1_cb__rscad_param": {
+        "T1": 0.49,
+        "T2": 2.1,
+        "T3": 7,
+        "Dt": 0,
+        "p_min": 0,
+        "p_max": 15,
+        "R": 0.05
+    },
+    "gov_ieee_tgov1_cb__1_param": {
+        "T1": 0.49,
+        "T2": 2.1,
+        "T3": 7,
+        "Dt": 0,
+        "p_min": 0,
+        "p_max": 15,
+        "R": 0.05
+    },
+    "gov_t1_cb__1_param": {
+        "T3": 0,
+        "T4": 0,
+        "T5": 50,
+        "Tc": 0.45,
+        "Ts": 0.1,
+        "p_max": 2.2,
+        "p_min": 0.1,
+        "R": 0.02
+    },
+    "gov_t1_cb__millano_param": {
+        "T3": 0,
+        "T4": 0,
+        "T5": 50,
+        "Tc": 0.45,
+        "Ts": 0.1,
+        "p_max": 1.2,
+        "p_min": 0.3,
+        "R": 0.02
+    },
+    "gov_ieee_tgov1_cb__3_param": {
+        "T1": 0.05,
+        "T2": 2.1,
+        "T3": 7,
+        "Dt": 0,
+        "p_min": -5,
+        "p_max": 5,
+        "R": 0.05
+    }
+}
