@@ -5,14 +5,11 @@
 
 ####################################################
 
-
 #---------------------------------------------------
 #---------------------------------------------------
 # utilities  functions
 #---------------------------------------------------
 #---------------------------------------------------
-
-
 
 """
 This function is a place holder for an anonymus
@@ -55,7 +52,6 @@ macro macro_get_list_items_name_and_value(arg)
 end
 
 # ------------------------------------------------------
-
 
 """
 functions returns second,third and
@@ -851,30 +847,30 @@ end
 
 
 
-function get_dynamic_idq_vhθh(
-    vh,
-    θh,
-    δ_ω_ed_eq,
-    ra_X_d_dash_X_q_dash )
+# function get_dynamic_idq_vhθh(
+#     vh,
+#     θh,
+#     δ_ω_ed_eq,
+#     ra_X_d_dash_X_q_dash )
 
-    if δ_ω_ed_eq == []
+#     if δ_ω_ed_eq == []
         
-        return [0.0, 0.0]
+#         return [0.0, 0.0]
         
-    else
+#     else
         
-        δ, ω, ed_dash, eq_dash = δ_ω_ed_eq
+#         δ, ω, ed_dash, eq_dash = δ_ω_ed_eq
         
-        ra, X_d_dash, X_q_dash = ra_X_d_dash_X_q_dash
+#         ra, X_d_dash, X_q_dash = ra_X_d_dash_X_q_dash
 
-        #id_iq = invZ_dq(ra, X_d_dash, X_q_dash) * [ed_dash - vh * sin(δ - θh), eq_dash - vh * cos(δ - θh)]
+#         #id_iq = invZ_dq(ra, X_d_dash, X_q_dash) * [ed_dash - vh * sin(δ - θh), eq_dash - vh * cos(δ - θh)]
         
-        return invZ_dq(ra, X_d_dash, X_q_dash) * [
-            ed_dash - vh * sin(δ - θh), eq_dash -
-                vh * cos(δ - θh)]
-    end
+#         return invZ_dq(ra, X_d_dash, X_q_dash) * [
+#             ed_dash - vh * sin(δ - θh), eq_dash -
+#                 vh * cos(δ - θh)]
+#     end
     
-end
+# end
 
 
 function get_dynamic_idq_vhθh(
@@ -1672,41 +1668,41 @@ function get_component_δ_ed_dash_eq_dash_from_pf(
 end
 
 
-function get_component_δ_ω_ed_dash_eq_dash_from_pf(
-    vh, θh, Pg, Qg, ra, X_d, X_q, X_d_dash, X_q_dash )
+# function get_component_δ_ω_ed_dash_eq_dash_from_pf(
+#     vh, θh, Pg, Qg, ra, X_d, X_q, X_d_dash, X_q_dash )
 
-    Sg = Pg + im * Qg
+#     Sg = Pg + im * Qg
     
-    uh = vh * exp(im * θh)
+#     uh = vh * exp(im * θh)
     
-    Ig = conj( Sg ) / conj( uh )
+#     Ig = conj( Sg ) / conj( uh )
 
-    E = uh + (ra + im * X_q) * Ig
+#     E = uh + (ra + im * X_q) * Ig
 
-    δ = angle(E)
+#     δ = angle(E)
 
-    id_iq = Ig * exp( -im * ( δ - pi/2 ))
+#     id_iq = Ig * exp( -im * ( δ - pi/2 ))
 
-    id = real(id_iq)
+#     id = real(id_iq)
 
-    iq = imag(id_iq)
+#     iq = imag(id_iq)
 
-    vd_vq = uh * exp( -im * ( δ - pi/2 ))
+#     vd_vq = uh * exp( -im * ( δ - pi/2 ))
 
-    vd = real( vd_vq )
+#     vd = real( vd_vq )
 
-    vq = imag( vd_vq )
+#     vq = imag( vd_vq )
 
-    ed_dash = ( X_q -  X_q_dash ) * iq
+#     ed_dash = ( X_q -  X_q_dash ) * iq
 
-    check_ed_dash = vd + ra * id - X_q_dash * iq
+#     check_ed_dash = vd + ra * id - X_q_dash * iq
     
-    eq_dash = vq + ra * iq + X_d_dash * id
+#     eq_dash = vq + ra * iq + X_d_dash * id
 
-    return [δ, ωs, ed_dash, eq_dash] 
+#     return [δ, ωs, ed_dash, eq_dash] 
     
 
-end
+# end
 
 
 
@@ -3053,205 +3049,205 @@ end
 #-------------------------------------------------------
 
 
-function get_eig_values_in_states_participation(
-    eig_values,
-    PF_pure_Asys,
-    im_pure_states_syms;
-    participation_threshold = 0.2 )
+# function get_eig_values_in_states_participation(
+#     eig_values,
+#     PF_pure_Asys,
+#     im_pure_states_syms;
+#     participation_threshold = 0.2 )
 
-    rows_size_PF_pure_Asys,cols_size_PF_pure_Asys =
-        size(PF_pure_Asys)
+#     rows_size_PF_pure_Asys,cols_size_PF_pure_Asys =
+#         size(PF_pure_Asys)
 
-    cols_PF_pure_Asys =
-        [PF_pure_Asys[:,a_col_idx]
-         for a_col_idx in
-             1:cols_size_PF_pure_Asys]
-
-
-    rows_PF_pure_Asys =
-        [PF_pure_Asys[a_row_idx,:]
-         for a_row_idx in
-             1:rows_size_PF_pure_Asys]
+#     cols_PF_pure_Asys =
+#         [PF_pure_Asys[:,a_col_idx]
+#          for a_col_idx in
+#              1:cols_size_PF_pure_Asys]
 
 
-    indices_of_PF_cols_greter_than =
-        [ findall(>( participation_threshold  ),
-                  PF_pure_Asys[:, a_col] )
-          for a_col  in
-              1:cols_size_PF_pure_Asys ]
+#     rows_PF_pure_Asys =
+#         [PF_pure_Asys[a_row_idx,:]
+#          for a_row_idx in
+#              1:rows_size_PF_pure_Asys]
 
 
-    indices_of_PF_rows_greter_than =
-        [ findall(>( participation_threshold ),
-                  PF_pure_Asys[a_row, :] )
-          for a_row  in
-              1:rows_size_PF_pure_Asys ]
+#     indices_of_PF_cols_greter_than =
+#         [ findall(>( participation_threshold  ),
+#                   PF_pure_Asys[:, a_col] )
+#           for a_col  in
+#               1:cols_size_PF_pure_Asys ]
 
 
-    tup_eig_value_state_vars_PF_cols_greter_than =
-        [(eig_values[idx_eig_value],
-          im_pure_states_syms[idx_row_greater_than],
+#     indices_of_PF_rows_greter_than =
+#         [ findall(>( participation_threshold ),
+#                   PF_pure_Asys[a_row, :] )
+#           for a_row  in
+#               1:rows_size_PF_pure_Asys ]
+
+
+#     tup_eig_value_state_vars_PF_cols_greter_than =
+#         [(eig_values[idx_eig_value],
+#           im_pure_states_syms[idx_row_greater_than],
           
-         a_col_PF_pure_Asys[idx_row_greater_than] )
-         for (idx_eig_value, idx_row_greater_than,
-              a_col_PF_pure_Asys) in
-             zip(1:cols_size_PF_pure_Asys,
-                 indices_of_PF_cols_greter_than,
-                 cols_PF_pure_Asys)]
+#          a_col_PF_pure_Asys[idx_row_greater_than] )
+#          for (idx_eig_value, idx_row_greater_than,
+#               a_col_PF_pure_Asys) in
+#              zip(1:cols_size_PF_pure_Asys,
+#                  indices_of_PF_cols_greter_than,
+#                  cols_PF_pure_Asys)]
 
 
-    tup_state_vars_eig_value_PF_rows_greter_than =
-        [(im_pure_states_syms[state_idx],
-          eig_values[idx_col_greater_than],
-         a_row_PF_pure_Asys[idx_col_greater_than] )
-         for (state_idx, idx_col_greater_than,
-              a_row_PF_pure_Asys) in
-             zip(1:rows_size_PF_pure_Asys,
-                 indices_of_PF_rows_greter_than,
-                 rows_PF_pure_Asys)]
+#     tup_state_vars_eig_value_PF_rows_greter_than =
+#         [(im_pure_states_syms[state_idx],
+#           eig_values[idx_col_greater_than],
+#          a_row_PF_pure_Asys[idx_col_greater_than] )
+#          for (state_idx, idx_col_greater_than,
+#               a_row_PF_pure_Asys) in
+#              zip(1:rows_size_PF_pure_Asys,
+#                  indices_of_PF_rows_greter_than,
+#                  rows_PF_pure_Asys)]
 
-    return (
-        ;tup_eig_value_state_vars_PF_cols_greter_than,
-        tup_state_vars_eig_value_PF_rows_greter_than )
-end
-
-
-"""
-
-https://arblib.org/acb_mat.html#acb-mat-eigenvalues
-
-https://github.com/kalmarek/Arblib.jl
-
-matrix_rows, matrix_cols = size(system_matrix)
-
-eig_val = Arblib.AcbVector(zeros(matrix_rows))
-
-Acb_system_matrix = Arblib.AcbMatrix(system_matrix)
-
-eigvecs_left  = similar(Acb_system_matrix)
-
-eigvecs_right = similar(Acb_system_matrix)
+#     return (
+#         ;tup_eig_value_state_vars_PF_cols_greter_than,
+#         tup_state_vars_eig_value_PF_rows_greter_than )
+# end
 
 
-return_code = Arblib.approx_eig_qr!(
-    eig_val,
-    eigvecs_left,
-    eigvecs_right,
-    Acb_system_matrix,
-    Mag(),
-    0,
-    Arblib._precision(Acb_system_matrix) )
+# """
 
-"""
-function get_eigens_via_arblib(
-    system_matrix; prec = nothing  )
+# https://arblib.org/acb_mat.html#acb-mat-eigenvalues
+
+# https://github.com/kalmarek/Arblib.jl
+
+# matrix_rows, matrix_cols = size(system_matrix)
+
+# eig_val = Arblib.AcbVector(zeros(matrix_rows))
+
+# Acb_system_matrix = Arblib.AcbMatrix(system_matrix)
+
+# eigvecs_left  = similar(Acb_system_matrix)
+
+# eigvecs_right = similar(Acb_system_matrix)
 
 
-    matrix_rows, matrix_cols = size(system_matrix)
+# return_code = Arblib.approx_eig_qr!(
+#     eig_val,
+#     eigvecs_left,
+#     eigvecs_right,
+#     Acb_system_matrix,
+#     Mag(),
+#     0,
+#     Arblib._precision(Acb_system_matrix) )
 
-    eig_values = Arblib.AcbVector(zeros(matrix_rows))
+# """
+# function get_eigens_via_arblib(
+#     system_matrix; prec = nothing  )
 
-    Acb_system_matrix = Arblib.AcbMatrix(system_matrix)
 
-    eigvecs_left  = similar(Acb_system_matrix)
+#     matrix_rows, matrix_cols = size(system_matrix)
 
-    eigvecs_right = similar(Acb_system_matrix)
+#     eig_values = Arblib.AcbVector(zeros(matrix_rows))
 
-    if prec ==  nothing
-        prec = Arblib._precision(Acb_system_matrix)
-    else
-        prec =  prec
-    end
+#     Acb_system_matrix = Arblib.AcbMatrix(system_matrix)
+
+#     eigvecs_left  = similar(Acb_system_matrix)
+
+#     eigvecs_right = similar(Acb_system_matrix)
+
+#     if prec ==  nothing
+#         prec = Arblib._precision(Acb_system_matrix)
+#     else
+#         prec =  prec
+#     end
     
         
-    return_code =
-        Arblib.approx_eig_qr!(
-            eig_values,
-            eigvecs_left,
-            eigvecs_right,
-            Acb_system_matrix,
-            Mag(),
-            0,
-            prec )
+#     return_code =
+#         Arblib.approx_eig_qr!(
+#             eig_values,
+#             eigvecs_left,
+#             eigvecs_right,
+#             Acb_system_matrix,
+#             Mag(),
+#             0,
+#             prec )
 
-    return (; eig_values, eigvecs_left,
-            eigvecs_right, return_code )
+#     return (; eig_values, eigvecs_left,
+#             eigvecs_right, return_code )
     
-end
+# end
 
 
 
-"""
+# """
 
-`get_eigens`
-This function returns eigen values, left and right
-eigen vectors.
+# `get_eigens`
+# This function returns eigen values, left and right
+# eigen vectors.
 
-"""
-function get_eigens(system_matrix)
+# """
+# function get_eigens(system_matrix)
 
-    # https://ralphas.github.io/GenericSchur.jl/stable/
+#     # https://ralphas.github.io/GenericSchur.jl/stable/
     
-    system_matrix = system_matrix .+ 0im
+#     system_matrix = system_matrix .+ 0im
     
-    schur_object = schur( system_matrix )
+#     schur_object = schur( system_matrix )
 
-    eig_values = schur_object.values
+#     eig_values = schur_object.values
 
-    eigvecs_right = eigvecs( schur_object )
+#     eigvecs_right = eigvecs( schur_object )
 
-    eigvecs_left = eigvecs(schur_object,left=true)
+#     eigvecs_left = eigvecs(schur_object,left=true)
 
-    return (; eig_values, eigvecs_left, eigvecs_right )
+#     return (; eig_values, eigvecs_left, eigvecs_right )
     
 
-end
+# end
 
 
-"""
-https://tobydriscoll.net/fnc-julia/linsys/norms.html
+# """
+# https://tobydriscoll.net/fnc-julia/linsys/norms.html
 
-https://discourse.julialang.org/t/computing-left-eigenvectors-with-high-precision/72949
+# https://discourse.julialang.org/t/computing-left-eigenvectors-with-high-precision/72949
 
-https://ralphas.github.io/GenericSchur.jl/stable/
+# https://ralphas.github.io/GenericSchur.jl/stable/
 
-`get_participation_factors`
-This function returns the participation factor matrix
+# `get_participation_factors`
+# This function returns the participation factor matrix
 
-Sauer: see page 232, equation 8.84
-
-
-"""
-function get_participation_factors(
-    system_matrix )
-
-    (; eig_values, eigvecs_left, eigvecs_right ) =
-        get_eigens(system_matrix)
+# Sauer: see page 232, equation 8.84
 
 
-    participation_factor =
-        abs.(eigvecs_left) .* abs.(eigvecs_right)
+# """
+# function get_participation_factors(
+#     system_matrix )
 
-    for i in eachindex(eig_values)
+#     (; eig_values, eigvecs_left, eigvecs_right ) =
+#         get_eigens(system_matrix)
 
-        λ_i_pf = participation_factor[:,i] ./
-            (abs.(eigvecs_left[:,i]') *
-            abs.(eigvecs_right[:,i] ))
+
+#     participation_factor =
+#         abs.(eigvecs_left) .* abs.(eigvecs_right)
+
+#     for i in eachindex(eig_values)
+
+#         λ_i_pf = participation_factor[:,i] ./
+#             (abs.(eigvecs_left[:,i]') *
+#             abs.(eigvecs_right[:,i] ))
         
-        max_λ_i_pf = max(abs.(λ_i_pf)... )
+#         max_λ_i_pf = max(abs.(λ_i_pf)... )
         
-        participation_factor[:,i] .= λ_i_pf ./ max_λ_i_pf
+#         participation_factor[:,i] .= λ_i_pf ./ max_λ_i_pf
             
-        # max_pf = max(participation_factor[:,i]... )
+#         # max_pf = max(participation_factor[:,i]... )
 
-        # participation_factor[:,i] .=
-        #     participation_factor[:,i] ./  max_pf 
+#         # participation_factor[:,i] .=
+#         #     participation_factor[:,i] ./  max_pf 
 
-    end
+#     end
 
-    return participation_factor
+#     return participation_factor
     
-end
+# end
 
 
 #-------------------------------------------------------

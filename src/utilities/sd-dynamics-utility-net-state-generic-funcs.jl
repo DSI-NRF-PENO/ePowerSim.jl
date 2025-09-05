@@ -3148,16 +3148,16 @@ function get_dynamic_idq_vhθh(
 end
 
 
-function get_dynamic_idq_vhθh(
-    vh,
-    θh,
-    δ_ω_ed_eq,
-    ra_Xd_dash_Xq_dash )
+# function get_dynamic_idq_vhθh(
+#     vh,
+#     θh,
+#     δ_ω_ed_eq,
+#     ra_Xd_dash_Xq_dash )
         
-    return  get_dynamic_idq_vhθh(
-        vh, θh, δ_ω_ed_eq...,
-        ra_Xd_dash_Xq_dash... )  
-end
+#     return  get_dynamic_idq_vhθh(
+#         vh, θh, δ_ω_ed_eq...,
+#         ra_Xd_dash_Xq_dash... )  
+# end
 
 
 
@@ -4008,41 +4008,41 @@ function get_component_δ_ed_dash_eq_dash_from_pf(
 end
 
 
-function get_component_δ_ω_ed_dash_eq_dash_from_pf(
-    vh, θh, Pg, Qg, ra, X_d, X_q, X_d_dash, X_q_dash )
+# function get_component_δ_ω_ed_dash_eq_dash_from_pf(
+#     vh, θh, Pg, Qg, ra, X_d, X_q, X_d_dash, X_q_dash )
 
-    Sg = Pg + im * Qg
+#     Sg = Pg + im * Qg
     
-    uh = vh * exp(im * θh)
+#     uh = vh * exp(im * θh)
     
-    Ig = conj( Sg ) / conj( uh )
+#     Ig = conj( Sg ) / conj( uh )
 
-    E = uh + (ra + im * X_q) * Ig
+#     E = uh + (ra + im * X_q) * Ig
 
-    δ = angle(E)
+#     δ = angle(E)
 
-    id_iq = Ig * exp( -im * ( δ - pi/2 ))
+#     id_iq = Ig * exp( -im * ( δ - pi/2 ))
 
-    id = real(id_iq)
+#     id = real(id_iq)
 
-    iq = imag(id_iq)
+#     iq = imag(id_iq)
 
-    vd_vq = uh * exp( -im * ( δ - pi/2 ))
+#     vd_vq = uh * exp( -im * ( δ - pi/2 ))
 
-    vd = real( vd_vq )
+#     vd = real( vd_vq )
 
-    vq = imag( vd_vq )
+#     vq = imag( vd_vq )
 
-    ed_dash = ( X_q -  X_q_dash ) * iq
+#     ed_dash = ( X_q -  X_q_dash ) * iq
 
-    check_ed_dash = vd + ra * id - X_q_dash * iq
+#     check_ed_dash = vd + ra * id - X_q_dash * iq
     
-    eq_dash = vq + ra * iq + X_d_dash * id
+#     eq_dash = vq + ra * iq + X_d_dash * id
 
-    return [δ, ωs, ed_dash, eq_dash] 
+#     return [δ, ωs, ed_dash, eq_dash] 
     
 
-end
+# end
 
 
 
@@ -4073,7 +4073,8 @@ end
 
 #------------------------------------------------
 
-function get_component_δ_id_iq_vd_vq_ed_dash_eq_dash_from_pf(vh, θh, Pg, Qg, ra, X_d, X_q, X_d_dash, X_q_dash; ω = ωs )
+function get_component_δ_id_iq_vd_vq_ed_dash_eq_dash_from_pf(
+    vh, θh, Pg, Qg, ra, X_d, X_q, X_d_dash, X_q_dash; ω = ωs )
 
     Sg = Pg + im * Qg
     

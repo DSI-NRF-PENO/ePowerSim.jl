@@ -16,7 +16,7 @@ export SdGen, SdNonGen, SdGov, SdAvr, SdPss
 
 export SdNonGenPlant, SdGenPlant, SdBranchElement
 
-
+export  ComponentsSymbols, get_subsubtype
 
 # ------------------------------------------------------
 #  Init function
@@ -37,7 +37,7 @@ export a_SC_plant_generic_model_init_func
 # ------------------------------------------------------
 
 export algebraic_generic_pf_ΔI_mismatch!
-export algebraic_generic_pf_ΔI_mismatch_sol(
+export algebraic_generic_pf_ΔI_mismatch_sol
 export pertubation_algebraic_generic_pf_ΔPQ_mismatch!
 
 export algebraic_generic_pf_ΔPQ_mismatch!

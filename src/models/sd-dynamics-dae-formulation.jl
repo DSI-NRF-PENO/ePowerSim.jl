@@ -238,11 +238,9 @@ function dae_generic_model_by_ext_idq_func!(
 
 end
 
-
 #-----------------------------------------------------
 # generic model system dynamics
 #-----------------------------------------------------
-
 
 function dae_SC_generic_model_dynamics!(
     res,

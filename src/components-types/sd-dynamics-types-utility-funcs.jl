@@ -35,34 +35,34 @@ struct ComponentsSymbols
 end
 
 
-function (compsyms::ComponentsSymbols)(
-    name::Union{get_subsubtype(AbstractPowerSystemComponent)...})
-    return compsyms.dict_syms[Symbol("$(typeof(name))")]["all_syms"]
-end
+# function (compsyms::ComponentsSymbols)(
+#     name::Union{get_subsubtype(AbstractPowerSystemComponent)...})
+#     return compsyms.dict_syms[Symbol("$(typeof(name))")]["all_syms"]
+# end
 
 
-function (compsyms::ComponentsSymbols)(struct_name::Union{Symbol, String})
-    return compsyms.dict_syms[Symbol(struct_name)]["all_syms"]
-end
+# function (compsyms::ComponentsSymbols)(struct_name::Union{Symbol, String})
+#     return compsyms.dict_syms[Symbol(struct_name)]["all_syms"]
+# end
 
 
-function (compsyms::ComponentsSymbols)(name)
-    return compsyms.dict_syms[Symbol("$(name)")]["all_syms"]
-end
+# function (compsyms::ComponentsSymbols)(name)
+#     return compsyms.dict_syms[Symbol("$(name)")]["all_syms"]
+# end
 
 
-"""
-``` symbolsof =  ComponentsSymbols(dict_syms)``` is a callable struct that can be used insted of
+# """
+# ``` symbolsof =  ComponentsSymbols(dict_syms)``` is a callable struct that can be used insted of
 
-list_components_types = get_subsubtype(AbstractComponentType)
+# list_components_types = get_subsubtype(AbstractComponentType)
 
-symbolsof(name) = dict_syms[Symbol("$(name)")]["all_syms"]
+# symbolsof(name) = dict_syms[Symbol("$(name)")]["all_syms"]
 
-symbolsof(name::Union{list_components_types...}) = dict_syms[Symbol("$(typeof(name))")]["all_syms"]
+# symbolsof(name::Union{list_components_types...}) = dict_syms[Symbol("$(typeof(name))")]["all_syms"]
 
-symbolsof(struct_name::Union{Symbol, String}) = dict_syms[Symbol(struct_name)]["all_syms"]
+# symbolsof(struct_name::Union{Symbol, String}) = dict_syms[Symbol(struct_name)]["all_syms"]
 
-"""
-# symbolsof =  ComponentsSymbols(dict_syms)
+# """
+# # symbolsof =  ComponentsSymbols(dict_syms)
 
-# ------------------------------------------------------
+# # ------------------------------------------------------

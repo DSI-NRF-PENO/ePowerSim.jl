@@ -97,11 +97,11 @@ import Ipopt
 import StatsPlots
 import PATHSolver
 
-import Test
+# import Test
 
 # ------------------------------------------------------
 
-using BifurcationKit
+# using BifurcationKit
 
 # ------------------------------------------------------
 
@@ -111,7 +111,7 @@ using SpecialFunctions, Random, Distributions
 
 using PDMats
 
-using Juniper
+# using Juniper
 
 using Latexify
 

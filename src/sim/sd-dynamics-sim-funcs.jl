@@ -7844,11 +7844,11 @@ function get_sim_mm_sudden_load_or_line_outage_pertubation(
     case_data_dir =
         joinpath( data_dir,
                   "converted-data",
-                  case_name,)
+                  case_name)
 
 
     json_case_dir =
-        joinpath(case_data_dir
+        joinpath(case_data_dir,
             "json")
 
     if (json_net_data_by_components_file == "" ||
@@ -8749,7 +8749,6 @@ function sim_sudden_load_change(
 
     fractional_digits,
     
-    dt              = 0.0001,
     use_saveat      = false,
     ts              = 0.001,
     
@@ -8878,7 +8877,7 @@ function sim_sudden_load_change(
 
     json_case_dir =
         joinpath(
-            case_data_dir
+            case_data_dir,
             "json")
 
     if (json_net_data_by_components_file == "" ||

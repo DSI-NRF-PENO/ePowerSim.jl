@@ -5514,296 +5514,296 @@ end
 #---------------------------------------------------
 #---------------------------------------------------
 
-function get_multi_gens_plant_instances_data_by_mpc(
-    dict_plants_gen_sym_type,
-    dict_gen_sym_type,
-    dict_gens_dyn_nt_params,
+# function get_multi_gens_plant_instances_data_by_mpc(
+#     dict_plants_gen_sym_type,
+#     dict_gen_sym_type,
+#     dict_gens_dyn_nt_params,
 
-    dict_gov_sym_type,
-    dict_gov_nt_params,
+#     dict_gov_sym_type,
+#     dict_gov_nt_params,
 
-    dict_avr_sym_type,
-    dict_avr_nt_params,
+#     dict_avr_sym_type,
+#     dict_avr_nt_params,
     
-    dyn_gens,
-    dyn_plants,
+#     dyn_gens,
+#     dyn_plants,
 
-    mpc_bus,
-    mpc_gen;
-    mpc_baseMVA=1.0,
+#     mpc_bus,
+#     mpc_gen;
+#     mpc_baseMVA=1.0,
 
-    p_order = 1.0,
-    v_ref = 1.0,
-    ω_ref = ωs,
-    by_components = false )
+#     p_order = 1.0,
+#     v_ref = 1.0,
+#     ω_ref = ωs,
+#     by_components = false )
 
-    #------------------------------------------
+#     #------------------------------------------
 
-    (;multi_gens_idx,
-     multi_gen_bool,
-     multi_gens_nodes) =
-         NamedTupleTools.select(
-             get_multi_gens_idx_wt_multi_gen_bool(
-                 mpc_gen),
-             (:multi_gens_idx,
-              :multi_gen_bool,
-              :multi_gens_nodes) )
+#     (;multi_gens_idx,
+#      multi_gen_bool,
+#      multi_gens_nodes) =
+#          NamedTupleTools.select(
+#              get_multi_gens_idx_wt_multi_gen_bool(
+#                  mpc_gen),
+#              (:multi_gens_idx,
+#               :multi_gen_bool,
+#               :multi_gens_nodes) )
 
-    #------------------------------------------
+#     #------------------------------------------
 
-    loc_load_exist =
-        loc_load_exist_bool_by_mpc(
-            mpc_bus )
+#     loc_load_exist =
+#         loc_load_exist_bool_by_mpc(
+#             mpc_bus )
 
-    loc_loads =
-        get_loc_loads_idx_and_locP_locQ_data_by_mpc(
-            mpc_bus;
-            mpc_baseMVA =
-                mpc_baseMVA )
+#     loc_loads =
+#         get_loc_loads_idx_and_locP_locQ_data_by_mpc(
+#             mpc_bus;
+#             mpc_baseMVA =
+#                 mpc_baseMVA )
 
     
-    gens_nodes_idx =
-        get_gens_nodes_idx_by_mpc(
-            mpc_bus)
+#     gens_nodes_idx =
+#         get_gens_nodes_idx_by_mpc(
+#             mpc_bus)
     
-    gens_with_loc_load_idx =
-        get_gens_nodes_with_loc_loads_idx_by_mpc(
-            mpc_bus)
+#     gens_with_loc_load_idx =
+#         get_gens_nodes_with_loc_loads_idx_by_mpc(
+#             mpc_bus)
 
-    #--------------------------------------
+#     #--------------------------------------
     
-    n2s_gens_idx =
-        get_n2s_any(gens_nodes_idx)
+#     n2s_gens_idx =
+#         get_n2s_any(gens_nodes_idx)
 
-    n2s_gens_with_loc_load_idxs =
-        loc_load_exist == true ?  get_n2s_any(
-            gens_with_loc_load_idx) : get_n2s_any(
-                gens_with_loc_load_idx;
-                nothing_bool = true)
+#     n2s_gens_with_loc_load_idxs =
+#         loc_load_exist == true ?  get_n2s_any(
+#             gens_with_loc_load_idx) : get_n2s_any(
+#                 gens_with_loc_load_idx;
+#                 nothing_bool = true)
 
 
-    #------------------------------------------    
-    #------------------------------------------    
+#     #------------------------------------------    
+#     #------------------------------------------    
     
-    plants_idx =
-        dyn_plants.bus
+#     plants_idx =
+#         dyn_plants.bus
 
-    sym_plants_types =
-        dyn_plants.Plant_type
+#     sym_plants_types =
+#         dyn_plants.Plant_type
     
-    sym_gens_types =
-        dyn_plants.Gen
+#     sym_gens_types =
+#         dyn_plants.Gen
     
-    bool_isa_slack =
-        dyn_plants.isa_slack
+#     bool_isa_slack =
+#         dyn_plants.isa_slack
     
-    sym_govs_nt_params =
-        dyn_plants.Gov
+#     sym_govs_nt_params =
+#         dyn_plants.Gov
     
-    sym_avrs_nt_params =
-        dyn_plants.Exc
+#     sym_avrs_nt_params =
+#         dyn_plants.Exc
 
 
-    plants_types =
-        [dict_plants_gen_sym_type[sym_plant_type]
-         for sym_plant_type in
-             sym_plants_types]
+#     plants_types =
+#         [dict_plants_gen_sym_type[sym_plant_type]
+#          for sym_plant_type in
+#              sym_plants_types]
 
-    gens_type_and_dym_data =
-        get_gens_type_and_dym_data(
-            dict_gen_sym_type,
-            dict_gens_dyn_nt_params,
-            dyn_gens)
+#     gens_type_and_dym_data =
+#         get_gens_type_and_dym_data(
+#             dict_gen_sym_type,
+#             dict_gens_dyn_nt_params,
+#             dyn_gens)
 
-    gens_nodes_static_tup_data =
-        get_gen_nodes_static_tup_data_by_mpc(
-            mpc_bus,
-            mpc_gen;
-            mpc_baseMVA =
-                mpc_baseMVA)
+#     gens_nodes_static_tup_data =
+#         get_gen_nodes_static_tup_data_by_mpc(
+#             mpc_bus,
+#             mpc_gen;
+#             mpc_baseMVA =
+#                 mpc_baseMVA)
 
-    #------------------------------------------
+#     #------------------------------------------
 
-    gens_instances_data =
-        get_gens_instance_data_by_mpc(
-            gens_type_and_dym_data,
-            gens_nodes_static_tup_data)
+#     gens_instances_data =
+#         get_gens_instance_data_by_mpc(
+#             gens_type_and_dym_data,
+#             gens_nodes_static_tup_data)
 
-    govs_instances_data =
-        get_govs_instances_data_by_mpc(
-            sym_govs_nt_params,
-            dict_gov_nt_params,
-            dict_gov_sym_type)
+#     govs_instances_data =
+#         get_govs_instances_data_by_mpc(
+#             sym_govs_nt_params,
+#             dict_gov_nt_params,
+#             dict_gov_sym_type)
 
-    avrs_instances_data =
-        get_avrs_instances_data_by_mpc(
-            sym_avrs_nt_params,
-            dict_avr_nt_params,
-            dict_avr_sym_type)
+#     avrs_instances_data =
+#         get_avrs_instances_data_by_mpc(
+#             sym_avrs_nt_params,
+#             dict_avr_nt_params,
+#             dict_avr_sym_type)
 
-    loc_load_instances_data =
-        loc_load_exist != false ? [
-            (loc_Load_t1, a_loc_load ) 
-            for a_loc_load in loc_loads  ] : []
+#     loc_load_instances_data =
+#         loc_load_exist != false ? [
+#             (loc_Load_t1, a_loc_load ) 
+#             for a_loc_load in loc_loads  ] : []
 
-    if multi_gen_bool == true
+#     if multi_gen_bool == true
 
-        if by_components == false
-            return [
-                get_node_idx_multi(plant_idx) ∈ gens_with_loc_load_idx ?
-                (plant_idx,(
-                    # plant_idx = plant_idx,
-                    plant_type =
-                        plant_type,
-                    gen_type_and_data =
-                        gen_data,
-                    isa_slack =
-                        isa_slack,
-                    gov_type_and_data =
-                        gov_data,
-                    avr_type_and_data =
-                        avr_data,
-                    loc_load_type_and_data=
-                        loc_load_instances_data[
-                        n2s_gens_with_loc_load_idxs[
-                            get_node_idx_multi(plant_idx) ] ],
-                    p_order  = p_order,
-                    v_ref = v_ref,
-                    ω_ref = ω_ref )) :
-                        (plant_idx,
-                         (# plant_idx = plant_idx,
-                           plant_type =
-                               plant_type,
-                           gen_type_and_data =
-                               gen_data,
-                           isa_slack =
-                               isa_slack,
-                           gov_type_and_data =
-                               gov_data,
-                           avr_type_and_data =
-                               avr_data,
-                           p_order =
-                               p_order,
-                           v_ref =
-                               v_ref,
-                           ω_ref =
-                               ω_ref ) )
-                for (plant_idx,
-                     plant_type,
-                     gen_data,
-                     isa_slack,
-                     gov_data,
-                     avr_data) in zip(multi_gens_idx,
-                                      plants_types,
-                                      gens_instances_data,
-                                      bool_isa_slack,
-                                      govs_instances_data,
-                                      avrs_instances_data) ]
-        else
+#         if by_components == false
+#             return [
+#                 get_node_idx_multi(plant_idx) ∈ gens_with_loc_load_idx ?
+#                 (plant_idx,(
+#                     # plant_idx = plant_idx,
+#                     plant_type =
+#                         plant_type,
+#                     gen_type_and_data =
+#                         gen_data,
+#                     isa_slack =
+#                         isa_slack,
+#                     gov_type_and_data =
+#                         gov_data,
+#                     avr_type_and_data =
+#                         avr_data,
+#                     loc_load_type_and_data=
+#                         loc_load_instances_data[
+#                         n2s_gens_with_loc_load_idxs[
+#                             get_node_idx_multi(plant_idx) ] ],
+#                     p_order  = p_order,
+#                     v_ref = v_ref,
+#                     ω_ref = ω_ref )) :
+#                         (plant_idx,
+#                          (# plant_idx = plant_idx,
+#                            plant_type =
+#                                plant_type,
+#                            gen_type_and_data =
+#                                gen_data,
+#                            isa_slack =
+#                                isa_slack,
+#                            gov_type_and_data =
+#                                gov_data,
+#                            avr_type_and_data =
+#                                avr_data,
+#                            p_order =
+#                                p_order,
+#                            v_ref =
+#                                v_ref,
+#                            ω_ref =
+#                                ω_ref ) )
+#                 for (plant_idx,
+#                      plant_type,
+#                      gen_data,
+#                      isa_slack,
+#                      gov_data,
+#                      avr_data) in zip(multi_gens_idx,
+#                                       plants_types,
+#                                       gens_instances_data,
+#                                       bool_isa_slack,
+#                                       govs_instances_data,
+#                                       avrs_instances_data) ]
+#         else
 
-            return [ (get_node_idx_multi(idx) ∈ gens_with_loc_load_idx && first( gov_data != nothing) ) ? get_a_gen_plant_wt_gov_wt_loc_load_by_mpc( idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data, loc_load_instances_data, n2s_gens_with_loc_load_idxs) :
-                           ( get_node_idx_multi(idx) ∈ gens_with_loc_load_idx && first( gov_data == nothing) ) ? get_a_gen_plant_no_gov_wt_loc_load_by_mpc( idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data, loc_load_instances_data, n2s_gens_with_loc_load_idxs) :
-                                   ( get_node_idx_multi(idx) ∉ gens_with_loc_load_idx && first( gov_data != nothing) ) ? get_a_gen_plant_wt_gov_no_loc_load_by_mpc(idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data, loc_load_instances_data, n2s_gens_with_loc_load_idxs) : get_a_gen_plant_no_gov_no_loc_load_by_mpc(idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data)
+#             return [ (get_node_idx_multi(idx) ∈ gens_with_loc_load_idx && first( gov_data != nothing) ) ? get_a_gen_plant_wt_gov_wt_loc_load_by_mpc( idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data, loc_load_instances_data, n2s_gens_with_loc_load_idxs) :
+#                            ( get_node_idx_multi(idx) ∈ gens_with_loc_load_idx && first( gov_data == nothing) ) ? get_a_gen_plant_no_gov_wt_loc_load_by_mpc( idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data, loc_load_instances_data, n2s_gens_with_loc_load_idxs) :
+#                                    ( get_node_idx_multi(idx) ∉ gens_with_loc_load_idx && first( gov_data != nothing) ) ? get_a_gen_plant_wt_gov_no_loc_load_by_mpc(idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data, loc_load_instances_data, n2s_gens_with_loc_load_idxs) : get_a_gen_plant_no_gov_no_loc_load_by_mpc(idx, plant_type, isa_slack, p_order, v_ref, ω_ref, gen_data, gov_data, avr_data)
 
-                    for (idx,
-                         plant_type,
-                         gen_data,
-                         isa_slack,
-                         gov_data,
-                         avr_data) in
-                        zip(multi_gens_idx,
-                            plants_types,
-                            gens_instances_data,
-                            bool_isa_slack,
-                            govs_instances_data,
-                            avrs_instances_data) ]
+#                     for (idx,
+#                          plant_type,
+#                          gen_data,
+#                          isa_slack,
+#                          gov_data,
+#                          avr_data) in
+#                         zip(multi_gens_idx,
+#                             plants_types,
+#                             gens_instances_data,
+#                             bool_isa_slack,
+#                             govs_instances_data,
+#                             avrs_instances_data) ]
 
 
-        end
+#         end
         
-    else
+#     else
 
 
-        if by_components == false
-            return [ plant_idx ∈ gens_with_loc_load_idx ?
-                (plant_idx,(
-                    # plant_idx = plant_idx,
-                    plant_type = plant_type,
-                    gen_type_and_data = gen_data,
-                    isa_slack = isa_slack,
-                    gov_type_and_data = gov_data,
-                    avr_type_and_data = avr_data,
-                    loc_load_type_and_data=loc_load_instances_data[
-                        n2s_gens_with_loc_load_idxs[plant_idx]],
-                    p_order  = p_order,
-                    v_ref = v_ref,
-                    ω_ref = ω_ref )) :
-                        (plant_idx,
-                         ( # plant_idx = plant_idx,
-                           plant_type = plant_type,
-                           gen_type_and_data = gen_data,
-                           isa_slack = isa_slack,
-                           gov_type_and_data = gov_data,
-                           avr_type_and_data = avr_data,
-                           p_order = p_order,
-                           v_ref = v_ref,
-                           ω_ref = ω_ref) )
-                     for (plant_idx, plant_type,
-                          gen_data, isa_slack,
-                          gov_data, avr_data) in
-                         zip(gens_nodes_idx,
-                            plants_types,
-                            gens_instances_data,
-                            bool_isa_slack,
-                            govs_instances_data,
-                             avrs_instances_data) ]
-        else
+#         if by_components == false
+#             return [ plant_idx ∈ gens_with_loc_load_idx ?
+#                 (plant_idx,(
+#                     # plant_idx = plant_idx,
+#                     plant_type = plant_type,
+#                     gen_type_and_data = gen_data,
+#                     isa_slack = isa_slack,
+#                     gov_type_and_data = gov_data,
+#                     avr_type_and_data = avr_data,
+#                     loc_load_type_and_data=loc_load_instances_data[
+#                         n2s_gens_with_loc_load_idxs[plant_idx]],
+#                     p_order  = p_order,
+#                     v_ref = v_ref,
+#                     ω_ref = ω_ref )) :
+#                         (plant_idx,
+#                          ( # plant_idx = plant_idx,
+#                            plant_type = plant_type,
+#                            gen_type_and_data = gen_data,
+#                            isa_slack = isa_slack,
+#                            gov_type_and_data = gov_data,
+#                            avr_type_and_data = avr_data,
+#                            p_order = p_order,
+#                            v_ref = v_ref,
+#                            ω_ref = ω_ref) )
+#                      for (plant_idx, plant_type,
+#                           gen_data, isa_slack,
+#                           gov_data, avr_data) in
+#                          zip(gens_nodes_idx,
+#                             plants_types,
+#                             gens_instances_data,
+#                             bool_isa_slack,
+#                             govs_instances_data,
+#                              avrs_instances_data) ]
+#         else
 
-            return [ ( idx ∈ gens_with_loc_load_idx && first(
-                gov_data != nothing )) ?
-                   get_a_gen_plant_wt_gov_wt_loc_load_by_mpc(
-                       idx, plant_type, isa_slack,
-                       p_order, v_ref, ω_ref,
-                       gen_data, gov_data, avr_data,
-                       loc_load_instances_data,
-                       n2s_gens_with_loc_load_idxs) :
-                           (idx ∈ gens_with_loc_load_idx &&
-                           first( gov_data == nothing )) ?
-                           get_a_gen_plant_no_gov_wt_loc_load_by_mpc(
-                               idx, plant_type, isa_slack,
-                               p_order, v_ref, ω_ref,
-                               gen_data, gov_data, avr_data,
-                               loc_load_instances_data,
-                               n2s_gens_with_loc_load_idxs) :
-                                   (idx ∉ gens_with_loc_load_idx &&
-                                   first( gov_data != nothing )) ?
-                                   get_a_gen_plant_wt_gov_no_loc_load_by_mpc(
-                                       idx, plant_type,
-                                       isa_slack, p_order,
-                                       v_ref, ω_ref, gen_data,
-                                       gov_data, avr_data,
-                                       loc_load_instances_data,
-                                       n2s_gens_with_loc_load_idxs) :
-                                           get_a_gen_plant_no_gov_no_loc_load_by_mpc(
-                                               idx, plant_type,
-                                               isa_slack, p_order,
-                                               v_ref, ω_ref, gen_data,
-                                               gov_data, avr_data )
+#             return [ ( idx ∈ gens_with_loc_load_idx && first(
+#                 gov_data != nothing )) ?
+#                    get_a_gen_plant_wt_gov_wt_loc_load_by_mpc(
+#                        idx, plant_type, isa_slack,
+#                        p_order, v_ref, ω_ref,
+#                        gen_data, gov_data, avr_data,
+#                        loc_load_instances_data,
+#                        n2s_gens_with_loc_load_idxs) :
+#                            (idx ∈ gens_with_loc_load_idx &&
+#                            first( gov_data == nothing )) ?
+#                            get_a_gen_plant_no_gov_wt_loc_load_by_mpc(
+#                                idx, plant_type, isa_slack,
+#                                p_order, v_ref, ω_ref,
+#                                gen_data, gov_data, avr_data,
+#                                loc_load_instances_data,
+#                                n2s_gens_with_loc_load_idxs) :
+#                                    (idx ∉ gens_with_loc_load_idx &&
+#                                    first( gov_data != nothing )) ?
+#                                    get_a_gen_plant_wt_gov_no_loc_load_by_mpc(
+#                                        idx, plant_type,
+#                                        isa_slack, p_order,
+#                                        v_ref, ω_ref, gen_data,
+#                                        gov_data, avr_data,
+#                                        loc_load_instances_data,
+#                                        n2s_gens_with_loc_load_idxs) :
+#                                            get_a_gen_plant_no_gov_no_loc_load_by_mpc(
+#                                                idx, plant_type,
+#                                                isa_slack, p_order,
+#                                                v_ref, ω_ref, gen_data,
+#                                                gov_data, avr_data )
 
-                     for (idx, plant_type, gen_data,
-                          isa_slack, gov_data, avr_data) in
-                         zip(gens_nodes_idx, plants_types,
-                            gens_instances_data, bool_isa_slack,
-                             govs_instances_data,
-                             avrs_instances_data) ]
+#                      for (idx, plant_type, gen_data,
+#                           isa_slack, gov_data, avr_data) in
+#                          zip(gens_nodes_idx, plants_types,
+#                             gens_instances_data, bool_isa_slack,
+#                              govs_instances_data,
+#                              avrs_instances_data) ]
 
 
-        end
+#         end
 
         
-    end
+#     end
     
-end
+# end
 
 
 

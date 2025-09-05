@@ -2063,12 +2063,12 @@ function get_nodes_∑_ynj_x_vj_by_Ybus(
 end
 
 
-function get_nodes_∑_ynj_x_vj_by_Ybus(
-    uh,
-    Ybus)
+# function get_nodes_∑_ynj_x_vj_by_Ybus(
+#     uh,
+#     Ybus)
     
-    return  Ybus * uh
-end
+#     return  Ybus * uh
+# end
 
 # -------------------------------------------
 # node net current injection based on Yπ_net
@@ -4430,6 +4430,8 @@ function get_a_gen_imag_stator_equations_mismatch(
 
 end
 
+# -------------------------------------------
+# -------------------------------------------
 
 function get_current_mismatch_nodes_no_loc_load(
     uh,
@@ -4561,85 +4563,85 @@ function get_nodes_current_mismatch(
 end
 
 
-function get_nodes_current_mismatch(
-    uh,
-    (P_Q_gens_view,
-     P_Q_non_gens_view,
-     P_Q_gens_loc_load_view),
-    ( gens_nodes_idx,
-      non_gens_nodes_idx,
-      gens_with_loc_load_idx ),
-    I_sum_ynj_vj;
-    loc_load_exist = false)
+# function get_nodes_current_mismatch(
+#     uh,
+#     (P_Q_gens_view,
+#      P_Q_non_gens_view,
+#      P_Q_gens_loc_load_view),
+#     ( gens_nodes_idx,
+#       non_gens_nodes_idx,
+#       gens_with_loc_load_idx ),
+#     I_sum_ynj_vj;
+#     loc_load_exist = false)
 
-    nodes_size = sum( [length(gens_nodes_idx),
-                       length(non_gens_nodes_idx) ])
+#     nodes_size = sum( [length(gens_nodes_idx),
+#                        length(non_gens_nodes_idx) ])
 
-    # This should not be zero initially
+#     # This should not be zero initially
     
-    current_mismatch = ones(ComplexF64, nodes_size )
+#     current_mismatch = ones(ComplexF64, nodes_size )
 
-    if loc_load_exist == true
+#     if loc_load_exist == true
         
-        S_gens = -1 * x_from_xr_xi.( P_Q_gens_view )
+#         S_gens = -1 * x_from_xr_xi.( P_Q_gens_view )
 
-        S_non_gens =
-            x_from_xr_xi.( P_Q_non_gens_view )
+#         S_non_gens =
+#             x_from_xr_xi.( P_Q_non_gens_view )
 
-        S_gens_loc_load =
-            x_from_xr_xi.( P_Q_gens_loc_load_view )
+#         S_gens_loc_load =
+#             x_from_xr_xi.( P_Q_gens_loc_load_view )
 
-        for (idx, S_node_type) in zip(
-            [gens_nodes_idx, non_gens_nodes_idx,
-             gens_with_loc_load_idx ],
-            [S_gens, S_non_gens,
-             S_gens_loc_load ] )
+#         for (idx, S_node_type) in zip(
+#             [gens_nodes_idx, non_gens_nodes_idx,
+#              gens_with_loc_load_idx ],
+#             [S_gens, S_non_gens,
+#              S_gens_loc_load ] )
 
-            current_mismatch[idx] .= 
-                I_sum_ynj_vj[idx] .+
-               ((conj.(S_node_type)) ./ (conj.( uh[idx])))
-        end
-    else
+#             current_mismatch[idx] .= 
+#                 I_sum_ynj_vj[idx] .+
+#                ((conj.(S_node_type)) ./ (conj.( uh[idx])))
+#         end
+#     else
         
-        # S_gens = -1 * x_from_xr_xi.( P_Q_gens_view )
+#         # S_gens = -1 * x_from_xr_xi.( P_Q_gens_view )
 
-        # S_non_gens =
-        #     x_from_xr_xi.( P_Q_non_gens_view )
+#         # S_non_gens =
+#         #     x_from_xr_xi.( P_Q_non_gens_view )
 
-        # for (idx, S_node_type) in zip(
-        #     [gens_nodes_idx, non_gens_nodes_idx],
-        #     [S_gens, S_non_gens ] )
+#         # for (idx, S_node_type) in zip(
+#         #     [gens_nodes_idx, non_gens_nodes_idx],
+#         #     [S_gens, S_non_gens ] )
 
-        #     current_mismatch[idx] .= I_sum_ynj_vj[idx] +
-        #        ((conj.(S_node_type))./(conj.(uh[idx]))) 
-        # end
+#         #     current_mismatch[idx] .= I_sum_ynj_vj[idx] +
+#         #        ((conj.(S_node_type))./(conj.(uh[idx]))) 
+#         # end
 
         
-        S_gens =
-            x_from_xr_xi.(P_Q_gens_view )
+#         S_gens =
+#             x_from_xr_xi.(P_Q_gens_view )
 
-        I_gens =
-            conj.(S_gens) ./ conj.(uh[gens_nodes_idx])
+#         I_gens =
+#             conj.(S_gens) ./ conj.(uh[gens_nodes_idx])
 
-        current_mismatch[gens_nodes_idx] .=
-            I_sum_ynj_vj[gens_nodes_idx] - I_gens
+#         current_mismatch[gens_nodes_idx] .=
+#             I_sum_ynj_vj[gens_nodes_idx] - I_gens
         
-        S_non_gens =
-            x_from_xr_xi.(P_Q_non_gens_view )
+#         S_non_gens =
+#             x_from_xr_xi.(P_Q_non_gens_view )
 
-        I_non_gens =
-            conj.(S_non_gens) ./ conj.(
-                uh[non_gens_nodes_idx])
+#         I_non_gens =
+#             conj.(S_non_gens) ./ conj.(
+#                 uh[non_gens_nodes_idx])
 
-        current_mismatch[non_gens_nodes_idx] .=
-            I_sum_ynj_vj[non_gens_nodes_idx] + I_non_gens
+#         current_mismatch[non_gens_nodes_idx] .=
+#             I_sum_ynj_vj[non_gens_nodes_idx] + I_non_gens
         
-    end
+#     end
 
-    return current_mismatch
+#     return current_mismatch
     
     
-end
+# end
 
 
 
@@ -4815,65 +4817,65 @@ end
 
 
 
-function get_nodes_current_mismatch_idq_θπ(
-    uh,
-    ( P_Q_non_gens_view,
-      P_Q_gens_loc_load_view ),
-    ( gens_nodes_idx,
-        non_gens_nodes_idx,
-      gens_with_loc_load_idx ),
-    idq_θ_π_vhθh,
-    I_sum_ynj_vj;
-    loc_load_exist = false)
+# function get_nodes_current_mismatch_idq_θπ(
+#     uh,
+#     ( P_Q_non_gens_view,
+#       P_Q_gens_loc_load_view ),
+#     ( gens_nodes_idx,
+#         non_gens_nodes_idx,
+#       gens_with_loc_load_idx ),
+#     idq_θ_π_vhθh,
+#     I_sum_ynj_vj;
+#     loc_load_exist = false)
 
-    nodes_size =
-        sum(
-            [length(gens_nodes_idx),
-             length(non_gens_nodes_idx) ])
+#     nodes_size =
+#         sum(
+#             [length(gens_nodes_idx),
+#              length(non_gens_nodes_idx) ])
 
-    # This should not be zero initially
+#     # This should not be zero initially
     
-    current_mismatch = ones(ComplexF64, nodes_size )
+#     current_mismatch = ones(ComplexF64, nodes_size )
 
 
-    if loc_load_exist == true
+#     if loc_load_exist == true
 
-        current_mismatch[gens_nodes_idx] .=
-            I_sum_ynj_vj[gens_nodes_idx] -
-            idq_θ_π_vhθh[gens_nodes_idx]
+#         current_mismatch[gens_nodes_idx] .=
+#             I_sum_ynj_vj[gens_nodes_idx] -
+#             idq_θ_π_vhθh[gens_nodes_idx]
 
-        S_non_gens =
-            x_from_xr_xi.( P_Q_non_gens_view )
+#         S_non_gens =
+#             x_from_xr_xi.( P_Q_non_gens_view )
 
-        S_gens_loc_load =
-            x_from_xr_xi.( P_Q_gens_loc_load_view )
+#         S_gens_loc_load =
+#             x_from_xr_xi.( P_Q_gens_loc_load_view )
 
-        for (idx, S_node_type) in zip(
-            [ non_gens_nodes_idx,
-             gens_with_loc_load_idx ],
-            [ S_non_gens,  S_gens_loc_load ] )
+#         for (idx, S_node_type) in zip(
+#             [ non_gens_nodes_idx,
+#              gens_with_loc_load_idx ],
+#             [ S_non_gens,  S_gens_loc_load ] )
 
-            current_mismatch[idx] .=
-                I_sum_ynj_vj[idx] .+
-               ((conj.(S_node_type)) ./(conj.(uh[idx])) )
-        end
-    else
+#             current_mismatch[idx] .=
+#                 I_sum_ynj_vj[idx] .+
+#                ((conj.(S_node_type)) ./(conj.(uh[idx])) )
+#         end
+#     else
         
-        current_mismatch[gens_nodes_idx] .=
-            I_sum_ynj_vj[gens_nodes_idx] -
-            idq_θ_π_vhθh[gens_nodes_idx]
+#         current_mismatch[gens_nodes_idx] .=
+#             I_sum_ynj_vj[gens_nodes_idx] -
+#             idq_θ_π_vhθh[gens_nodes_idx]
         
-        S_non_gens =
-            x_from_xr_xi.( P_Q_non_gens_view )
+#         S_non_gens =
+#             x_from_xr_xi.( P_Q_non_gens_view )
 
-        current_mismatch[ non_gens_nodes_idx ] .=
-                I_sum_ynj_vj[ non_gens_nodes_idx ] .+
-                ((conj.(S_non_gens)) ./ (conj.(uh[non_gens_nodes_idx]))) 
+#         current_mismatch[ non_gens_nodes_idx ] .=
+#                 I_sum_ynj_vj[ non_gens_nodes_idx ] .+
+#                 ((conj.(S_non_gens)) ./ (conj.(uh[non_gens_nodes_idx]))) 
         
-    end
+#     end
 
-    return current_mismatch
-end
+#     return current_mismatch
+# end
 
 
 
