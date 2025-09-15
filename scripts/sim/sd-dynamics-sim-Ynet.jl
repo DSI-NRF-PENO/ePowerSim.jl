@@ -67,13 +67,13 @@ pf_alg      = NewtonRaphson()
 
 ode_alg     = Rodas4()
 
+dae_alg     = IDA()
+
 # ode_alg   = ImplicitMidpoint()
 
 dt          = 0.0001
 
 Δt          = 1.0 / 2^(4)
-
-dae_alg     = IDA()
 
 abstol      = 1e-12
 
@@ -85,8 +85,7 @@ reltol      = 1e-12
 
 on_fault_time = 10.617 # 10.0
 
-Δt_clear_time =
-    0.5
+Δt_clear_time = 0.5
 
 Δt_generation_adjustment_time =
     Δt_clear_time # 0.2
@@ -301,12 +300,8 @@ network_cases =
      "case57",
      "case118",
      "case300",
-     "case1354pegase",
-     "case2869pegase",
-     # "case9241pegase",
-     # "case13659pegase"
-     
-     ]
+     "case1354",
+     "case2869" ]
 
 #---------------------------------------- 
 

@@ -1,0 +1,5 @@
+
+# [Network Reduction](@id network-reduction)
+
+Demonstrates how  to perform network reduction in ePowerSim.
+

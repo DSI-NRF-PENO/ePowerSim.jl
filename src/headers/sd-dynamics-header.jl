@@ -84,8 +84,8 @@ models_dir =
 network_dir =
     joinpath( src_dir, "network")
 
-parser_dir =
-    joinpath( src_dir, "parser")
+# parser_dir =
+#     joinpath( src_dir, "parser")
 
 powerflow_dir =
     joinpath( src_dir, "powerflow")
@@ -128,19 +128,45 @@ dynamics_types_utility_funcs =
 
 include( dynamics_types_utility_funcs )
 
+#------------------------------------
+#------------------------------------
 
-# dynamics_utility_net_state_generic_funcs =
-#     joinpath(
-#         utilities_dir,
-#         "sd-dynamics-utility-net-state-generic-funcs.jl")
+dynamics_stability =
+    joinpath(network_dir,
+             "sd-dynamics-stability-x-new-sparse.jl")
 
-# include(dynamics_utility_net_state_generic_funcs)
+include( dynamics_stability )
 
-# dynamics_utility_net_state_funcs =
-#     joinpath( utilities_dir,
-#              "sd-dynamics-utility-net-state-funcs.jl")
 
-# include( dynamics_utility_net_state_funcs)
+dynamics_control_devices_structure =
+    joinpath(network_dir,
+             "sd-dynamics-control-devices-structure.jl")
+
+include( dynamics_control_devices_structure)
+
+
+dynamics_edge_components_structure =
+    joinpath(network_dir,
+             "sd-dynamics-edge-components-structure.jl")
+
+include( dynamics_edge_components_structure)
+
+
+dynamics_node_components_structure =
+    joinpath(network_dir,
+             "sd-dynamics-node-components-structure.jl")
+
+include( dynamics_node_components_structure)
+
+
+dynamics_plants_structures =
+    joinpath(network_dir,
+             "sd-dynamics-plants-structures.jl")
+
+include( dynamics_plants_structures)
+
+#------------------------------------
+#------------------------------------
 
 dynamics_utility_powerflow_generic_funcs =
     joinpath( utilities_dir,
@@ -148,83 +174,11 @@ dynamics_utility_powerflow_generic_funcs =
 
 include( dynamics_utility_powerflow_generic_funcs )
 
-# dynamics_utility_powerflow_funcs =
-#     joinpath( utilities_dir,
-#              "sd-dynamics-utility-powerflow-funcs.jl")
-
-# include( dynamics_utility_powerflow_funcs )
-
 dynamics_utility_plots_funcs =
     joinpath( utilities_dir,
              "sd-dynamics-utility-plots-funcs.jl")
 
 include( dynamics_utility_plots_funcs )
-
-# dynamics_stability =
-#     joinpath( network_dir,
-#              "sd-dynamics-stability-x-new-sparse.jl")
-
-# include( dynamics_stability )
-
-# dynamics_control_devices_structure =
-#     joinpath( network_dir,
-#              "sd-dynamics-control-devices-structure.jl")
-
-# include( dynamics_control_devices_structure)
-
-# dynamics_edge_components_structure =
-#     joinpath( network_dir,
-#              "sd-dynamics-edge-components-structure.jl")
-
-# include( dynamics_edge_components_structure)
-
-# dynamics_node_components_structure =
-#     joinpath( network_dir,
-#              "sd-dynamics-node-components-structure.jl")
-
-# include( dynamics_node_components_structure)
-
-# dynamics_plants_structures =
-#     joinpath( network_dir,
-#              "sd-dynamics-plants-structures.jl")
-
-# include( dynamics_plants_structures)
-
-# dynamics_plants_accessor_func =
-#     joinpath( network_dir,
-#              "sd-dynamics-plants-accessor-func.jl")
-
-# include( dynamics_plants_accessor_func)
-
-# dynamics_network_data_structure =
-#     joinpath( network_dir,
-#              "sd-dynamics-network-data-structure.jl")
-
-# include( dynamics_network_data_structure)
-
-# dynamics_init =
-#     joinpath( init_dir,
-#              "sd-dynamics-init.jl")
-
-# include( dynamics_init)
-
-# dynamics_network_Idx =
-#     joinpath( network_dir,
-#              "sd-dynamics-network-Idx.jl")
-
-# include( dynamics_network_Idx)
-
-# dynamics_core =
-#     joinpath( network_dir,
-#              "sd-dynamics-core.jl")
-
-# include( dynamics_core)
-
-# dynamics_powerflow_parameters =
-#     joinpath(powerflow_dir,
-#              "sd-dynamics-powerflow-parameters.jl")
-
-# include( dynamics_powerflow_parameters  )
 
 dynamics_dynamic_powerflow =
     joinpath( powerflow_dir,
@@ -232,26 +186,7 @@ dynamics_dynamic_powerflow =
 
 include( dynamics_dynamic_powerflow )
 
-# dynamics_types_utility_funcs =
-#     joinpath( components_types_dir,
-#              "sd-dynamics-types-utility-funcs.jl")
-
-# include( dynamics_types_utility_funcs )
-
 # ------------------------------------------------------
-
-
-# dynamics_ode_models =
-#     joinpath( models_dir,
-#             "sd-dynamics-ode-models.jl")
-
-# include( dynamics_ode_models )
-
-# dynamics_ode_models_update_and_para =
-#     joinpath( models_dir,
-#     "sd-dynamics-ode-models-update-parameters.jl")
-
-# include( dynamics_ode_models_update_and_para )
 
 dynamics_powerflow_mismatch =
     joinpath( powerflow_dir,
@@ -265,23 +200,11 @@ dynamics_powerflow_results =
 
 include( dynamics_powerflow_results  )
 
-# dynamics_small_signal_stability =
-#     joinpath( stability_dir,
-#              "sd-dynamics-small-signal-stability.jl")
-
-# include( dynamics_small_signal_stability )
-
 dynamics_reduced_order_models =
     joinpath( reduced_order_dir,
              "sd-dynamics-reduced-order-models.jl")
 
 include( dynamics_reduced_order_models )
-
-# dynamics_dae_formulation =
-#     joinpath( models_dir,
-#              "sd-dynamics-dae-formulation.jl")
-
-# include( dynamics_dae_formulation )
 
 dynamics_dae_generic_algebraic_equations =
     joinpath( models_dir,
@@ -357,15 +280,17 @@ dynamics_utility_accessors =
     joinpath(utilities_dir,
              "sd-dynamics-utility-accessors-funcs.jl")
 
-include( dynamics_utility_accessors  )
+include( dynamics_utility_accessors )
 
 # ------------------------------------------------------
 
-# dynamics_matpower_parser =
-#     joinpath(parser_dir,
-#              "sd-dynamics-matpower-parser.jl")
+dynamics_matpower_parser =
+    joinpath(utilities_dir,
+             "sd-dynamics-matpower-parser.jl")
 
-# include( dynamics_matpower_parser )
+include( dynamics_matpower_parser )
+
+# ------------------------------------------------------
 
 dynamics_libs =
     joinpath(utilities_dir,
@@ -421,6 +346,7 @@ include( dynamics_sim_funcs )
 
 # ------------------------------------------------------
 
-println( "I am done with include files" )
+# println( "I am done with include files" )
 
+#-------------------------------------------------------
 #-------------------------------------------------------

@@ -6381,21 +6381,6 @@ function ode_generic_system_model_by_funcs_dynamics!(
         
 
     end
-
-    
-    # #----------------------------------------
-    # #----------------------------------------
-    # # using aggregate plants dynamics 
-    # #----------------------------------------
-    # #----------------------------------------
-
-    # ode_gens_plants_generic_model_func!(
-    #     du_state_vars_view,
-    #     u_state_vars_view,
-    #     ωref0_vref0_porder0_id_iq_vh,
-    #     t;
-    #     kwd_para =
-    #         ode_plants_kwd_para )
     
     #----------------------------------------    
     #----------------------------------------
@@ -6411,13 +6396,6 @@ function ode_generic_system_model_by_funcs_dynamics!(
          Q_non_gens;
          P_g_loc_load;
          Q_g_loc_load]
-    
-    # pf_algebraic_generic_model_sol(
-    #     dx[algebraic_var_Idx_in_state],
-    #     x[algebraic_var_Idx_in_state],
-    #     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-    #     kwd_para =
-    #         algebraic_generic_model_sol_kwd_para )
 
 
     vh_θh_id_iq =
@@ -6455,13 +6433,6 @@ function ode_generic_system_dynamics_by_ode_pf_funcs!(
     kwd_para =
         generic_model_dynamics_kwd_para  )
 
-    #----------------------------------------
-
-
-    # (;generic_model_dynamics_para,
-    #   plants_cb_paras_switches ) =
-    #      model_dynamics_para
-    
     #----------------------------------------
 
     (;gens_nodes_idx,
@@ -7535,21 +7506,6 @@ function dae_generic_system_model_by_funcs_dynamics!(
     end
 
     
-    # #----------------------------------------
-    # #----------------------------------------
-    # # using aggregate plants dynamics 
-    # #----------------------------------------
-    # #----------------------------------------
-
-    # dae_gens_plants_generic_model_func!(
-    #     res_state_vars_view,
-    #     du_state_vars_view,
-    #     u_state_vars_view,
-    #     ωref0_vref0_porder0_id_iq_vh,
-    #     t;
-    #     kwd_para =
-    #         dae_plants_kwd_para )
-    
     #----------------------------------------
     #----------------------------------------
     # power flow equations
@@ -7854,61 +7810,12 @@ function dae_generic_system_dynamics_by_dae_pf_funcs!(
     # using per plant dynamics 
     #----------------------------------------
     #----------------------------------------
-
-    # (per_plant_gov_dyn_fun_sym_name,
-    #  per_plant_generic_model_para,
-    #  per_plant_generic_model_kwd_para) =
-    #      get_generic_namedtuple_per_plant_para_wt_kwd_para(
-    #          ωref0_vref0_porder0_id_iq_vh;
-    #          kwd_para = dae_plants_kwd_para )
-
-    # for (a_res_state_vars_view,
-    #      a_du_state_vars_view,
-    #      a_u_state_vars_view,
-         
-    #      a_gov_dyn_fun_sym_name,
-    #      a_ωref0_vref0_porder0_id_iq_vh,
-    #      a_per_kwd_para) in zip(
-    #          res_states_vars_views,
-    #          du_states_vars_views,
-    #          u_states_vars_views,
-             
-    #          per_plant_gov_dyn_fun_sym_name,
-    #          per_plant_generic_model_para,
-    #          per_plant_generic_model_kwd_para )
-        
-    #     if a_gov_dyn_fun_sym_name == :nothing
-            
-    #         dae_a_SC_plant_generic_model_func!(
-    #             a_res_state_vars_view,
-    #             a_du_state_vars_view,
-    #             a_u_state_vars_view,
-    #             a_ωref0_vref0_porder0_id_iq_vh,
-    #             t;
-    #             kwd_para =
-    #                 a_per_kwd_para )
-    #     else
-
-    #         dae_a_SM_plant_generic_model_func!(
-    #             a_res_state_vars_view,
-    #             a_du_state_vars_view,
-    #             a_u_state_vars_view,
-    #             a_ωref0_vref0_porder0_id_iq_vh,
-    #             t;
-    #             kwd_para =
-    #                 a_per_kwd_para )
-            
-    #     end
-        
-
-    # end
-
     
-    # #----------------------------------------
-    # #----------------------------------------
-    # # using aggregate plants dynamics 
-    # #----------------------------------------
-    # #----------------------------------------
+    #----------------------------------------
+    #----------------------------------------
+    # using aggregate plants dynamics 
+    #----------------------------------------
+    #----------------------------------------
 
     dae_gens_plants_generic_model_func!(
         res_state_vars_view,
@@ -8273,23 +8180,6 @@ function mm_ode_generic_system_model_dynamics!(
     #----------------------------------------
     #----------------------------------------
 
-    # # ode_gens_plants_generic_model_func!(
-    # #     dx[state_var_Idx_in_state],
-    # #     x[state_var_Idx_in_state],
-    # #     ωref0_vref0_porder0_id_iq_vh,
-    # #     t;
-    # #     kwd_para =
-    # #         plants_kwd_para )
-
-    
-    # ode_gens_plants_generic_model_func!(
-    #     ode_dx_views,
-    #     ode_x_views,
-    #     ωref0_vref0_porder0_id_iq_vh,
-    #     t;
-    #     kwd_para =
-    #         plants_kwd_para )
-
     ωref0_vref0_porder0_id_iq_vh =
         [ω_ref;
          v_ref;
@@ -8320,21 +8210,6 @@ function mm_ode_generic_system_model_dynamics!(
          Q_non_gens;
          P_g_loc_load;
          Q_g_loc_load]
-    
-    # pf_algebraic_generic_model_sol(
-    #     dx[algebraic_var_Idx_in_state],
-    #     x[algebraic_var_Idx_in_state],
-    #     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-    #     kwd_para =
-    #         algebraic_generic_model_sol_kwd_para )
-
-    
-    # ode_pf_algebraic_generic_model_sol(
-    #     du_algebraic_vars_view,
-    #     u_algebraic_vars_view,
-    #     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-    #     kwd_para =
-    #         algebraic_generic_model_sol_kwd_para )
     
     algebraic_generic_pf_ΔPQ_mismatch_sol(
         du_algebraic_vars_view,
@@ -8387,7 +8262,7 @@ function mm_ode_generic_system_model_by_funcs_dynamics!(
 
      ode_plants_kwd_para,
 
-     algebraic_generic_model_sol_kwd_para,
+     # algebraic_generic_model_sol_kwd_para,
      algebraic_generic_model_kwd_para) =
          NamedTupleTools.select(
              kwd_para,
@@ -8411,7 +8286,7 @@ function mm_ode_generic_system_model_by_funcs_dynamics!(
               
               :ode_plants_kwd_para,
 
-              :algebraic_generic_model_sol_kwd_para,
+              # :algebraic_generic_model_sol_kwd_para,
               :algebraic_generic_model_kwd_para))
 
 
@@ -8659,21 +8534,6 @@ function mm_ode_generic_system_model_by_funcs_dynamics!(
         
 
     end
-
-    
-    # #----------------------------------------
-    # #----------------------------------------
-    # # using aggregate plants dynamics 
-    # #----------------------------------------
-    # #----------------------------------------
-
-    # ode_gens_plants_generic_model_func!(
-    #     du_state_vars_view,
-    #     u_state_vars_view,
-    #     ωref0_vref0_porder0_id_iq_vh,
-    #     t;
-    #     kwd_para =
-    #         ode_plants_kwd_para )
     
     #----------------------------------------    
     #----------------------------------------
@@ -8689,33 +8549,12 @@ function mm_ode_generic_system_model_by_funcs_dynamics!(
          Q_non_gens;
          P_g_loc_load;
          Q_g_loc_load]
-    
-    # pf_algebraic_generic_model_sol(
-    #     dx[algebraic_var_Idx_in_state],
-    #     x[algebraic_var_Idx_in_state],
-    #     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-    #     kwd_para =
-    #         algebraic_generic_model_sol_kwd_para )
-
 
     vh_θh_id_iq =
         [vh;
          θh;
          gens_i_d;
          gens_i_q]
-
-    # # ode_pf_algebraic_generic_model_sol_ext
-    
-    # pf_sol = algebraic_generic_pf_ΔPQ_mismatch_sol(
-    #     vh_θh_id_iq,
-    #     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-    #     kwd_para =
-    #         algebraic_generic_model_sol_kwd_para )
-    
-        
-    # du_algebraic_vars_view .=
-    #     pf_sol[ idx_range ] -  u_algebraic_vars_view
-
     
     algebraic_generic_pf_ΔPQ_mismatch!(
         du_algebraic_vars_view,
@@ -8743,7 +8582,6 @@ function mm_ode_generic_system_dynamics_by_ode_pf_funcs!(
 
     #----------------------------------------
 
-
     # (;generic_model_dynamics_para,
     #   plants_cb_paras_switches ) =
     #      model_dynamics_para
@@ -8770,7 +8608,7 @@ function mm_ode_generic_system_dynamics_by_ode_pf_funcs!(
 
      ode_plants_kwd_para,
 
-     algebraic_generic_model_sol_kwd_para,
+     # algebraic_generic_model_sol_kwd_para,
      algebraic_generic_model_kwd_para) =
          NamedTupleTools.select(
              kwd_para,
@@ -8794,9 +8632,8 @@ function mm_ode_generic_system_dynamics_by_ode_pf_funcs!(
               
               :ode_plants_kwd_para,
 
-              :algebraic_generic_model_sol_kwd_para,
-              :algebraic_generic_model_kwd_para))
-
+              # :algebraic_generic_model_sol_kwd_para,
+              :algebraic_generic_model_kwd_para ))
 
     #----------------------------------------
     
@@ -9019,31 +8856,12 @@ function mm_ode_generic_system_dynamics_by_ode_pf_funcs!(
          Q_non_gens;
          P_g_loc_load;
          Q_g_loc_load]
-    
-    # pf_algebraic_generic_model_sol(
-    #     dx[algebraic_var_Idx_in_state],
-    #     x[algebraic_var_Idx_in_state],
-    #     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-    #     kwd_para =
-    #         algebraic_generic_model_sol_kwd_para )
 
     vh_θh_id_iq =
         [vh;
          θh;
          gens_i_d;
          gens_i_q]
-
-    # # ode_pf_algebraic_generic_model_sol_ext
-    
-    # pf_sol = algebraic_generic_pf_ΔPQ_mismatch_sol(
-    #     vh_θh_id_iq,
-    #     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-    #     kwd_para =
-    #         algebraic_generic_model_sol_kwd_para )
-    
-        
-    # du_algebraic_vars_view .=
-    #     pf_sol[ idx_range ] -  u_algebraic_vars_view
         
     algebraic_generic_pf_ΔPQ_mismatch!(
         du_algebraic_vars_view,

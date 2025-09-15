@@ -4303,11 +4303,11 @@ end
 #--------------------------------------------------------
 
 
-function only_gen_in_plant(plant )
+# function only_gen_in_plant(plant )
 
-    return (:Gen ∈ propertynames(plant)) &&  (:Gov ∉ propertynames(plant)) &&  (:Exc ∉ propertynames(plant) )
+#     return (:Gen ∈ propertynames(plant)) &&  (:Gov ∉ propertynames(plant)) &&  (:Exc ∉ propertynames(plant) )
 
-end
+# end
 
 
 function only_gen_in_plant(plant; only_gen = false )
@@ -4343,16 +4343,16 @@ end
 # ------------------------------------------------------
 
 
-function get_only_gen_plant_system_matrices(
-    Gen )
+# function get_only_gen_plant_system_matrices(
+#     Gen )
 
-    return (Ax = Gen.Ax( Gen, Gen.param_matrix_values...),
-            Bx = Gen.Bx( Gen, Gen.param_matrix_values...),
-            Cx = Gen.Cx( Gen, Gen.param_matrix_values...),
-            Ax_τm_vf = Gen.Ax_τm_vf(
-                Gen, Gen.param_matrix_values...)) 
+#     return (Ax = Gen.Ax( Gen, Gen.param_matrix_values...),
+#             Bx = Gen.Bx( Gen, Gen.param_matrix_values...),
+#             Cx = Gen.Cx( Gen, Gen.param_matrix_values...),
+#             Ax_τm_vf = Gen.Ax_τm_vf(
+#                 Gen, Gen.param_matrix_values...)) 
 
-end
+# end
 
 
 function get_only_gen_plant_system_matrices(
@@ -6317,24 +6317,24 @@ end
 #--------------------------------------------------------
 
 
-function get_only_gen_plant_system_stability_matrices(
-    plant)
+# function get_only_gen_plant_system_stability_matrices(
+#     plant)
 
-    return (
-        stab_Ax = plant.Gen.stab_Ax(
-            plant.Gen,
-            plant.Gen.param_matrix_values...),
-        stab_Bx = plant.Gen.stab_Bx(
-            plant.Gen,
-            plant.Gen.param_matrix_values...),
-        stab_Cx = plant.Gen.stab_Cx(
-            plant.Gen,
-            plant.Gen.param_matrix_values...),
-        stab_Ax_τm_vf = plant.Gen.stab_Ax_τm_vf(
-            plant.Gen,
-            plant.Gen.param_matrix_values...)) 
+#     return (
+#         stab_Ax = plant.Gen.stab_Ax(
+#             plant.Gen,
+#             plant.Gen.param_matrix_values...),
+#         stab_Bx = plant.Gen.stab_Bx(
+#             plant.Gen,
+#             plant.Gen.param_matrix_values...),
+#         stab_Cx = plant.Gen.stab_Cx(
+#             plant.Gen,
+#             plant.Gen.param_matrix_values...),
+#         stab_Ax_τm_vf = plant.Gen.stab_Ax_τm_vf(
+#             plant.Gen,
+#             plant.Gen.param_matrix_values...)) 
 
-end
+# end
 
 
 function get_only_gen_plant_system_stability_matrices(

@@ -4,94 +4,31 @@
 # AA Yusuff : yusufaa@unisa.ac.za
 
 
-# using Pkg
-
-# QuickDynamicTest =
-#     joinpath(@__DIR__,"..","..")
-
-# cd(QuickDynamicTest)
-
-# Pkg.activate( QuickDynamicTest )
-
-
-# ####################################################
-
-"""
-https://discourse.julialang.org/t/jump-efficient-quadratic-objective-formulation/6177
-
-https://math.stackexchange.com/questions/3541245/is-there-a-constant-term-in-the-quadratic-form
-
-https://discourse.julialang.org/t/nlp-attribute-scalarnonlinearfunction-is-not-supported-by-the-model/110444/9
-
-https://discourse.julialang.org/t/nlp-attribute-scalarnonlinearfunction-is-not-supported-by-the-model/110444
-
-https://github.com/lanl-ansi/PowerModels.jl/blob/master/src/core/data.jl
-
-https://stackoverflow.com/questions/70817325/user-defined-nonlinear-objective-with-vectorized-variables-in-jump
-
-https://discourse.julialang.org/t/how-to-register-a-function-with-parameter-in-jump/45457
-
-https://discourse.julialang.org/t/how-to-make-a-user-defined-objective-function-with-mulitple-vector-variable-and-parameter-arguments/63849
-
-https://stackoverflow.com/questions/44710900/juliajump-variable-number-of-arguments-to-function
-
-https://github.com/lanl-ansi/PowerModels.jl/blob/96796067773a38510d3ae3a56f4a4eef73fa186e/src/io/matpower.jl
-
-https://discourse.julialang.org/t/how-to-register-a-function-with-parameter-in-jump/45457
-
-https://github.com/jump-dev/JuMP.jl/issues/1914
-
-https://jump.dev/JuMP.jl/stable/tutorials/nonlinear/operator_ad/
-
-https://discourse.julialang.org/t/how-to-create-an-user-defined-function-with-multiple-vector-as-inputs/99068
-
-https://discourse.julialang.org/t/registering-user-defined-functions-in-jump-for-mixed-integer-non-linear-programming/95522
-
-https://juliamath.github.io/Polynomials.jl/stable/
-
-https://discourse.julialang.org/t/jump-jl-vs-optimization-jl/112736/17
-
-https://github.com/jump-dev/JuMP.jl/blob/master/docs/src/tutorials/linear/basis.jl
-
-https://github.com/jump-dev/JuMP.jl
-
- https://jump.dev/JuMP.jl/stable/tutorials/applications/optimal_power_flow/
-
-
-https://jump.dev/JuMP.jl/stable/tutorials/nonlinear/operator_ad/
-
-https://jump.dev/JuMP.jl/stable/manual/nonlinear/#Common-mistakes-when-writing-a-user-defined-operator
-
-https://jump.dev/JuMP.jl/stable/tutorials/applications/power_systems/
-
-"""
-
 #---------------------------------------------------
 ####################################################
 #---------------------------------------------------
 
-# https://jump.dev/JuMP.jl/stable/tutorials/nonlinear/operator_ad/
 
-"""
-    fdiff_derivatives(f::Function) -> Tuple{Function,Function}
+# """
+#     fdiff_derivatives(f::Function) -> Tuple{Function,Function}
 
-Return a tuple of functions that evaluate the gradient and Hessian of `f` using
-ForwardDiff.jl.
-"""
-function fdiff_derivatives(f::Function)
-    function ∇f(g::AbstractVector{T}, x::Vararg{T,N}) where {T,N}
-        ForwardDiff.gradient!(g, y -> f(y...), collect(x))
-        return
-    end
-    function ∇²f(H::AbstractMatrix{T}, x::Vararg{T,N}) where {T,N}
-        h = ForwardDiff.hessian(y -> f(y...), collect(x))
-        for i in 1:N, j in 1:i
-            H[i, j] = h[i, j]
-        end
-        return
-    end
-    return ∇f, ∇²f
-end
+# Return a tuple of functions that evaluate the gradient and Hessian of `f` using
+# ForwardDiff.jl.
+# """
+# function fdiff_derivatives(f::Function)
+#     function ∇f(g::AbstractVector{T}, x::Vararg{T,N}) where {T,N}
+#         ForwardDiff.gradient!(g, y -> f(y...), collect(x))
+#         return
+#     end
+#     function ∇²f(H::AbstractMatrix{T}, x::Vararg{T,N}) where {T,N}
+#         h = ForwardDiff.hessian(y -> f(y...), collect(x))
+#         for i in 1:N, j in 1:i
+#             H[i, j] = h[i, j]
+#         end
+#         return
+#     end
+#     return ∇f, ∇²f
+# end
 
 
 # https://github.com/JuliaStats/PDMats.jl/
@@ -223,27 +160,17 @@ function get_solar_gens_power_forecast(
 
 end
 
+#---------------------------------------------------
 
-"""
-    thermal_cost_function(g)
-
-A user-defined thermal cost function in pure-Julia! You can include
-nonlinearities, and even things like control flow.
-
-!!! warning
-    It's still up to you to make sure that the function has a meaningful
-    derivative.
-"""
-function thermal_cost_function(g)
-    if g <= 500
-        return g
+function thermal_cost_function(pg, c0, c1, c2)
+    if pg <= c0
+        return pg
     else
-        return g + 1e-2 * (g - 500)^2
+        return pg + c1 * (pg - c2)^2
     end
 end
 
-
-function a_gen_cost_fun(pg, c0, c1, c2)
+function a_gen_cost_fun(pg, c0, c1, c2 )
 
     return c0 + c1 * pg + c2 * pg^2
 end
@@ -276,9 +203,32 @@ function a_demand_wind_solar_scenario(
     
 end
 
+
 #---------------------------------------------------
 
+"""
+This was taken from JuMP tutoria:
 
+    thermal_cost_function(g)
+
+A user-defined thermal cost function in pure-Julia! You can include nonlinearities, and even things like control flow.
+
+!!! warning
+    It's still up to you to make sure that the function has a meaningful
+    derivative.
+"""
+function thermal_cost_function(g)
+    if g <= 500
+        return g
+    else
+        return g + 1e-2 * (g - 500)^2
+    end
+end
+
+
+"""
+This was taken from JuMP tutoria:
+"""
 function ThermalGenerator(
     min::Float64,
     max::Float64,
@@ -293,7 +243,9 @@ function ThermalGenerator(
     )
 end
 
-
+"""
+This was taken from JuMP tutoria:
+"""
 function Scenario(
     demand::Float64,
     wind::Float64)
@@ -302,14 +254,18 @@ function Scenario(
             wind = wind)
 end
 
-
+"""
+This was taken from JuMP tutoria:
+"""
 function WindGenerator(variable_cost::Float64)
 
     return (variable_cost = variable_cost,)
 
 end
 
-
+"""
+This was taken from JuMP tutoria:
+"""
 function scale_generator_cost(
     g,
     scale)
@@ -320,7 +276,9 @@ function scale_generator_cost(
         scale * g.variable_cost)
 end
 
-
+"""
+This was taken from JuMP tutoria:
+"""
 function scale_demand(
     scenario,
     scale)
@@ -329,7 +287,7 @@ function scale_demand(
         scenario.wind)
 end
 
-
+#---------------------------------------------------
 #---------------------------------------------------
 
 # transpose(t_pg ) * P * t_pg + transpose(Q) * t_pg
@@ -357,7 +315,6 @@ end
 
 # obj_quadratic_form =
 #     make_obj_quadratic_form(mpc_gencost )
-
 
 
 function obj_quadratic_form(gens_pg)
@@ -3091,7 +3048,6 @@ function get_opf_by_scenario(
 end
 
 
-
 function get_opf_by_relaxation_by_scenario(
     case_file;
     active_power_demand_deviation_scale = 1.1,
@@ -5710,7 +5666,8 @@ function solve_mixed_complementarity(
     #     [300, 350, 400, 450, 500]
 
     # # Utility function coefficients
-    # utility_func_coefficients_B = 1                          
+    # utility_func_coefficients_B = 1
+    
 
     model = Model(PATHSolver.Optimizer)
 
@@ -5910,117 +5867,6 @@ function get_mixed_complementarity(
 end
 
 
-function solve_economic_dispatch(
-    generators::Vector,
-    wind,
-    scenario)
-
-    # Define the economic dispatch (ED) model
-    model = Model(HiGHS.Optimizer)
-    
-    set_silent(model)
-
-    # Define decision variables
-    # power output of generators
-
-    N = length(generators)
-    @variable(
-        model,
-        generators[i].min <= g[i = 1:N] <= generators[i].max)
-    # wind power injection
-    @variable(model, 0 <= w <= scenario.wind)
-
-    # Define the objective function
-    @objective(
-        model,
-        Min,
-        sum(generators[i].variable_cost * g[i]
-            for i in 1:N) +
-        wind.variable_cost * w, )
-
-    # Define the power balance constraint
-    @constraint(
-        model,
-        sum(g[i] for i in 1:N) + w == scenario.demand)
-
-    # Solve statement
-    optimize!(model)
-
-    # assert_is_solved_and_feasible(model)
-
-    # return the optimal value of
-    # the objective function and its minimizers
-    return (
-        g = value.(g),
-        w = value(w),
-        wind_spill = scenario.wind - value(w),
-        total_cost = objective_value(model), )
-end
-
-
-function solve_economic_dispatch_inplace(
-    generators::Vector,
-    wind,
-    scenario,
-    scale::AbstractVector{Float64}, )
-    obj_out = Float64[]
-    w_out = Float64[]
-    g1_out = Float64[]
-    g2_out = Float64[]
-
-    # This function only works for two generators
-    @assert length(generators) == 2
-
-    model = Model(HiGHS.Optimizer)
-    set_silent(model)
-    N = length(generators)
-    @variable(
-        model,
-        generators[i].min <= g[i = 1:N] <=
-            generators[i].max)
-
-    @variable(model, 0 <= w <= scenario.wind)
-
-    @objective(
-        model,
-        Min,
-        sum(
-            generators[i].variable_cost * g[i]
-            for i in 1:N) + wind.variable_cost * w, )
-
-    @constraint(
-        model,
-        sum(g[i]
-            for i in 1:N) + w == scenario.demand)
-
-    for c_g1_scale in scale
-        @objective(
-            model,
-            Min,
-            c_g1_scale * generators[1].variable_cost *
-                g[1] +
-            generators[2].variable_cost * g[2] +
-            wind.variable_cost * w, )
-
-        optimize!(model)
-        # assert_is_solved_and_feasible(model)
-        push!(obj_out, objective_value(model))
-        push!(w_out, value(w))
-        push!(g1_out, value(g[1]))
-        push!(g2_out, value(g[2]))
-    end
-
-    df = DataFrames.DataFrame(;
-        scale = scale,
-        dispatch_G1 = g1_out,
-        dispatch_G2 = g2_out,
-        dispatch_wind = w_out,
-        spillage_wind = scenario.wind .- w_out,
-        total_cost = obj_out,
-    )
-    return df
-end
-
 
 function solve_unit_commitment(
     generators::Vector,
@@ -6133,6 +5979,118 @@ function solve_nonlinear_economic_dispatch(
         wind_spill = scenario.wind - value(w),
         total_cost = objective_value(model), )
 end
+
+
+# function solve_economic_dispatch(
+#     generators::Vector,
+#     wind,
+#     scenario)
+
+#     # Define the economic dispatch (ED) model
+#     model = Model(HiGHS.Optimizer)
+    
+#     set_silent(model)
+
+#     # Define decision variables
+#     # power output of generators
+
+#     N = length(generators)
+#     @variable(
+#         model,
+#         generators[i].min <= g[i = 1:N] <= generators[i].max)
+#     # wind power injection
+#     @variable(model, 0 <= w <= scenario.wind)
+
+#     # Define the objective function
+#     @objective(
+#         model,
+#         Min,
+#         sum(generators[i].variable_cost * g[i]
+#             for i in 1:N) +
+#         wind.variable_cost * w, )
+
+#     # Define the power balance constraint
+#     @constraint(
+#         model,
+#         sum(g[i] for i in 1:N) + w == scenario.demand)
+
+#     # Solve statement
+#     optimize!(model)
+
+#     # assert_is_solved_and_feasible(model)
+
+#     # return the optimal value of
+#     # the objective function and its minimizers
+#     return (
+#         g = value.(g),
+#         w = value(w),
+#         wind_spill = scenario.wind - value(w),
+#         total_cost = objective_value(model), )
+# end
+
+
+# function solve_economic_dispatch_inplace(
+#     generators::Vector,
+#     wind,
+#     scenario,
+#     scale::AbstractVector{Float64}, )
+#     obj_out = Float64[]
+#     w_out = Float64[]
+#     g1_out = Float64[]
+#     g2_out = Float64[]
+
+#     # This function only works for two generators
+#     @assert length(generators) == 2
+
+#     model = Model(HiGHS.Optimizer)
+#     set_silent(model)
+#     N = length(generators)
+#     @variable(
+#         model,
+#         generators[i].min <= g[i = 1:N] <=
+#             generators[i].max)
+
+#     @variable(model, 0 <= w <= scenario.wind)
+
+#     @objective(
+#         model,
+#         Min,
+#         sum(
+#             generators[i].variable_cost * g[i]
+#             for i in 1:N) + wind.variable_cost * w, )
+
+#     @constraint(
+#         model,
+#         sum(g[i]
+#             for i in 1:N) + w == scenario.demand)
+
+#     for c_g1_scale in scale
+#         @objective(
+#             model,
+#             Min,
+#             c_g1_scale * generators[1].variable_cost *
+#                 g[1] +
+#             generators[2].variable_cost * g[2] +
+#             wind.variable_cost * w, )
+
+#         optimize!(model)
+#         # assert_is_solved_and_feasible(model)
+#         push!(obj_out, objective_value(model))
+#         push!(w_out, value(w))
+#         push!(g1_out, value(g[1]))
+#         push!(g2_out, value(g[2]))
+#     end
+
+#     df = DataFrames.DataFrame(;
+#         scale = scale,
+#         dispatch_G1 = g1_out,
+#         dispatch_G2 = g2_out,
+#         dispatch_wind = w_out,
+#         spillage_wind = scenario.wind .- w_out,
+#         total_cost = obj_out,
+#     )
+#     return df
+# end
 
 #---------------------------------------------------
 # mixed complementarity problems
@@ -6661,450 +6619,3 @@ end
     
     
 # end
-
-# #---------------------------------------------------
-# #---------------------------------------------------
-# # Test
-# #---------------------------------------------------
-# #---------------------------------------------------
-
-# # case_matpower_dict = get_matpower_dict_by_case_file(
-# #     case_file )
-
-# # matpower_dict_keys  =
-# #     keys( get_matpower_dict_by_case_file(
-# #         case_file ) )
-
-# function case1_driver_examples_from_jump()
-
-#     # Economic dispatch
-
-#     # thermal generators:
-
-#     generators = [
-#         ThermalGenerator(0.0, 1000.0, 1000.0, 50.0),
-#         ThermalGenerator(300.0, 1000.0, 0.0, 100.0),
-#     ]
-
-#     # A wind generator
-
-#     wind_generator = WindGenerator(50.0)
-
-#     # a scenario
-
-#     scenario = Scenario(1500.0, 200.0)
-
-#     # economic_dispatch,
-
-#     solution =
-#         solve_economic_dispatch(
-#             generators,
-#             wind_generator,
-#             scenario);
-
-#     println("Dispatch of Generators: ", solution.g, " MW")
-#     println("Dispatch of Wind: ", solution.w, " MW")
-#     println("Wind spillage: ", solution.wind_spill, " MW")
-#     println("Total cost: \$", solution.total_cost)
-
-# end
-
-
-# function case2_driver_examples_from_jump()
-
-#     # Economic dispatch
-
-#     # thermal generators:
-
-#     generators = [
-#         ThermalGenerator(0.0, 1000.0, 1000.0, 50.0),
-#         ThermalGenerator(300.0, 1000.0, 0.0, 100.0),
-#     ]
-
-#     # A wind generator
-
-#     wind_generator = WindGenerator(50.0)
-
-#     # a scenario
-
-#     scenario = Scenario(1500.0, 200.0)
-#     #---------------------------------------------------
-
-#     # Economic dispatch with adjustable incremental costs
-
-#     start = time()
-    
-#     c_g_scale_df = DataFrames.DataFrame(;
-#         # Scale factor
-#         scale = Float64[],
-#         # Dispatch of Generator 1 [MW]
-#         dispatch_G1 = Float64[],
-#         # Dispatch of Generator 2 [MW]
-#         dispatch_G2 = Float64[],
-#         # Dispatch of Wind [MW]
-#         dispatch_wind = Float64[],
-#         # Spillage of Wind [MW]
-#         spillage_wind = Float64[],
-#         # Total cost [$]
-#         total_cost = Float64[], )
-    
-#     for c_g1_scale in 0.5:0.1:3.0
-        
-#         # Update the incremental cost of the
-#         # first generator at every iteration.
-        
-#         new_generators =
-#             scale_generator_cost.(
-#                 generators,
-#                 [c_g1_scale, 1.0])
-        
-#         # Solve the economic-dispatch problem with
-#         # the updated incremental cost
-#         sol =
-#             solve_economic_dispatch(
-#                 new_generators,
-#                 wind_generator,
-#                 scenario)
-#         push!(
-#             c_g_scale_df,
-#             (c_g1_scale,
-#              sol.g[1],
-#              sol.g[2],
-#              sol.w,
-#              sol.wind_spill,
-#              sol.total_cost), )
-#     end
-
-#     print(
-#         string("elapsed time: ",
-#                time() - start,
-#                " seconds"))
-
-#     c_g_scale_df
-
-# end
-
-
-# function case3_driver_examples_from_jump()
-
-#     # Economic dispatch
-
-#     # thermal generators:
-
-#     generators = [
-#         ThermalGenerator(0.0, 1000.0, 1000.0, 50.0),
-#         ThermalGenerator(300.0, 1000.0, 0.0, 100.0),
-#     ]
-
-#     # A wind generator
-
-#     wind_generator = WindGenerator(50.0)
-
-#     # a scenario
-
-#     scenario = Scenario(1500.0, 200.0)
-
-#     # Modifying the JuMP model in-place
-
-#     start = time()
-    
-#     inplace_df = solve_economic_dispatch_inplace(
-#         generators,
-#         wind_generator,
-#         scenario,
-#         0.5:0.1:3.0, )
-    
-#     print(
-#         string("elapsed time: ",
-#                time() - start,
-#                " seconds"))
-
-#     inplace_df
-# end
-
-
-# function case4_driver_examples_from_jump()
-
-#     # Economic dispatch
-
-#     # thermal generators:
-
-#     generators = [
-#         ThermalGenerator(0.0, 1000.0, 1000.0, 50.0),
-#         ThermalGenerator(300.0, 1000.0, 0.0, 100.0),
-#     ]
-
-#     # A wind generator
-
-#     wind_generator = WindGenerator(50.0)
-
-#     # a scenario
-
-    
-#     scenario = Scenario(1500.0, 200.0)
-#     #---------------------------------------------------
-
-#     # Inefficient usage of wind generators
-
-#     demand_scale_df = DataFrames.DataFrame(;
-#         demand = Float64[],
-#         dispatch_G1 = Float64[],
-#         dispatch_G2 = Float64[],
-#         dispatch_wind = Float64[],
-#         spillage_wind = Float64[],
-#         total_cost = Float64[],
-#     )
-
-#     for demand_scale in 0.2:0.1:1.4
-        
-#         new_scenario =
-#             scale_demand(
-#                 scenario,
-#                 demand_scale)
-        
-#         sol =
-#             solve_economic_dispatch(
-#                 generators,
-#                 wind_generator,
-#                 new_scenario)
-#         push!(
-#             demand_scale_df,
-#             (
-#                 new_scenario.demand,
-#                 sol.g[1],
-#                 sol.g[2],
-#                 sol.w,
-#                 sol.wind_spill,
-#                 sol.total_cost,
-#             ),
-#         )
-#     end
-
-#     demand_scale_df
-
-#     #---------------------------------------------------
-
-#     dispatch_plot = StatsPlots.@df(
-#         demand_scale_df,
-#         Plots.plot(
-#             :demand,
-#             [:dispatch_G1, :dispatch_G2],
-#             labels = ["G1" "G2"],
-#             title = "Thermal Dispatch",
-#             legend = :bottomright,
-#             linewidth = 3,
-#             xlabel = "Demand",
-#             ylabel = "Dispatch [MW]",
-#         ),
-#     )
-
-#     wind_plot = StatsPlots.@df(
-#         demand_scale_df,
-#         Plots.plot(
-#             :demand,
-#             [:dispatch_wind, :spillage_wind],
-#             labels = ["Dispatch" "Spillage"],
-#             title = "Wind",
-#             legend = :bottomright,
-#             linewidth = 3,
-#             xlabel = "Demand [MW]",
-#             ylabel = "Energy [MW]",
-#         ),
-#     )
-
-#     Plots.plot(dispatch_plot, wind_plot)
-
-# end
-
-# # plt4 = case4_driver_examples_from_jump()
-
-# function case5_driver_examples_from_jump()
-
-#     # thermal generators:
-
-#     generators = [
-#         ThermalGenerator(0.0, 1000.0, 1000.0, 50.0),
-#         ThermalGenerator(300.0, 1000.0, 0.0, 100.0),
-#     ]
-
-#     # A wind generator
-
-#     wind_generator = WindGenerator(50.0)
-
-#     # a scenario
-
-#     scenario = Scenario(1500.0, 200.0)
-    
-#     #---------------------------------------------------
-
-#     # Unit commitment
-
-#     solution =
-#         solve_unit_commitment(
-#             generators,
-#             wind_generator,
-#             scenario)
-
-#     println("Dispatch of Generators: ", solution.g, " MW")
-#     println("Commitments of Generators: ", solution.u)
-#     println("Dispatch of Wind: ", solution.w, " MW")
-#     println("Wind spillage: ", solution.wind_spill, " MW")
-#     println("Total cost: \$", solution.total_cost)
-
-# end
-
-# # case5_driver_examples_from_jump()
-
-# function case6_driver_examples_from_jump()
-
-#     # Economic dispatch
-
-#     # thermal generators:
-
-#     generators = [
-#         ThermalGenerator(0.0, 1000.0, 1000.0, 50.0),
-#         ThermalGenerator(300.0, 1000.0, 0.0, 100.0),
-#     ]
-
-#     # A wind generator
-
-#     wind_generator = WindGenerator(50.0)
-
-#     # a scenario
-
-#     scenario = Scenario(1500.0, 200.0)
-
-#     # Unit commitment as a function of demand
-
-#     uc_df = DataFrames.DataFrame(;
-#         demand = Float64[],
-#         commitment_G1 = Float64[],
-#         commitment_G2 = Float64[],
-#         dispatch_G1 = Float64[],
-#         dispatch_G2 = Float64[],
-#         dispatch_wind = Float64[],
-#         spillage_wind = Float64[],
-#         total_cost = Float64[],
-#     )
-
-#     for demand_scale in 0.2:0.1:1.4
-#         new_scenario =
-#             scale_demand(
-#                 scenario,
-#                 demand_scale)
-        
-#         sol =
-#             solve_unit_commitment(
-#                 generators,
-#                 wind_generator,
-#                 new_scenario)
-        
-#         if sol.status == OPTIMAL
-#             push!(
-#                 uc_df,
-#                 (
-#                     new_scenario.demand,
-#                     sol.u[1],
-#                     sol.u[2],
-#                     sol.g[1],
-#                     sol.g[2],
-#                     sol.w,
-#                     sol.wind_spill,
-#                     sol.total_cost,
-#                 ),
-#             )
-#         end
-        
-#         println("Status: $(sol.status) for " *
-#             "demand_scale = $(demand_scale)")
-#     end
-
-#     uc_df
-
-#     #---------------------------------------------------
-
-#     commitment_plot = StatsPlots.@df(
-#         uc_df,
-#         Plots.plot(
-#             :demand,
-#             [:commitment_G1, :commitment_G2],
-#             labels = ["G1" "G2"],
-#             title = "Commitment",
-#             legend = :bottomright,
-#             linewidth = 3,
-#             xlabel = "Demand [MW]",
-#             ylabel = "Commitment decision {0, 1}",
-#         ),
-#     )
-
-#     dispatch_plot = StatsPlots.@df(
-#         uc_df,
-#         Plots.plot(
-#             :demand,
-#             [:dispatch_G1, :dispatch_G2, :dispatch_wind],
-#             labels = ["G1" "G2" "Wind"],
-#             title = "Dispatch [MW]",
-#             legend = :bottomright,
-#             linewidth = 3,
-#             xlabel = "Demand",
-#             ylabel = "Dispatch [MW]",
-#         ),
-#     )
-
-#     Plots.plot(commitment_plot, dispatch_plot)
-
-# end
-
-# # plt6 = case6_driver_examples_from_jump()
-
-# function case7_driver_examples_from_jump()
-
-#     # Nonlinear economic dispatch
-    
-#     # thermal generators:
-
-#     generators = [
-#         ThermalGenerator(0.0, 1000.0, 1000.0, 50.0),
-#         ThermalGenerator(300.0, 1000.0, 0.0, 100.0),
-#     ]
-
-#     # A wind generator
-
-#     wind_generator = WindGenerator(50.0)
-
-#     # a scenario
-
-#     scenario = Scenario(1500.0, 200.0)
-
-#     solution =
-#         solve_nonlinear_economic_dispatch(
-#             generators,
-#             wind_generator,
-#             scenario)
-
-#     wind_cost = 0.0:1:100
-    
-#     wind_dispatch = Float64[]
-    
-#     for c in wind_cost
-#         sol = solve_nonlinear_economic_dispatch(
-#             generators,
-#             WindGenerator(c),
-#             scenario;
-#             silent = true,
-#         )
-#         push!(wind_dispatch, sol.w)
-#     end
-
-#     Plots.plot(
-#         wind_cost,
-#         wind_dispatch;
-#         xlabel = "Cost",
-#         ylabel = "Dispatch [MW]",
-#         label = false,
-#     )
-
-# end
-
-# plt7 = case7_driver_examples_from_jump()
-

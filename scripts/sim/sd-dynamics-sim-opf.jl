@@ -1,8 +1,3 @@
-# ####################################################
-# using Pkg
-# PowerSystemsCoSim_folder = joinpath(@__DIR__,"../..")
-# cd(PowerSystemsCoSim_folder)
-# Pkg.activate(PowerSystemsCoSim_folder)
 
 #---------------------------------------------------
 # global settings

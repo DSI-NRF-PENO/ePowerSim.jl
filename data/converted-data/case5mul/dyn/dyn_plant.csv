@@ -1,0 +1,6 @@
+bus,Plant_type,Gen,isa_slack,Gov,Exc
+1-1,plant_cb_v6,SM_2axis_cb_v6,false,gov_t1_cb_sauer__1_param,avr_t1_cb_sauer__1_param
+1-2,plant_cb_v6,SM_2axis_cb_v6,false,gov_t1_cb_sauer__1_param,avr_t1_cb_sauer__1_param
+3,plant_wt_loc_load_v6,SM_2axis_wt_loc_load_cb_v6,false,gov_t1_cb_sauer__1_param,avr_t1_cb_sauer__1_param
+4,plant_wt_loc_load_v6,SM_2axis_wt_loc_load_cb_v6,true,gov_t1_cb_sauer__1_param,avr_t1_cb_sauer__1_param
+5,plant_cb_v6,SM_2axis_cb_v6,false,gov_t1_cb_sauer__1_param,avr_t1_cb_sauer__1_param

@@ -5,50 +5,6 @@
 
 ####################################################
 
-# using Pkg
-
-# QuickDynamicTest =
-#     joinpath(@__DIR__,"..","..")
-
-# cd(QuickDynamicTest)
-
-# Pkg.activate( QuickDynamicTest )
-
-# #---------------------------------------------------
-# #---------------------------------------------------
-
-#---------------------------------------------------
-#---------------------------------------------------
-
-
-"""
-https://discourse.julialang.org/t/bifurcationkit-jl-automatic-bifurcation-diagrams-in-julia/42192
-
-https://discourse.julialang.org/t/producing-fold-bifurcation-diagram-using-birfurcationkit/96543
-
-https://discourse.julialang.org/t/bifurcationkit-jl-automatic-bifurcation-diagrams-in-julia/42192/2
-
-https://github.com/JuliaDynamics/Attractors.jl
-
-https://discourse.julialang.org/t/too-many-bifurcation-points-marked/123504
-
-
-"""
-
-#---------------------------------------------------
-
-
-# get_nodes_incident_edges
-
-# get_nodes_incident_edges_by_orientations
-
-# get_Cnb_by_orientations(edges_orientations)
-
-# get_Cbn_by_orientations(edges_orientations)
-
-# get_nodes_incident_edges_by_orientations( edges_orientations )
-
-
 #---------------------------------------------------
 #---------------------------------------------------
 # Distributed slack bus

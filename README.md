@@ -2,7 +2,29 @@
 
 ## Citing
 
-See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
+If you use `ePowerSim.jl` in your work, we ask that you cite and
+consider starring this repository. These will help us to guage the impact of our work and possibly secure additional grants for development.  See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
+
+## Installation
+
+This package requires Julia >= v1.11.4 
+
+To install it, please run
+
+`] add https://github.com/DSI-NRF-PENO/ePowerSim.jl.git`
 
 # ePowerSim.jl
-An energy and power system modelling, simulation and analysis package for static and dynamic simulations. It is part of Power, Energy, Network and Optimisation (PENO) Framework supported by DSI/NRF SARChi chair on PENO initiative at University of South Africa.
+An energy and power system modelling, simulation and analysis package
+for static and dynamic simulations. It is part of Power, Energy,
+Network and Optimisation (PENO) Framework supported by DSI/NRF SARChi
+chair on PENO initiative at University of South Africa.
+
+## Funding
+Development of this project is in part funded by the *South African
+Department of Science and Innovation (DSI), and National Research
+Foundation (NRF) under  South African Research Chair Initiative
+(SARChi) in Power, Energy, Network and Optimnisation  (Grant Numbers 150572, 2023-2027).
+
+```@raw html
+<img src="docs/src/assets/dsi-nrf-umisa.png"  width="20%" height="20%"/>
+```

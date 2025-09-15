@@ -344,10 +344,10 @@ end
 #---------------------------------------------------
 
 """
-`get_dict_states_syms_from_json_lib_file`
+    get_dict_states_syms_from_json_lib_file(
+        json_states_syms_lib_file)
 
-This function converts values read from
-`json_states_syms_lib_file` to symbolds
+ Converts values read from `json_states_syms_lib_file` to symbols
 
 """
 function get_dict_states_syms_from_json_lib_file(
@@ -370,13 +370,14 @@ function get_dict_states_syms_from_json_lib_file(
 end
 
 """
-`get_gens_govs_avrs_types_by_json`
+    get_gens_govs_avrs_types_by_json(
+        plant_generators_data_from_json)
 
-This function selects :gen, :gov, :avr as a tuple
-from  :components_type property of a plant.
+It selects `:gen`, `:gov`, `:avr` as a tuple
+from  `:components_type` property of a plant.
 
-:components_type property of a plant contains other
-properties such as :loc_load
+`:components_type` property of a plant contains other
+properties such as `:loc_load`.
 """
 function get_gens_govs_avrs_types_by_json(
     plant_generators_data_from_json )
@@ -397,19 +398,26 @@ function get_gens_govs_avrs_types_by_json(
 end
 
 """
-`get_gens_govs_avrs_states_syms_by_json`
+     get_gens_govs_avrs_states_syms_by_json(
+            net_data_by_components_file;
+            components_libs_dir =
+                components_libs_dir )
 
-This function retrives states variables symbols for
-different types of gens, govs, and avrs from the library
-of state symbols.
+
+Retrives states variables symbols `gens_govs_avrs_states_syms`, `gens_govs_avrs_types` for different types of gens, govs, and avrs from the library of state symbols.
+
+
+# Arguments
+- `net_data_by_components_file::String`: the path to network json file.
+- `components_libs_dir::String`: the path to components library folder.
 
 This information is stored in :
 
- components_libs_dir
-      states-syms
-           gens
-           govs
-           avrs
+- components_libs_dir:
+      - states-syms
+           - gens
+           - govs
+           - avrs
  
 """
 function get_gens_govs_avrs_states_syms_by_json(
@@ -508,9 +516,10 @@ end
 #---------------------------------------------------
 
 """
-This function converts a list of functions into
-a dictionaly of functions. A key in the dictionary is a
-type of a model of component, and the value is a specific function that is applicable to the component.
+    get_dict_types_dyn_or_output_func(
+        types_func)
+
+It converts a list of functions into a dictionaly of functions. A key in the dictionary is a type of a model of component, and the value is a specific function that is applicable to the component.
 """
 function get_dict_types_dyn_or_output_func(
     types_func)
@@ -564,14 +573,12 @@ function get_dict_types_dyn_or_output_func(
         
 end
 
-
 """
-This function return a singleton namedtuple.
-The property of the namedtuple is the type of
-modelling, which could either be :ode or :dae,
-while the property value is a dictionary of
-component models and their specific associated
-functions.
+    get_a_namedtuple_dict_types_dyn_or_output_func(
+        types_func,
+        dae_or_ode_type)
+
+It return a singleton namedtuple. The property of the namedtuple is the type of modelling, which could either be `:ode` or `:dae`, while the property value is a dictionary of component models and their specific associated functions.
 """
 function get_a_namedtuple_dict_types_dyn_or_output_func(
     types_func, dae_or_ode_type)
@@ -607,10 +614,14 @@ function get_a_namedtuple_dict_types_dyn_or_output_func(
         
 end
 
-
 """
-This function return a namedtuple of dictionaries
-for ode and dae functions.
+    get_namedtuple_dict_types_dyn_or_output_func(
+        ode_types_func,
+        dae_types_func;
+        ode_type = :ode,
+        dae_type = :dae )
+
+Return a namedtuple of dictionaries for ode and dae functions.
 
 """
 function get_namedtuple_dict_types_dyn_or_output_func(
@@ -841,17 +852,23 @@ function get_avrs_dyn_func(
         
 end
 
-
 #-----------------------------------------------------
-#-----------------------------------------------------
-
 
 """
+     get_ode_gens_generic_para(
+         plant_generators_data_from_json;
+         sequence_order =
+             gens_generic_sequence_order,
+         selections =
+             ode_gens_generic_selections)
 
-These functions are used to get some selected parameters
-of devices from `plant_generators_data_from_json`.
+Returns a namedtuple of selected parameters of devices from `plant_generators_data_from_json`.
 
-`get_ode_gens_generic_para, get_generic_gens_avr_gov_para`
+# Arguments
+- `sequence_order::Tuple{Symbol}`: the selection order of components data.
+- `selections::Tuple{Symbol}`: the tuple of parameters data to be selected.
+
+It is used in `get_ode_gens_generic_para, get_generic_gens_avr_gov_para`
 """
 function get_ode_gens_generic_para(
     plant_generators_data_from_json;
@@ -930,11 +947,16 @@ end
 # ---------------------------------------------------
 
 """
+    get_generic_namedtuple_per_plant_para_wt_kwd_para(
+        ωref0_vref0_porder0_id_iq_vh;
+        kwd_para = plants_kwd_para )
 
-This function is used in generating a namedtuple
-consisting of data struture needed to simulate a
-generator plant. A generator plant can consist of a
-generator, gov, avr, etc.
+Returns namedtuples of parameters per plant. It is used in generating a namedtuple consisting of data struture needed to simulate a generator plant. A generator plant can consist of a generator, gov, avr, etc.
+
+# Arguments
+- `ωref0_vref0_porder0_id_iq_vh`: the flattend vector consisting concatenation of `ωref0`, `vref0`, `porder0`, `id`, `iq`, and `vh`
+- plants_kwd_para: 
+
 
 """
 function get_generic_namedtuple_per_plant_para_wt_kwd_para(

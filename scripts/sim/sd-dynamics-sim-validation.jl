@@ -1,9 +1,4 @@
 # ####################################################
-# using Pkg
-# PowerSystemsCoSim_folder = joinpath(@__DIR__,"../..")
-# cd(PowerSystemsCoSim_folder)
-# Pkg.activate(PowerSystemsCoSim_folder)
-
 
 #---------------------------------------------------
 # global settings
@@ -22,31 +17,6 @@ freq = 60
 using Pkg
 
 using ePowerSim
-
-# script_dir = @__DIR__
-
-# pkg_env = joinpath(script_dir,"../..")
-
-# cd(pkg_env)
-
-# Pkg.activate(pkg_env)
-
-
-# #---------------------------------------------------
-
-# model3_dynamics =
-#     joinpath(
-#         script_dir,"..",
-#         "model3-dynamics")
-
-# cd(model3_dynamics)
-
-# sd_dynamics_header =
-#     joinpath(
-#         model3_dynamics,
-#         "sd-dynamics-header.jl")
-
-# include(sd_dynamics_header)
 
 #---------------------------------------------------
 
@@ -176,63 +146,6 @@ create_a_case_net_data_by_components_file_by_xlsx(
         "net-static-data-avr-sauer-gov-sauer.xlsx" )
 
 """
-
-#---------------------------------------------------
-#---------------------------------------------------
-    
-# #--------------------------------------
-
-# if (components_libs_dir == "") || (
-#     components_libs_dir == nothing)
-
-#     package_dir = pkgdir(ePowerSim)
-
-#     src_dir =
-#         joinpath( package_dir, "src")
-
-#     components_libs_dir =
-#         joinpath(
-#             src_dir,
-#             "components-lib")
-
-# end
-
-# #--------------------------------------    
-
-# if (data_dir == "") || (data_dir == nothing)
-
-#     package_dir = pkgdir(ePowerSim)
-
-#     data_dir = joinpath(package_dir,
-#                  "data")
-
-# end
-
-# #--------------------------------------
-
-# json_case_dir =
-#     joinpath(
-#         data_dir,
-#         "converted-data",
-#         case_name,
-#         "json")
-
-# if  (json_net_data_by_components_file == "" ||
-#     json_net_data_by_components_file == nothing) 
-
-#     net_data_by_components_file =
-#         joinpath(
-#             json_case_dir,
-#             "net_data_by_components_file.json")
-# else
-
-#     net_data_by_components_file =
-#         joinpath(
-#             json_case_dir,
-#             json_net_data_by_components_file)
-
-# end
-
 
 #---------------------------------------------------
 ## simulation case
@@ -405,7 +318,6 @@ ntuple_status_steady_state_data =
             use_pu_in_PQ,
         line_data_in_pu =
             line_data_in_pu)
-
 
 
 (;sta_pf_red_sol,

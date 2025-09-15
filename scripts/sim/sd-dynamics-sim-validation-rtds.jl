@@ -418,7 +418,7 @@ sim_result_sudden_load_change_line_outage_pertubation =
 
 #---------------------------------------------------
 
-sim_result_sudden_load_change_line_outage_pertubation =
+sim_result_sudden_load_change_line_outage_pertubation =    
     get_sim_mm_sudden_load_or_line_outage_pertubation(
         ;case_name,
         json_net_data_by_components_file =

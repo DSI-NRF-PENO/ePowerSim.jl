@@ -8,9 +8,17 @@
 #---------------------------------------------------
 
 """
-This function returns a vector of properties of
-components selected by the variables
-`sequence_order` and `selection`.
+    get_components_properties_by_json(
+        plant_generators_data_from_json;
+        <keyword arguments>)
+
+Returns a vector of properties of components selected by the variables `sequence_order` and `selection`.
+
+# Arguments
+- `sequence_order::Tuple{Symbol}=(:components_data, :gen)`: the selection order of components data.
+- `selections::Tuple{Symbol}=(:P, :Q)`: the tuple of parameters data to be selected.
+
+
 """
 function get_components_properties_by_json(
     plant_generators_data_from_json ;
@@ -28,11 +36,18 @@ function get_components_properties_by_json(
 
 end
 
-
 """
-This function returns a vector of properties of edges
- selected by the variables `sequence_order` and
- `selection`.
+    get_selected_edges_data_by_json(
+        edge_data_from_json;
+        sequence_order =
+            (:components_data, ) ,
+        selections =
+            (:r, :x, :b, :ratio,
+             :angle) )
+
+
+Returns a vector of properties of edges selected by the variables `sequence_order` and `selection`.
+
 """
 function get_selected_edges_data_by_json(
     edge_data_from_json;
@@ -66,40 +81,41 @@ end
 #---------------------------------------------------
 #---------------------------------------------------
 
+"""
+    get_components_libs_and_case_data(
+        case_name;
+        <keyword arguments> )
 
+
+Returns selected static parameters and dynamic types of components from network model csv files.
+"""
 function get_components_libs_and_case_data(
     case_name;
     case_data_dir  = "",
-    components_lib = "" )
-
-    #--------------------------------------
-
-    # case_name = "case9"
+    components_lib = "",
     
-    # case_data_dir =
-    #     joinpath(@__DIR__,"..","..","src",
-    #              "data-dir","converted_data",
-    #              case_name )
+    mpc_branch_column_select =
+        ["fbus", "tbus", "r", "x", "b",
+         "ratio", "angle", "status"],
 
+    mpc_gen_column_select =
+        ["bus", "Pg", "Qg", "Qmax", "Qmin",
+         "Vg", "mBase", "status", "Pmax","Pmin"],
 
-    # components_libs_dir =
-    #     joinpath(@__DIR__,"..","..","src",
-    #              components_lib )
+    mpc_bus_column_select =
+        ["bus_i", "type", "Pd",
+         "Qd", "Gs", "Bs", "Vmax", "Vmin"],
 
-    #--------------------------------------
+    mpc_scalar_column_select =
+        ["mpc_baseMVA" ],
 
-    # if components_lib == ""
+    dyn_gens_column_select =
+        ["bus","sym_gen_type",
+         "sym_gen_dynamic_para"],
 
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # else
-        
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  components_lib )
-
-    # end
+    dyn_plants_column_select =
+        ["bus","Plant_type","Gen",
+         "isa_slack","Gov","Exc"])
 
     #--------------------------------------
 
@@ -128,10 +144,7 @@ function get_components_libs_and_case_data(
        case_data_dir =
            joinpath( data_dir,
                      "converted-data",
-                     case_name,)
-        
-
-
+                     case_name,)        
     end
 
     #--------------------------------------
@@ -297,28 +310,28 @@ function get_components_libs_and_case_data(
 
     #--------------------------------------
 
-    mpc_branch_column_select =
-        ["fbus", "tbus", "r", "x", "b",
-         "ratio", "angle", "status"]
+    # mpc_branch_column_select =
+    #     ["fbus", "tbus", "r", "x", "b",
+    #      "ratio", "angle", "status"]
 
-    mpc_gen_column_select =
-        ["bus", "Pg", "Qg", "Qmax", "Qmin",
-         "Vg", "mBase", "status", "Pmax","Pmin"]
+    # mpc_gen_column_select =
+    #     ["bus", "Pg", "Qg", "Qmax", "Qmin",
+    #      "Vg", "mBase", "status", "Pmax","Pmin"]
 
-    mpc_bus_column_select =
-        ["bus_i", "type", "Pd",
-         "Qd", "Gs", "Bs", "Vmax", "Vmin"]
+    # mpc_bus_column_select =
+    #     ["bus_i", "type", "Pd",
+    #      "Qd", "Gs", "Bs", "Vmax", "Vmin"]
 
-    mpc_scalar_column_select =
-        ["mpc_baseMVA" ]
+    # mpc_scalar_column_select =
+    #     ["mpc_baseMVA" ]
 
-    dyn_gens_column_select =
-        ["bus","sym_gen_type",
-         "sym_gen_dynamic_para"]
+    # dyn_gens_column_select =
+    #     ["bus","sym_gen_type",
+    #      "sym_gen_dynamic_para"]
 
-    dyn_plants_column_select =
-        ["bus","Plant_type","Gen",
-         "isa_slack","Gov","Exc"]
+    # dyn_plants_column_select =
+    #     ["bus","Plant_type","Gen",
+    #      "isa_slack","Gov","Exc"]
 
     #--------------------------------------
 
@@ -379,7 +392,14 @@ end
 #---------------------------------------------------
 #---------------------------------------------------
 
+"""
+    get_case_data_by_csv(
+        case_name;
+        <keyword arguments> )
 
+
+Returns selected static parameters and dynamic types of components from network model csv files.
+"""
 function get_case_data_by_csv(
     case_name ;
     case_data_dir = "",
@@ -700,7 +720,15 @@ function get_case_data_by_csv(
 end
 
 
+"""
+    get_net_static_data_by_components_by_xlsx(
+        ; case_name
+        data_dir,
+        by_components )
 
+
+Returns selected static parameters and dynamic types of components from network model xlsx file.
+"""
 function get_net_static_data_by_components_by_xlsx(
     ;case_name = "case9",        
     data_dir = "",
@@ -818,6 +846,16 @@ end
 # generic functions 
 #---------------------------------------------------
 
+"""
+    get_edge_y_data_by_generic(
+        fbus, tbus,
+        r, x, b,
+        ratio, angle,
+        status,
+        baseMVA, basekV)
+
+Returns per unit π parameters for branches admittances.
+"""
 function get_edge_y_data_by_generic(
     fbus, tbus,
     r, x, b,
@@ -852,7 +890,16 @@ function get_edge_y_data_by_generic(
     
 end
 
+"""
+    get_edge_y_line_data_by_generic(
+        fbus, tbus,
+        r, x, b,
+        ratio, angle,
+        status,
+        baseMVA, basekV)
 
+Returns per unit π parameters for branches admittances.
+"""
 function get_edge_y_line_data_by_generic(
     fbus, tbus,
     r, x, b,
@@ -885,6 +932,16 @@ function get_edge_y_line_data_by_generic(
 end
 
 
+"""
+    get_edge_y_transformer_data_by_generic(
+        fbus, tbus,
+        r, x, b,
+        ratio, angle,
+        status,
+        baseMVA, basekV)
+
+Returns per unit π parameters for transformers admittances.
+"""
 function get_edge_y_transformer_data_by_generic(
     fbus, tbus,
     r, x, b,
@@ -917,8 +974,14 @@ function get_edge_y_transformer_data_by_generic(
     
 end
 
+"""
+    get_edges_orientation_by_generic(
+        branches_fbus,
+        branches_tbus )
 
 
+Returns branches orientations in form of a list of tuples `(src, dst)`.
+"""
 function  get_edges_orientation_by_generic(
     branches_fbus,
     branches_tbus )
@@ -931,6 +994,18 @@ function  get_edges_orientation_by_generic(
 end
 
 
+"""
+    get_edges_Ybr_by_generic(
+        r, x, b,
+        ratio, angle,
+        edge_type,
+        Gs, Bs;
+        baseMVA = 1.0,
+        basekV = 1.0 )
+
+
+Returns a list of per unit π admittance matrices for branches.
+"""
 function get_edges_Ybr_by_generic(
     r, x, b,
     ratio, angle,
@@ -987,6 +1062,15 @@ function get_edges_Ybr_by_generic(
 end
 
 
+"""
+    get_nodes_Yshunt_by_generic(
+        buses_Gs,
+        buses_Bs;
+        baseMVA = 1.0 )
+
+
+Returns a list of per unit nodes shunt admittance.
+"""
 function get_nodes_Yshunt_by_generic(
     buses_Gs,
     buses_Bs;
@@ -1000,6 +1084,15 @@ function get_nodes_Yshunt_by_generic(
 end
 
 
+"""
+    get_nodes_idx_and_Yshunt_non_zero(
+        buses_Gs,
+        buses_Bs;
+        baseMVA = 1.0 )
+
+
+Returns namedtuples `y_sh_shunt_exist`, `nz_y_sh_idxs`, `nz_y_sh`  for nodes non-zero shunt admittances.
+"""
 function get_nodes_idx_and_Yshunt_non_zero(
     buses_Gs,
     buses_Bs;
@@ -1021,14 +1114,20 @@ function get_nodes_idx_and_Yshunt_non_zero(
     return (;y_sh_shunt_exist,
             nz_y_sh_idxs,
             nz_y_sh = y_sh[nz_y_sh_idxs] )
-    
-    # return [(node_idx, y_shunt)
-    #         for (node_idx, y_shunt) in
-    #            zip(non_zero_indices, y_sh[non_zero_indices])]
 
 end
 
 
+"""
+    get_nodes_idx_and_Yshunt_by_generic(
+        buses_idx,
+        buses_Gs,
+        buses_Bs;
+        baseMVA = 1.0 )
+
+
+Returns a list of tuples of nodes indices and nodes shunt admittances.
+"""
 function get_nodes_idx_and_Yshunt_by_generic(
     buses_idx,
     buses_Gs,
@@ -1047,6 +1146,18 @@ function get_nodes_idx_and_Yshunt_by_generic(
 end
 
 
+"""
+    get_edges_Ybr_cal_and_edges_orientation_by_generic(
+        branches_fbus,
+        branches_tbus,
+        r, x, b,
+        ratio, angle,
+        edge_type,
+        Gs, Bs;
+        baseMVA = 1.0, basekV = 1.0 )
+
+Returns namedtuple of branches π admittance matrices and branches orientations.
+"""
 function get_edges_Ybr_cal_and_edges_orientation_by_generic(
     branches_fbus,
     branches_tbus,
@@ -1072,11 +1183,25 @@ function get_edges_Ybr_cal_and_edges_orientation_by_generic(
     return (;edges_Ybr_cal,
             edges_orientation )
     
-
 end
+    
+"""
+    get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
+        edges_r, edges_x, edges_b,
+        edges_ratio, edges_angle,
+        Gs, Bs;
+        edges_fbus,
+        edges_tbus,
+        edges_type,    
+        all_nodes_idx,
+        n2s_all_nodes_idx,
+        baseMVA=1.0,
+        basekV=1.0,
+        line_data_in_pu = true)
 
 
-
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
     edges_r, edges_x, edges_b,
     edges_ratio, edges_angle,
@@ -1130,7 +1255,28 @@ function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
 
 end
 
+# """
+# See [`get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data`](@ref)
 
+# """
+
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+    get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
+        ;edges_fbus, edges_tbus,
+        edges_type,
+        edges_r, edges_x, edges_b,
+        edges_ratio, edges_angle,
+        Gs, Bs,
+        all_nodes_idx,
+        n2s_all_nodes_idx,
+        baseMVA=1.0,
+        basekV=1.0,
+        line_data_in_pu = true)
+
+
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
     ;edges_fbus, edges_tbus,
     edges_type,
@@ -1184,7 +1330,29 @@ function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
 end
 
 
+# """
+# See [`get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data`](@ref)
 
+# """
+
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+
+    get_sense_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
+        ;edges_fbus, edges_tbus,
+        edges_type,
+        edges_r, edges_x, edges_b,
+        edges_ratio, edges_angle,
+        Gs, Bs,
+        all_nodes_idx,
+        n2s_all_nodes_idx,
+        baseMVA=1.0,
+        basekV=1.0,
+        line_data_in_pu = true)
+
+
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_sense_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
     ;edges_fbus, edges_tbus,
     edges_type,
@@ -1238,6 +1406,28 @@ function get_sense_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data(
 end
 
 
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+    get_sense_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
+        branches_fbus,
+        branches_tbus,
+        r,
+        x,
+        b,
+        ratio,
+        angle,        
+        Gs,
+        Bs;
+        edges_type,
+        all_nodes_idx,
+        n2s_all_nodes_idx,
+        baseMVA = 1.0,
+        basekV = 1.0,
+        baseShunt = 1.0 )
+
+
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_sense_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
     branches_fbus,
     branches_tbus,
@@ -1354,7 +1544,28 @@ function get_sense_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
 end
 
 
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+    get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
+        branches_fbus,
+        branches_tbus,
+        r,
+        x,
+        b,
+        ratio,
+        angle,        
+        Gs,
+        Bs;
+        edges_type,
+        all_nodes_idx,
+        n2s_all_nodes_idx,
+        baseMVA = 1.0,
+        basekV = 1.0,
+        baseShunt = 1.0 )
 
+
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
     branches_fbus,
     branches_tbus,
@@ -1471,7 +1682,28 @@ function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
 end
 
 
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+    get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
+        branches_fbus,
+        branches_tbus,
+        r,
+        x,
+        b,
+        ratio,
+        angle,
+        edge_type,    
+        Gs,
+        Bs;
+        all_nodes_idx,
+        n2s_all_nodes_idx,
+        baseMVA = 1.0,
+        basekV = 1.0,
+        baseShunt = 1.0 )
 
+
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
     branches_fbus,
     branches_tbus,
@@ -1587,8 +1819,23 @@ function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
     
 end
 
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+    get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
+        branches_fbus,
+        branches_tbus,
+        r, x, b,
+        ratio, angle,
+        edge_type,
+        buses_idx,
+        Gs, Bs;
+        baseMVA = 1.0,
+        basekV = 1.0,
+        baseShunt = 1.0 )
 
 
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_generic(
     branches_fbus,
     branches_tbus,
@@ -1714,8 +1961,20 @@ end
 
 
 #--------------------------------------
-#--------------------------------------
 
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+    get_Ynet(
+        edge_data_from_json,
+        shunt_data_from_json;
+        baseMVA = 1.0,
+        basekV = 1.0,
+        baseShunt = 1.0,
+        line_data_in_pu = true)
+
+
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_Ynet(
     edge_data_from_json,
     shunt_data_from_json;
@@ -1891,8 +2150,19 @@ function get_Ynet(
     
 end
 
+# @doc (@doc get_Ynet_wt_nodes_idx_wt_adjacent_nodes_by_edges_data)
+"""
+    get_Ynet(
+        edge_data_from_json,
+        shunt_data_from_json;
+        baseMVA = 1.0,
+        basekV = 1.0,
+        baseShunt = 1.0,
+        line_data_in_pu = true)
 
 
+Returns a namedtuple of network admitance vectors and network nodes neigbouhood vectors.
+"""
 function get_Ynet_sp_sh(
     edge_data_from_json,
     shunt_data_from_json;
@@ -2079,9 +2349,21 @@ end
 #--------------------------------------
 
 
-""" `get_Yπ_net`
+"""
+    get_Yπ_net(
+        edge_data_from_json,
+        shunt_data_from_json;
+        # all_nodes_idx,
+        # n2s_all_nodes_idx,
+        baseMVA = 1.0,
+        basekV = 1.0,
+        baseShunt = 1.0,
+        line_data_in_pu = true,
+        orientated_bool = false )
 
-It returns nodes incident edges elementary admittance matrices `yπ`.
+
+Returns nodes incident edges elementary admittance matrices `yπ`.
+
 
 swap_yπ_diagonal_elements is used to ensure a
 proper orientation of elementary `yπ` based on an
@@ -2124,10 +2406,6 @@ function get_Yπ_net(
              edge_data_from_json )
 
     #--------------------------------------
-
-    # (Gs, Bs) =
-    #     get_nodes_shunts_Gs_and_Bs_by_json(
-    #         shunt_data_from_json)
 
     (shunt_idx,
      Gs,
@@ -2221,20 +2499,6 @@ function get_Yπ_net(
             a_node_incident_edges ]
           for a_node_incident_edges in
               nodes_incident_edges ]
-
-    # This suppose to address non continous nodes labeling
-    # but, it seems erronous
-    
-    # nodes_idx_with_adjacent_nodes_idx = [
-    #     [ [[idx],
-    #        [ idx == orient[1] ?
-    #            orient[2] : orient[1]
-    #          for orient in
-    #              a_node_edges_other_nodes_idx] ]...; ]
-    #     for (idx, a_node_edges_other_nodes_idx) in
-    #         zip(transformed_all_nodes_idx,
-    #             nodes_incident_edges_and_orientation)]
-
     
     nodes_idx_with_adjacent_nodes_idx = [
         [ [[idx],
@@ -2256,18 +2520,6 @@ function get_Yπ_net(
 
     if orientated_bool == true
 
-        # Yπ_net = [
-        #     [ node_idx == first(first(
-        #         orientations_and_edges_Ybr[k] )) ?
-        #             last(orientations_and_edges_Ybr[k]) :
-        #             swap_yπ_diagonal_elements(
-        #             last(orientations_and_edges_Ybr[k])) 
-        #       for k in 1:length(
-        #           orientations_and_edges_Ybr ) ]
-        #     for (node_idx, orientations_and_edges_Ybr) in 
-        #         zip(transformed_all_nodes_idx,
-        #             nodes_incident_edges_orientation_and_Ybr_cal ) ]
-
         Yπ_net = [
             [ node_idx == first(first(
                 orientations_and_edges_Ybr[k] )) ?
@@ -2283,25 +2535,12 @@ function get_Yπ_net(
         
     else
 
-        # Yπ_net = [
-        #     [ last(orientations_and_edges_Ybr[k])
-        #       for k in 1:length(
-        #           orientations_and_edges_Ybr ) ]
-        #     for (node_idx, orientations_and_edges_Ybr) in 
-        #         zip(transformed_all_nodes_idx,
-        #             nodes_incident_edges_orientation_and_Ybr_cal ) ]
-
         Yπ_net = [
             [ last.(orientations_and_edges_Ybr) ]
             for orientations_and_edges_Ybr in 
                     nodes_incident_edges_orientation_and_Ybr_cal  ]
         
     end
-
-    # Yπ_net_Yshunt_wt_nodes_idx_wt_adjacent_nodes =
-    #     (;Yπ_net,
-    #      Yshunt,
-    #      nodes_idx_with_adjacent_nodes_idx )
     
     return (;Yπ_net,
          Yshunt,
@@ -2311,6 +2550,17 @@ end
 
 #--------------------------------------
 
+"""
+    get_Ybus(
+        edge_data_from_json,
+        shunt_data_from_json;
+        basekV = 1.0,
+        baseMVA = 1.0,
+        line_data_in_pu = true )
+
+
+Returns network sparse admittance matrix.
+"""
 function get_Ybus(
     edge_data_from_json,
     shunt_data_from_json;
@@ -2443,10 +2693,17 @@ function get_Ybus(
 end
 
 
-#--------------------------------------
-#--------------------------------------
+"""
+    get_Ynet_and_related_vectors(
+        edge_data_from_json,
+        shunt_data_from_json;
+        basekV = 1.0,
+        baseMVA = 1.0,
+        line_data_in_pu = true )
 
 
+Returns constituent objects for building `Ynet`.
+"""
 function get_Ynet_and_related_vectors(
     edge_data_from_json,
     shunt_data_from_json;
@@ -2576,21 +2833,6 @@ function get_Ynet_and_related_vectors(
               nodes_incident_edges ]
 
 
-    # nodes_idx_with_adjacent_nodes_idx
-    # nodes_node_idx_and_incident_edges_other_node_idx
-
-    
-    # nodes_idx_with_adjacent_nodes_idx = [
-    #     [ [[idx],
-    #        [ idx == orient[1] ?
-    #            orient[2] : orient[1]
-    #          for orient in
-    #              a_node_edges_other_nodes_idx]]...; ]
-    #     for (idx, a_node_edges_other_nodes_idx) in
-    #         enumerate(
-    #             nodes_incident_edges_and_orientation)]
-
-
     # this address non continous nodes labeling
     
     nodes_idx_with_adjacent_nodes_idx = [
@@ -2661,6 +2903,18 @@ end
 
 #--------------------------------------
 
+
+"""
+    get_Ybus_and_related_matrices(
+        edge_data_from_json,
+        shunt_data_from_json;
+        basekV = 1.0,
+        baseMVA = 1.0,
+        line_data_in_pu = true )
+
+
+Returns constituent objects for building `Ybus`.
+"""
 function get_Ybus_and_related_matrices(
     edge_data_from_json,
     shunt_data_from_json;
@@ -2680,10 +2934,6 @@ function get_Ybus_and_related_matrices(
      edges_type) =
          get_edges_ftbus_and_generic_data_by_json(
              edge_data_from_json )
-
-    # (Gs, Bs) =
-    #     get_nodes_shunts_Gs_and_Bs_by_json(
-    #         shunt_data_from_json)
 
     (shunt_idx,
      Gs,
@@ -2807,6 +3057,21 @@ end
 
 #--------------------------------------
 
+"""
+    get_Yπ_net_and_related_vectors(
+        edge_data_from_json,
+        shunt_data_from_json;
+        all_nodes_idx,
+        n2s_all_nodes_idx,
+        basekV = 1.0,
+        baseMVA = 1.0,
+        baseShunt = 1.0,
+        line_data_in_pu = true,
+        orientated_bool = true )
+
+
+Returns constituent objects for building `Yπ_net`.
+"""
 function get_Yπ_net_and_related_vectors(
     edge_data_from_json,
     shunt_data_from_json;
@@ -2982,8 +3247,16 @@ end
 
 
 #---------------------------------------------------
-#---------------------------------------------------
 
+"""
+    get_a_node_type_tup_idx_PQ_data_by_generic(
+        idx, Pd, Qd;
+        baseMVA = 1.0,
+        node_type = :load )
+
+
+Returns a tuple of `(idx, Bus, P, Q, node_type)` for non-generation node.
+"""
 function get_a_node_type_tup_idx_PQ_data_by_generic(
     idx, Pd, Qd;
     baseMVA = 1.0,
@@ -2996,31 +3269,19 @@ function get_a_node_type_tup_idx_PQ_data_by_generic(
             node_type)
 end
 
-# function get_load_node_tup_idx_PQ_data_by_mpc(
-#     idx, Pd, Qd;mpc_baseMVA = 1.0 )
-
-#     return (idx,
-#             (Bus = "bus$(idx)",
-#              P   = Pd/mpc_baseMVA,
-#              Q   = Qd/mpc_baseMVA),
-#             :load)
-# end
-
-# function get_transmission_node_tup_idx_PQ_data_by_mpc(
-#     idx, Pd, Qd;mpc_baseMVA = 1.0 )
-
-#     return (idx,
-#             (Bus = "bus$(idx)",
-#              P   = Pd/mpc_baseMVA,
-#              Q   = Qd/mpc_baseMVA),
-#             :transmission)
-# end
-
 #---------------------------------------------------
 # data by mpc
 #---------------------------------------------------
 
+"""
+    get_shunt_data_by_mpc(
+        mpc_bus;
+        mpc_baseMVA =
+            1.0)
 
+
+Returns a dict `Dict{:shunt_idx,:shunt_Gs,:shunt_Bs }` for network lines shunt parameters.
+"""
 function get_shunt_data_by_mpc(
     mpc_bus;
     mpc_baseMVA =
@@ -3033,7 +3294,15 @@ function get_shunt_data_by_mpc(
 end
 
 
+"""
+    get_gencost_data_by_mpc(
+        mpc_gencost;
+        mpc_baseMVA =
+            1.0)
 
+
+Returns a dict `Dict{:cost_type,:startup,:shutdown,:n,:c_n_1,:c_1,:c_0 }` for generators operation cost.
+"""
 function get_gencost_data_by_mpc(
     mpc_gencost;
     mpc_baseMVA =
@@ -3049,9 +3318,6 @@ function get_gencost_data_by_mpc(
 
 end
 
-
-
-#---------------------------------------------------
 
 function get_branches_impedance_data_by_components_by_mpc(
     mpc_branch;
@@ -3167,7 +3433,14 @@ function get_branches_data_and_types_by_mpc(
     
 end
 
+"""
+    get_loc_load_tup_idx_PQ_data_by_mpc(
+        idx, Pd, Qd;
+        mpc_baseMVA = 1.0)
 
+
+Returns a tuple of `(idx, Bus, loc_P, loc_Q, node_type)` for generation node local load.
+"""
 function get_loc_load_tup_idx_PQ_data_by_mpc(
     idx,
     Pd,
@@ -3181,6 +3454,14 @@ function get_loc_load_tup_idx_PQ_data_by_mpc(
             :loc_load)
 end
 
+"""
+    get_non_gen_node_tup_idx_PQ_data_by_mpc(
+        idx, Pd, Qd;
+        mpc_baseMVA = 1.0)
+
+
+Returns a tuple of `(idx, Bus, P, Q)` for non-generation node.
+"""
 function get_non_gen_node_tup_idx_PQ_data_by_mpc(
     idx,
     Pd,
@@ -3194,6 +3475,20 @@ function get_non_gen_node_tup_idx_PQ_data_by_mpc(
 end
 
 
+"""
+    get_gen_node_static_data_tup_by_mpc(
+        idx,
+        vmax,vmin,
+        Pg,Qg,
+        Vg,
+        Qmax, Qmin,
+        Pmax, Pmin;
+        mpc_baseMVA = 1.0 )
+
+
+Returns a generator's index and static parameters as a tuple of index and namedtuple of static parameters.
+
+"""
 function get_gen_node_static_data_tup_by_mpc(
     idx,
     vmax,vmin,
@@ -3215,10 +3510,21 @@ function get_gen_node_static_data_tup_by_mpc(
              Pmax = Pmax/mpc_baseMVA,
              Pmin = Pmin/mpc_baseMVA,
              Sn   = (sqrt(Pmax^2 + Qmax^2))/mpc_baseMVA
-           ), :generator )
+             ),
+            :generator )
 end
 
 
+"""
+    get_gen_sub_static_data_tup_by_mpc(
+        idx,
+        n2s_gens_idx,
+        mpc_gen )
+
+
+Returns a tuple of static parameters for a generator.
+
+"""
 function get_gen_sub_static_data_tup_by_mpc(
     idx,
     n2s_gens_idx,
@@ -3234,6 +3540,14 @@ function get_gen_sub_static_data_tup_by_mpc(
 end
 
 
+"""
+    get_gen_nodes_static_tup_data_by_mpc(
+        mpc_bus,
+        mpc_gen;
+        mpc_baseMVA=1.0 )
+
+Returns a list of static parameters for single or multi generators per node for all generation nodes.
+"""
 function get_gen_nodes_static_tup_data_by_mpc(
     mpc_bus,
     mpc_gen;
@@ -3246,7 +3560,7 @@ function get_gen_nodes_static_tup_data_by_mpc(
      multi_gens_nodes) =
          NamedTupleTools.select(
              get_multi_gens_idx_wt_multi_gen_bool(
-                 mpc_gen),
+                 mpc_gen; sorted_bool = false ),
              (:multi_gens_idx,
               :multi_gen_bool,
               :multi_gens_nodes) )
@@ -3255,23 +3569,33 @@ function get_gen_nodes_static_tup_data_by_mpc(
         get_n2s_any( multi_gens_idx )
     
     #------------------------------------------
-    
-    gens_nodes_idx =
-        get_gens_nodes_idx_by_mpc( mpc_bus )
+     
+ 
+    """
+    The right idxs to use is the unsorted idx, since they
+    are the one aligned with gens static parameters in mpc.
+    `gen_node_static_data_tup_by_mpc` can then be sorted
+    latter by idx
+    """
 
-    # n2s_gens_idx =
-    #     get_a_n2s_net_group(gens_nodes_idx)
-
+    gens_nodes_idx =mpc_gen.bus
 
     n2s_gens_idx =
-        get_n2s_any(gens_nodes_idx)
-    
+        get_n2s_any( gens_nodes_idx )
+
+        
     all_nodes_idx =
-        get_all_nodes_idx_by_mpc( mpc_bus)
+        get_all_nodes_idx_by_mpc(
+            mpc_bus;
+            sorted_bool = false)
 
     n2s_all_nodes_idx =
         get_n2s_any( all_nodes_idx)
 
+    # @show  gens_nodes_idx
+
+    # @show n2s_gens_idx
+    
     if multi_gen_bool == true
 
         
@@ -3288,20 +3612,31 @@ function get_gen_nodes_static_tup_data_by_mpc(
 
     else
 
-        return [get_gen_node_static_data_tup_by_mpc(
-            idx,
-            mpc_bus.Vmax[ n2s_all_nodes_idx[idx]],
-            mpc_bus.Vmin[ n2s_all_nodes_idx[idx]],
-            get_gen_sub_static_data_tup_by_mpc(
-                idx, n2s_gens_idx, mpc_gen )...
-                    ;mpc_baseMVA = mpc_baseMVA)
-                 for idx in gens_nodes_idx ]            
+        gen_node_static_data_tup_by_mpc =
+            [get_gen_node_static_data_tup_by_mpc(
+                idx,
+                mpc_bus.Vmax[ n2s_all_nodes_idx[idx]],
+                mpc_bus.Vmin[ n2s_all_nodes_idx[idx]],
+                get_gen_sub_static_data_tup_by_mpc(
+                    idx, n2s_gens_idx, mpc_gen )...
+                        ;mpc_baseMVA = mpc_baseMVA)
+             for idx in gens_nodes_idx ]
+
+        return sort(gen_node_static_data_tup_by_mpc,
+                    by = x -> x[1] ) 
     end
     
 
 end
 
+"""
+    get_gen_nodes_dict_static_data_by_mpc(
+        mpc_bus,
+        mpc_gen;
+        mpc_baseMVA = 1.0 )
 
+Returns an OrderedDict of static data indexed by generators indices.
+"""
 function get_gen_nodes_dict_static_data_by_mpc(
     mpc_bus,
     mpc_gen;
@@ -3315,15 +3650,25 @@ function get_gen_nodes_dict_static_data_by_mpc(
      
     tup_type = NamedTuple
     
-    return OrderedDict{Union{Int64,String,Symbol}, tup_type}(
-        idx => node_data_tup
-        for (idx, node_data_tup) in
-            zip(first.(gen_nodes_static_tup),
-                second.(gen_nodes_static_tup)) )
+    return OrderedDict{
+        Union{Int64,String,Symbol},
+        tup_type}(
+            idx => node_data_tup
+            for (idx, node_data_tup) in
+                zip(first.(gen_nodes_static_tup),
+                    second.(gen_nodes_static_tup)) )
     
 end
 
 
+"""
+    get_nodes_static_tup_data_by_mpc(
+        mpc_bus,
+        mpc_gen;
+        mpc_baseMVA = 1.0 )
+
+Returns tuples of static data indexed by generating and non-generating plants indices.
+"""
 function get_nodes_static_tup_data_by_mpc(
     mpc_bus,
     mpc_gen;
@@ -3332,19 +3677,23 @@ function get_nodes_static_tup_data_by_mpc(
     #------------------------------------------
 
     load_nodes_idx =
-        get_load_nodes_idx_by_mpc( mpc_bus)
+        get_load_nodes_idx_by_mpc(
+            mpc_bus ;
+            sorted_bool = false )
 
     transmission_nodes_idx =
-        get_transmission_nodes_idx_by_mpc( mpc_bus)
+        get_transmission_nodes_idx_by_mpc(
+            mpc_bus;
+            sorted_bool = false)
 
-    gens_nodes_idx =
-        get_gens_nodes_idx_by_mpc( mpc_bus)
+    gens_nodes_idx =  mpc_gen.bus
+    # gens_nodes_idx =
+    #     get_gens_nodes_idx_by_mpc( mpc_bus)
 
     all_nodes_idx =
-        get_all_nodes_idx_by_mpc( mpc_bus)
-
-    # n2s_gens_idx =
-    #     get_a_n2s_net_group(gens_nodes_idx)
+        get_all_nodes_idx_by_mpc(
+            mpc_bus;
+            sorted_bool = false)
 
     n2s_gens_idx =
         get_n2s_any(gens_nodes_idx)
@@ -3448,52 +3797,55 @@ function get_nodes_static_tup_data_by_mpc(
                  for idx in all_nodes_idx ]
         
     end
-
-    # return [ idx ∈ load_nodes_idx ?
-    #     get_load_node_tup_idx_PQ_data_by_mpc(
-    #         idx, mpc_bus.Pd[idx], mpc_bus.Qd[idx];
-    #         mpc_baseMVA = mpc_baseMVA ) :
-    #             idx ∈ transmission_nodes_idx ?
-    #             get_transmission_node_tup_idx_PQ_data_by_mpc(
-    #                 idx, mpc_bus.Pd[idx], mpc_bus.Qd[idx];
-    #                 mpc_baseMVA = mpc_baseMVA ) :
-    #                     get_gen_node_static_data_tup_by_mpc(
-    #                         idx,
-    #                         mpc_bus.Vmax[idx],
-    #                         mpc_bus.Vmin[idx],
-    #                         get_gen_sub_static_data_tup_by_mpc(idx,n2s_gens_idx,mpc_gen )...
-    #                        ; mpc_baseMVA = mpc_baseMVA)
-    #          for idx in all_nodes_idx ]
-
     
 end
 
 
+"""
+    get_nodes_dict_static_data_by_mpc(
+        mpc_bus,
+        mpc_gen;
+        mpc_baseMVA = 1.0 )
+
+Returns an OrderedDict of static data indexed by generators indices.
+"""
 function get_nodes_dict_static_data_by_mpc(
     mpc_bus,
     mpc_gen;
     mpc_baseMVA = 1.0 )
 
     nodes_static_tup =
-        get_nodes_static_tup_data_by_mpc(
+        sort(get_nodes_static_tup_data_by_mpc(
             mpc_bus,
             mpc_gen;
-            mpc_baseMVA=mpc_baseMVA )
+            mpc_baseMVA=mpc_baseMVA) , by = x-> [x1])
+
+    # nodes_static_tup =
+    #     get_nodes_static_tup_data_by_mpc(
+    #         mpc_bus,
+    #         mpc_gen;
+    #         mpc_baseMVA=mpc_baseMVA)
+    
 
     tup_type = NamedTuple
     
-    return OrderedDict{Union{Int64,String,Symbol}, tup_type}(
-        idx => node_data_tup
-        for (idx, node_data_tup) in
-            zip(first.(nodes_static_tup),
-                second.(nodes_static_tup)) )
+    return OrderedDict{
+        Union{Int64,String,Symbol}, tup_type}(
+            idx => node_data_tup
+            for (idx, node_data_tup) in
+                zip(first.(nodes_static_tup),
+                    second.(nodes_static_tup)) )
     
 end
 
 
-# get_non_gen_node_tup_idx_PQ_data_by_mpc(
-#     idx, Pd, Qd;mpc_baseMVA = 1.0 )
+"""
+     get_load_nodes_idx_wt_type_tup_by_mpc(
+        mpc_load_type_data )
 
+
+Returns tuple of load nodes indices, load nodes types and static data.
+"""
 function get_load_nodes_idx_wt_type_tup_by_mpc(
     mpc_load_type_data )
 
@@ -3521,9 +3873,14 @@ function get_load_nodes_idx_wt_type_tup_by_mpc(
     
 end
 
+"""
+    get_load_nodes_static_tup_data_by_mpc(
+        mpc_bus;
+        mpc_baseMVA = 1.0)
 
 
-
+Returns tuple of load nodes indices and static data.
+"""
 function get_load_nodes_static_tup_data_by_mpc(
     mpc_bus;
     mpc_baseMVA = 1.0)
@@ -3547,7 +3904,14 @@ function get_load_nodes_static_tup_data_by_mpc(
     
 end
 
+"""
+    get_transmission_nodes_static_tup_data_by_mpc(
+        mpc_bus;
+        mpc_baseMVA = 1.0)
 
+
+Returns tuple of transmission nodes indices and static data.
+"""
 function get_transmission_nodes_static_tup_data_by_mpc(
     mpc_bus;
     mpc_baseMVA=1.0)
@@ -3581,9 +3945,16 @@ end
 
 
 #---------------------------------------------------
-#---------------------------------------------------
 
 
+"""
+    get_static_loc_loads_json_data_storage_format(
+        loc_loads_idx_and_locP_locQ_data;
+        type_loc_load = "loc_Load_t1")
+
+
+Returns OrderedDict of namedtuples for generators local loads indexed by generators indices.
+"""
 function get_static_loc_loads_json_data_storage_format(
     loc_loads_idx_and_locP_locQ_data;
     type_loc_load = "loc_Load_t1")
@@ -3604,6 +3975,14 @@ function get_static_loc_loads_json_data_storage_format(
 end
 
 
+"""
+    get_static_load_nodes_json_data_storage_format(
+        load_nodes_static_tup_data,
+        load_nodes_idx_wt_type_tup;
+        plant_type = "plant_PQ_Const_I")
+
+Returns namedtuples of static load nodes data
+"""
 function get_static_load_nodes_json_data_storage_format(
     load_nodes_static_tup_data,
     load_nodes_idx_wt_type_tup;
@@ -3624,6 +4003,14 @@ function get_static_load_nodes_json_data_storage_format(
 end
 
 
+"""
+    get_static_transmission_nodes_json_data_storage_format(
+        transmission_nodes_static_tup_data,
+        load_nodes_idx_wt_type_tup;
+        plant_type = "plant_Transmission_t2")
+
+Returns namedtuples of static transmission nodes data.
+"""
 function get_static_transmission_nodes_json_data_storage_format(
     transmission_nodes_static_tup_data,
     load_nodes_idx_wt_type_tup;
@@ -3647,7 +4034,12 @@ function get_static_transmission_nodes_json_data_storage_format(
 end
 
 
+"""
+    loc_load_exist_bool_by_mpc( mpc_bus )
 
+
+Returns `true` or `false` if any of the generators has a local load.
+"""
 function loc_load_exist_bool_by_mpc( mpc_bus )
 
     gens_nodes_with_loc_loads_idx =
@@ -3685,8 +4077,8 @@ function get_loc_loads_idx_and_locP_locQ_data_by_mpc(
                     zip( mpc_bus.bus_i, mpc_bus.type,
                          mpc_bus.Pd, mpc_bus.Qd )
                     if (node_type == 3 || node_type == 2) &&
-                        ( (node_Pd != 0.0 || node_Pd != 0) ||
-                        (node_Qd != 0.0 || node_Qd != 0) ) ]
+                        ((node_Pd != 0.0 || node_Pd != 0) ||
+                        (node_Qd != 0.0 || node_Qd != 0))]
     else
         return nothing
     end
@@ -3694,61 +4086,96 @@ function get_loc_loads_idx_and_locP_locQ_data_by_mpc(
 end
 
 #---------------------------------------------------
+# sorted indices
 #---------------------------------------------------
 
-function get_slack_gens_nodes_idx_by_mpc(
-    mpc_bus)
 
-    return sort([a_node
+function get_all_nodes_idx_by_mpc(
+    mpc_bus; sorted_bool = true )
+
+    return sorted_bool == false ? copy(mpc_bus.bus_i) : sort(
+        copy(mpc_bus.bus_i))
+end
+
+
+# function get_all_nodes_idx_by_mpc(
+#     mpc_bus)
+
+#     return sort([a_node
+#             for a_node in mpc_bus.bus_i ])
+# end
+
+
+function get_slack_gens_nodes_idx_by_mpc(
+    mpc_bus;
+    sorted_bool = true )
+
+    return sorted_bool == false ? [a_node
             for (a_node, node_type) in
                 zip(mpc_bus.bus_i,
                     mpc_bus.type)
-             if node_type == 3 ])
+             if node_type == 3 ] :  sort( [a_node
+            for (a_node, node_type) in
+                zip(mpc_bus.bus_i,
+                    mpc_bus.type)
+             if node_type == 3 ] )
 end
 
 
 function get_non_slack_gens_nodes_idx_by_mpc(
-    mpc_bus)
+    mpc_bus;sorted_bool = true  )
 
-    return sort([a_node
+    return sorted_bool == false ? [a_node
             for (a_node, node_type) in
                 zip( mpc_bus.bus_i,
                      mpc_bus.type)
-                if node_type == 2 ])
+                if node_type == 2 ] : sort( [a_node
+            for (a_node, node_type) in
+                zip( mpc_bus.bus_i,
+                     mpc_bus.type)
+                if node_type == 2 ] )
 end
 
 
 function get_gens_nodes_idx_by_mpc(
-    mpc_bus)
+    mpc_bus; sorted_bool = true )
 
-    return sort([a_node for (a_node, node_type) in
+    return sorted_bool == false ? [a_node for (a_node, node_type) in
                 zip( mpc_bus.bus_i,
                      mpc_bus.type)
-                if node_type == 3 || node_type == 2 ])
+                if node_type == 3 || node_type == 2 ] :  sort( [a_node for (a_node, node_type) in
+                zip( mpc_bus.bus_i,
+                     mpc_bus.type)
+                if node_type == 3 || node_type == 2 ] )
 end
 
 
 function get_non_gens_nodes_idx_by_mpc(
-    mpc_bus)
+    mpc_bus; sorted_bool = true )
 
-    return sort([a_node
+    return sorted_bool == false ? [a_node
             for (a_node, node_type) in
                 zip( mpc_bus.bus_i, mpc_bus.type)
-             if node_type == 1 ])
+             if node_type == 1 ] :  sort([a_node
+            for (a_node, node_type) in
+                zip( mpc_bus.bus_i, mpc_bus.type)
+             if node_type == 1 ] )
 end
 
 
 function get_non_slack_gens_and_non_gens_idx_by_mpc(
-    mpc_bus)
+    mpc_bus; sorted_bool = true )
 
-    return sort([a_node for (a_node, node_type) in
+    return sorted_bool == false ? [a_node for (a_node, node_type) in
              zip( mpc_bus.bus_i, mpc_bus.type)
-             if node_type == 2 || node_type == 1  ])
+             if node_type == 2 || node_type == 1 ] :  sort( [a_node for (a_node, node_type) in
+             zip( mpc_bus.bus_i, mpc_bus.type)
+             if node_type == 2 || node_type == 1 ] )
 end
 
 
 function get_gens_nodes_with_loc_loads_idx_by_mpc(
-    mpc_bus)
+    mpc_bus; sorted_bool = true)
 
     gens_nodes_with_loc_loads_idx =
         [a_node for (a_node,node_type,node_Pd,node_Qd) in
@@ -3758,27 +4185,45 @@ function get_gens_nodes_with_loc_loads_idx_by_mpc(
                  ( (node_Pd != 0.0 || node_Pd != 0) ||
                  (node_Qd != 0.0 || node_Qd != 0) ) ]
     
-    return length(gens_nodes_with_loc_loads_idx) != 0 ?
-        sort(gens_nodes_with_loc_loads_idx) : []
+    return length(gens_nodes_with_loc_loads_idx) == 0 ? [] :
+        sorted_bool == false ? gens_nodes_with_loc_loads_idx : sort(gens_nodes_with_loc_loads_idx)
+    
 end
 
 
 function get_nodes_with_demands_idx_by_mpc(
-    mpc_bus)
+    mpc_bus; sorted_bool = true )
 
-    return sort([a_node for (a_node, node_Pd, node_Qd) in
+    return sorted_bool == false ?
+        [a_node for (a_node, node_Pd, node_Qd) in
              zip( mpc_bus.bus_i, mpc_bus.Pd, mpc_bus.Qd)
              if  (node_Pd != 0.0 || node_Pd != 0) ||
-                 (node_Qd != 0.0 || node_Qd != 0)])
+                 (node_Qd != 0.0 || node_Qd != 0)] : sort(
+                     [a_node for (a_node, node_Pd, node_Qd) in
+             zip( mpc_bus.bus_i, mpc_bus.Pd, mpc_bus.Qd)
+             if  (node_Pd != 0.0 || node_Pd != 0) ||
+                 (node_Qd != 0.0 || node_Qd != 0)] )
 end
 
 
 function get_load_nodes_idx_by_mpc(
-    mpc_bus)
+    mpc_bus; sorted_bool = true )
 
-    return sort([a_node for (a_node,node_type,node_Pd,node_Qd) in
+    return sorted_bool == false ?
+        [a_node for (a_node,node_type,node_Pd,node_Qd) in
              zip(mpc_bus.bus_i, mpc_bus.type, mpc_bus.Pd,
                  mpc_bus.Qd)
+             if (node_type == 1) && (
+                 ((node_Pd != 0.0 || node_Pd != 0) || (
+                     node_Qd !=0.0 || node_Qd != 0)))] : sort(
+                         [a_node
+                          for (a_node,
+                               node_type,
+                               node_Pd,node_Qd) in
+                              zip(mpc_bus.bus_i,
+                                  mpc_bus.type,
+                                  mpc_bus.Pd,
+                                  mpc_bus.Qd)
                 if (node_type == 1) && (
                     ((node_Pd != 0.0 || node_Pd != 0) || (
                         node_Qd != 0.0 || node_Qd != 0))) ])
@@ -3786,7 +4231,7 @@ end
 
 
 function get_transmission_nodes_idx_by_mpc(
-    mpc_bus)
+    mpc_bus; sorted_bool = true )
 
     transmission_nodes_idx =
         [a_node for (a_node,a_type, node_Pd, node_Qd) in
@@ -3796,10 +4241,10 @@ function get_transmission_nodes_idx_by_mpc(
                  (( (node_Pd == 0.0 || node_Pd == 0) &&
                  (node_Qd == 0.0 || node_Qd == 0))) ]
 
-    return  length(transmission_nodes_idx) != 0 ?
-        sort(transmission_nodes_idx) : []
+    return  length(transmission_nodes_idx) == 0 ?  [] :
+        sorted_bool == false ? transmission_nodes_idx : sort(
+            transmission_nodes_idx)
 end
-
 
 #---------------------------------------------------
 #---------------------------------------------------
@@ -3807,12 +4252,6 @@ end
 
 function  get_edges_orientation_by_mpc(
     mpc_branch )
-
-    # edges_orientation
-    
-    # return [(fbus, tbus)
-    #         for (fbus, tbus) in
-    #             zip( mpc_branch.fbus, mpc_branch.tbus)]
 
     return get_edges_orientation_by_generic(
         mpc_branch.fbus,
@@ -3825,47 +4264,6 @@ function get_edges_Ybr_by_mpc(
     mpc_baseMVA;
     basekV = 1.0 )
 
-
-    # #---------------------------------------------------
-
-    # ys =
-    #     mpc_baseMVA ./ (mpc_branch.r +
-    #     im * mpc_branch.x) 
-       
-
-    # y_c =
-    #     1 / 2 * (im *  mpc_branch.b) *
-    #     mpc_baseMVA
-
-    # y_sh =  (mpc_bus.Gs .+ im * mpc_bus.Bs)/mpc_baseMVA
-
-    # inv_τ =
-    #     [ (a_ratio == 0.0 || a_ratio == 0) ?
-    #     1.0 : 1/a_ratio
-    #           for a_ratio in
-    #               mpc_branch.ratio  ]
-    
-    # θ_shift = mpc_branch.angle
-
-    # #---------------------------------------------------
-    
-    # Yff = (ys +  y_c) .* (inv_τ).^2
-
-    # Ytf = -ys .* (inv_τ ./ exp.(im * θ_shift))
-
-    # Yft = -ys .* (inv_τ ./ exp.(-im * θ_shift))
-
-    # Ytt = (ys +  y_c)
-
-    # #---------------------------------------------------
-    
-    # # edges_Ybr_cal
-    
-    # return [ [yff ytf; yft ytt ]
-    #           for (yff, ytf, yft, ytt) in
-    #               zip( Yff, Ytf, Yft, Ytt ) ]
-
-    #---------------------------------------------------
 
     edge_type = [ (a_ratio == 0.0 || a_ratio == 0) ?
         "PiModelLine" : "Transformer"
@@ -3886,16 +4284,6 @@ end
 function get_nodes_idx_and_Yshunt_by_mpc(
     mpc_bus,
     mpc_baseMVA )
-    
-    # nodes_with_sh_idx =
-    #     [a_bus_with_sh
-    #      for (a_bus_with_sh, Gs, Bs) in
-    #          zip(mpc_bus.bus_i, mpc_bus.Gs,mpc_bus.Bs )
-    #          if (Gs != 0 || Gs != 0.0) ||
-    #              (Bs != 0 || Bs != 0.0)]
-             
-    # y_sh =
-    #     (mpc_bus.Gs .+ im *  mpc_bus.Bs) ./ mpc_baseMVA
 
     y_sh =
         get_nodes_Yshunt_by_generic(
@@ -4135,111 +4523,6 @@ function get_Ynet_and_nodes_idx_wt_adjacent_nodes_idx_by_mpc(
                  line_data_in_pu = line_data_in_pu ),
              (:Ynet,
               :nodes_idx_with_adjacent_nodes_idx ))
-
-    # buses_idx = mpc_bus.bus_i
-    
-    # nodes_idx_and_Yshunt =
-    #     get_nodes_idx_and_Yshunt_by_mpc(
-    #         mpc_bus, mpc_baseMVA )
-    
-    # edges_orientation =
-    #     get_edges_orientation_by_mpc(
-    #         mpc_branch )
-
-    # nodes_incident_edges =
-    #     get_nodes_incident_edges_by_orientations(
-    #         edges_orientation )
-    
-    # #-----------------------------------------
-
-    # "This gets the orientation of nodes incident edges"
-    
-    # nodes_incident_edges_and_orientation =
-    #     [ edges_orientation[
-    #         a_node_incident_edges ]
-    #       for a_node_incident_edges in
-    #           nodes_incident_edges ]
-
-
-    # # nodes_idx_with_adjacent_nodes_idx
-    # # nodes_node_idx_and_incident_edges_other_node_idx
-    
-    # # nodes_idx_with_adjacent_nodes_idx = [
-    # #     [ [[idx],
-    # #        [ idx == orient[1] ?
-    # #            orient[2] : orient[1]
-    # #          for orient in
-    # #              a_node_edges_other_nodes_idx]]...; ]
-    # #     for (idx, a_node_edges_other_nodes_idx) in
-    # #         enumerate(
-    # #             nodes_incident_edges_and_orientation)]
-
-    # #-----------------------------------------
-    
-    # nodes_idx_with_adjacent_nodes_idx = [
-    #     [ [[idx],
-    #        [ idx == orient[1] ?
-    #            orient[2] : orient[1]
-    #          for orient in
-    #              a_node_edges_other_nodes_idx]]...; ]
-    #     for (idx, a_node_edges_other_nodes_idx) in
-    #         zip(buses_idx,
-    #             nodes_incident_edges_and_orientation)]
-    
-     
-    # #------------------------------------------
-    
-    # edges_Ybr_cal =
-    #     get_edges_Ybr_by_mpc(
-    #         mpc_bus, mpc_branch, mpc_baseMVA;
-    #         basekV = basekV )
-
-    # edges_orientation_and_edges_Ybr_cal =
-    #     [ (orient, a_Ybr)
-    #       for (orient, a_Ybr) in
-    #           zip( edges_orientation,
-    #                edges_Ybr_cal )] 
-
-
-    # nodes_incident_edges_orientation_and_Ybr_cal =[
-    #     edges_orientation_and_edges_Ybr_cal[
-    #         a_node_incident_edges ]
-    #     for a_node_incident_edges in
-    #         nodes_incident_edges]
-    
-    # #------------------------------------------
-
-    # Ynet_no_shunt = [
-    #     [ k == 0 ?
-    #         sum( [ node_idx == first( first(
-    #             orient_and_Ybr) ) ?
-    #                 last(orient_and_Ybr)[1] :
-    #                 last(orient_and_Ybr)[4]
-    #                for orient_and_Ybr in
-    #                    orientations_and_edges_Ybr]) :
-    #                        node_idx == first(first(
-    #                            orientations_and_edges_Ybr[k])) ?
-    #                                last(orientations_and_edges_Ybr[k])[3] :
-    #                                last(orientations_and_edges_Ybr[k])[2]
-    #       for k in 0:length(
-    #           orientations_and_edges_Ybr ) ]
-    #     for (node_idx,orientations_and_edges_Ybr) in 
-    #         zip(buses_idx,
-    #             nodes_incident_edges_orientation_and_Ybr_cal ) ]
-
-    # #------------------------------------------
-
-    # Ynet =
-    #     Vector{ComplexF64}[
-    #         [  idx == 1 ?
-    #             last(node_k_idx_and_shunt) +
-    #             Ynet_k_element :
-    #             Ynet_k_element
-    #            for (idx, Ynet_k_element) in
-    #                enumerate(
-    #                    Ynet_no_shunt[shunt_idx] ) ]
-    #         for (shunt_idx, node_k_idx_and_shunt) in
-    #             enumerate( nodes_idx_and_Yshunt) ]
 
     return (; 
             Ynet,
@@ -5283,8 +5566,6 @@ function get_pf_sta_ΔPQ_mismatch_parameters_by_json(
 end
 
 
-
-
 #---------------------------------------------------
 #---------------------------------------------------
 # components data related functions 
@@ -5435,7 +5716,7 @@ function get_static_gens_plant_instances_data_by_mpc(
         get_gen_nodes_static_tup_data_by_mpc(
             mpc_bus, mpc_gen;
             mpc_baseMVA=
-                mpc_baseMVA)
+                mpc_baseMVA )
 
     #------------------------------------------
 
@@ -5506,7 +5787,7 @@ function get_static_gens_plant_instances_data_by_mpc(
                          plants_types,
                          sym_gens_types,
                          bool_isa_slack,
-                         static_gens_instance_data) ]        
+                         static_gens_instance_data) ]
     end
         
 end
@@ -5838,13 +6119,15 @@ function get_gens_type_and_dym_data(
     dict_gens_dyn_nt_params,
     dyn_gens)
 
-    return [(idx,
+    gens_type_and_dym_data = [(idx,
              (dict_gen_sym_type[sym_gen_type],
               dict_gens_dyn_nt_params[sym_gen_dym_para]))
             for (idx, sym_gen_type, sym_gen_dym_para) in
                 zip(dyn_gens.bus,
                     dyn_gens.sym_gen_type,
                     dyn_gens.sym_gen_dynamic_para)]
+    
+     return sort(gens_type_and_dym_data, by = x -> x[1]) 
 
 end
 
@@ -5854,10 +6137,12 @@ function get_static_gens_idx_and_type(
     plants_idx,
     sym_gens_types)
 
-    return [ (idx, sym_gen_type)
+    static_gens_idx_and_type = [ (idx, sym_gen_type)
             for (idx, sym_gen_type) in
                 zip(plants_idx,
                     sym_gens_types)]
+
+    return sort(static_gens_idx_and_type, by = x-> x[1] )
 
 end
 
@@ -6096,11 +6381,12 @@ function get_gens_plant_instances_data_by_mpc(
     
     gens_nodes_idx =
         get_gens_nodes_idx_by_mpc(
-            mpc_bus)
+            mpc_bus ; sorted_bool = false )
+
     
     gens_with_loc_load_idx =
         get_gens_nodes_with_loc_loads_idx_by_mpc(
-            mpc_bus)
+            mpc_bus ; sorted_bool = false )
     
     # n2s_gens_idx =
     #     get_a_n2s_net_group(gens_nodes_idx)
@@ -6951,52 +7237,58 @@ function get_Dyn_Nodes_data_by_components_by_mpc(
         plant_Transmission_t2,
     by_components = true )
 
-    ##
+    ## Added by AAY
     
-    gens_nodes_idx =
-        get_gens_nodes_idx_by_mpc(
-            mpc_bus)
+    # gens_nodes_idx =
+    #     get_gens_nodes_idx_by_mpc(
+    #         mpc_bus)
     
-    load_nodes_idx =
-        get_load_nodes_idx_by_mpc(
-            mpc_bus)
+    # load_nodes_idx =
+    #     get_load_nodes_idx_by_mpc(
+    #         mpc_bus)
     
-    transmission_nodes_idx =
-        get_transmission_nodes_idx_by_mpc(
-            mpc_bus)
+    # transmission_nodes_idx =
+    #     get_transmission_nodes_idx_by_mpc(
+    #         mpc_bus)
     
-    all_nodes_idx =
-        get_all_nodes_idx_by_mpc(
-            mpc_bus)
+    # all_nodes_idx =
+    #     get_all_nodes_idx_by_mpc(
+    #         mpc_bus)
+
+
+    #----------------------
+    
+    # gens_nodes_idx =
+    #     get_unsorted_gens_nodes_idx_by_mpc(
+    #         mpc_bus)
+    
+    # load_nodes_idx =
+    #     get_unsorted_load_nodes_idx_by_mpc(
+    #         mpc_bus)
+    
+    # transmission_nodes_idx =
+    #     get_transmission_nodes_idx_by_mpc(
+    #         mpc_bus ;sorted_bool = false)
+    
+    # all_nodes_idx =
+    #     get_unsorted_all_nodes_idx_by_mpc(
+    #         mpc_bus)
+    
     
     # n2s_gens_idx =
-    #     get_a_n2s_net_group(
+    #     get_n2s_any(
     #         gens_nodes_idx)
 
     # n2s_load_nodes_idx =
-    #     get_a_n2s_net_group(
+    #     get_n2s_any(
     #         load_nodes_idx)
     
     # n2s_transmission_idxs =
     #     length(transmission_nodes_idx) != 0 ?
-    #     get_a_n2s_net_group(
-    #         transmission_nodes_idx;
-    #         transmission_group = true) : []
-    
-    n2s_gens_idx =
-        get_n2s_any(
-            gens_nodes_idx)
-
-    n2s_load_nodes_idx =
-        get_n2s_any(
-            load_nodes_idx)
-    
-    n2s_transmission_idxs =
-        length(transmission_nodes_idx) != 0 ?
-        get_n2s_any(
-            transmission_nodes_idx) : get_n2s_any(
-                transmission_nodes_idx;
-                nothing_bool= true)
+    #     get_n2s_any(
+    #         transmission_nodes_idx) : get_n2s_any(
+    #             transmission_nodes_idx;
+    #             nothing_bool= true)
 
     gens_plant_instances_data =
         get_gens_plant_instances_data_by_mpc(
@@ -7334,19 +7626,6 @@ function create_a_default_case_mpc_branch_type(
         "Transformer" : mpc_branch_transformer_type
     
     #--------------------------------------
-
-    # case_name = "case9"
-    
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data",
-    #                  case_name )
-        
-    # end
-
-    #--------------------------------------    
     
     if (data_dir == "") || (data_dir == nothing)
 
@@ -7356,7 +7635,6 @@ function create_a_default_case_mpc_branch_type(
                      "data")
         
     end
-
     
     if (case_data_dir == "") || (case_data_dir == nothing)
 
@@ -7417,7 +7695,6 @@ function create_a_default_case_mpc_branch_type(
                DataFrame( idx = idx ,
                           branch_type = branch_type ) )
     
-    #--------------------------------------
     return nothing
     
 end
@@ -7442,21 +7719,6 @@ function create_a_default_case_mpc_load_type(
         "Trans_t2_Node" : mpc_transmission_node_type
     
     #--------------------------------------
-
-    # case_name = "case9"
-    
-
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data",
-    #                  case_name )
-        
-    # end
-
-
-    #--------------------------------------    
     
     if (data_dir == "") || (data_dir == nothing)
 
@@ -7529,7 +7791,6 @@ function create_a_default_case_mpc_load_type(
                DataFrame( idx = idx ,
                           load_type = load_type ) )
     
-    #--------------------------------------
     return nothing
     
    
@@ -7553,17 +7814,6 @@ function create_a_default_case_dyn_gens_file(
 
     synchronous_machine_dynamic_param =
         "gen_dynamic_paras_ieee_14_b" )
-    
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir",
-    #                  "converted_data",
-    #                  case_name )
-        
-    # end
-
 
     #--------------------------------------    
     
@@ -7614,7 +7864,6 @@ function create_a_default_case_dyn_gens_file(
     end
 
     #--------------------------------------
-    #--------------------------------------
 
     csv_bus_file =
         joinpath(case_data_dir,
@@ -7645,40 +7894,52 @@ function create_a_default_case_dyn_gens_file(
                   select = mpc_bus_column_select )
 
     gens_nodes_idx_in_bus_cvs =
-        sort([ a_tup.bus_i for a_tup in
+        [ a_tup.bus_i for a_tup in
              mpc_bus_selected_data if
-                 a_tup.type == 3 || a_tup.type == 2 ])
+                 a_tup.type == 3 || a_tup.type == 2 ]
 
     slack_nodes_idx_in_bus_cvs =
-        sort([a_tup.bus_i for a_tup in
+        [a_tup.bus_i for a_tup in
              mpc_bus_selected_data if
-                 a_tup.type == 3 ])
+                 a_tup.type == 3 ]
     
     mpc_gen_selected_data =
         CSV.File( csv_gen_file;
                   select = mpc_gen_column_select )
 
-    gens_idx = sort( gens_nodes_idx_in_bus_cvs )
-    
-    #--------------------------------------
+    # gens_idx = gens_nodes_idx_in_bus_cvs
 
-    # a_tup.bus_i 
+    """ This is important, when there are more than one
+    generators per bus """
+
+    # [idx for idx in mpc_gen_selected_data.bus]    
+
+    gens_idx = mpc_gen_selected_data.bus
     
-    # bus_nodes_with_Pd_demands_idx =
-    #     [ a_tup.bus_i for a_tup in
-    #          mpc_bus_selected_data if (
-    #              a_tup.Pd != 0 || a_tup.Pd != 0.0 ) ]
+    gens_countmap =
+        countmap(gens_idx)
+
+    multi_gens_nodes = [k for (k, v) in
+                           gens_countmap if v > 1]
+
+    multi_gen_bool =
+        length(multi_gens_nodes) == 0 ? false : true
+
     
-    # bus_nodes_with_Qd_demands_idx =
-    #     [ a_tup.bus_i for a_tup in
-    #          mpc_bus_selected_data if (
-    #              a_tup.Qd != 0 || a_tup.Qd != 0.0 ) ]
+    gens_idx = multi_gen_bool == false ? gens_idx : [
+        [ idxs ∈ multi_gens_nodes ?
+            [ "$(idxs)-$(idx)"
+              for idx in 1:gens_countmap[ idxs ]] :
+                  "$(idxs)" for idxs in
+                      unique(gens_idx)]...;]
+
+    #--------------------------------------
     
     bus_nodes_with_demands_idx =
         [ a_tup.bus_i for a_tup in
              mpc_bus_selected_data if (
                  a_tup.Pd != 0 || a_tup.Pd != 0.0 ) || (
-                 a_tup.Qd != 0 || a_tup.Qd != 0.0 ) ]
+                 a_tup.Qd != 0 || a_tup.Qd != 0.0)]
 
     #--------------------------------------
 
@@ -7696,6 +7957,8 @@ function create_a_default_case_dyn_gens_file(
     
     #--------------------------------------
 
+    """ These are bus_SM and bus_SC with local loads """
+    
     bus_SM_in_loc_load =
         [ idx for idx in bus_SM
              if idx ∈  bus_nodes_with_demands_idx ]
@@ -7706,25 +7969,34 @@ function create_a_default_case_dyn_gens_file(
 
     #--------------------------------------
     
-    gens_idx = sort(gens_idx)
+    # gens_idx = sort(gens_idx)
     
-    sym_gen_type =
-        [idx ∈ bus_SC_in_loc_load ?
-        synchronous_condenser_wt_loc_load :
-        idx ∈ bus_SM_in_loc_load ?
-        synchronous_machine_wt_loc_load :
-        idx ∈ bus_SC ? synchronous_condenser :
-        synchronous_machine
-          for idx in gens_nodes_idx_in_bus_cvs ]
+    sym_gen_type =  multi_gen_bool == false ? [
+        idx ∈ bus_SC_in_loc_load ?
+            synchronous_condenser_wt_loc_load :
+            idx ∈ bus_SM_in_loc_load ?
+            synchronous_machine_wt_loc_load :
+            idx ∈ bus_SC ? synchronous_condenser :
+            synchronous_machine
+        for idx in gens_idx
+             ] :  [
+              get_node_idx_multi(idx) ∈ bus_SC_in_loc_load ?
+                     synchronous_condenser_wt_loc_load :
+               get_node_idx_multi(idx) ∈ bus_SM_in_loc_load ?
+                     synchronous_machine_wt_loc_load :
+                     get_node_idx_multi(idx) ∈ bus_SC ?
+                     synchronous_condenser :
+                     synchronous_machine
+                 for idx in gens_idx ] 
     
     sym_gen_dynamic_para =
         [synchronous_machine_dynamic_param
-         for idx in gens_nodes_idx_in_bus_cvs  ]
+         for idx in gens_idx ]
 
     #--------------------------------------
     
     CSV.write( dyn_gens_file,
-               DataFrame( bus = gens_nodes_idx_in_bus_cvs ,
+               DataFrame( bus = gens_idx ,
                           sym_gen_type = sym_gen_type,
                           sym_gen_dynamic_para =
                               sym_gen_dynamic_para  ) )
@@ -7742,34 +8014,30 @@ function create_a_default_case_dyn_plants_file(
     dyn_plants_file = "",
     
     synchronous_machine_wt_loc_load =
-        "SM_2axis_wt_loc_load_cb_v6", 
+        "SM_2axis_wt_loc_load_cb_v6",
+    
     synchronous_condenser_wt_loc_load =
         "SC_2axis_wt_loc_load_cb_v6",
+    
     synchronous_machine =
         "SM_2axis_cb_v6",
+    
     synchronous_condenser =
         "SC_2axis_cb_v6",
 
     plant_wt_loc_load =
         "plant_wt_loc_load_v6",
+    
     plant_no_gov_wt_loc_load =
         "plant_no_gov_wt_loc_load_v6",
+    
     plant_no_gov = "plant_no_gov",
+    
     plant = "plant_cb_v6",
     
     avr_param = "avr_t1_cb_sauer__1_param",
-    gov_param = "gov_t1_cb_sauer__1_param" )
-
     
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir",
-    #                  "converted_data",
-    #                  case_name )
-        
-    # end
+    gov_param = "gov_t1_cb_sauer__1_param" )
 
     #--------------------------------------    
     
@@ -7844,61 +8112,77 @@ function create_a_default_case_dyn_plants_file(
          "Qg"]
     
     #--------------------------------------
-        
+
+
+    
     mpc_bus_selected_data =
         CSV.File( csv_bus_file;
                   select = mpc_bus_column_select )
 
     gens_nodes_idx_in_bus_cvs =
-        sort([a_tup.bus_i for a_tup in
+        [a_tup.bus_i for a_tup in
              mpc_bus_selected_data if
-                 a_tup.type == 3 || a_tup.type == 2 ])
+                 a_tup.type == 3 || a_tup.type == 2 ]
 
     slack_nodes_idx_in_bus_cvs =
-        sort([a_tup.bus_i for a_tup in
+        [a_tup.bus_i for a_tup in
              mpc_bus_selected_data if
-                 a_tup.type == 3 ])
+                 a_tup.type == 3 ]
     
     mpc_gen_selected_data =
         CSV.File( csv_gen_file;
                   select = mpc_gen_column_select )
 
+    # gens_idx = sort( gens_nodes_idx_in_bus_cvs )
+
     gens_idx = [ a_tup.bus for a_tup in
                     mpc_gen_selected_data ]
+    
+    gens_countmap =
+        countmap(gens_idx)
 
-    gens_idx = sort( gens_nodes_idx_in_bus_cvs )
+    multi_gens_nodes = [k for (k, v) in
+                           gens_countmap if v > 1]
+
+    multi_gen_bool =
+        length(multi_gens_nodes) == 0 ? false : true
+    
+    gens_idx = multi_gen_bool == false ? gens_idx : [
+        [ idxs ∈ multi_gens_nodes ?
+            [ "$(idxs)-$(idx)"
+              for idx in 1:gens_countmap[ idxs ]] :
+                  "$(idxs)" for idxs in
+                      unique(gens_idx)]...; ]
+
+    #--------------------------------------    
 
     nodes_idx_with_type =
-        [ ( a_tup.bus_i, a_tup.type )
+        [ (a_tup.bus_i, a_tup.type )
           for a_tup in
               mpc_bus_selected_data ]
 
-    nodes_idx_with_type =
-        sort( nodes_idx_with_type, by = x->x[ 1 ] )
+    # nodes_idx_with_type =
+    #     sort( nodes_idx_with_type, by = x->x[ 1 ] )
 
-    nodes_idx  = first.( nodes_idx_with_type  )
+    nodes_idx  = first.(
+        nodes_idx_with_type )
 
-    nodes_type = second.( nodes_idx_with_type )
-        
+    nodes_type = second.(
+        nodes_idx_with_type )
+
+    a_slack_bus_idx =
+        [ first(a_tup) for a_tup in nodes_idx_with_type
+             if second(a_tup) == 3  ]
+    
     #--------------------------------------
 
     bus_nodes_with_demands_idx =
         [ a_tup.bus_i for a_tup in
              mpc_bus_selected_data if
                  ( a_tup.Pd != 0 || a_tup.Pd != 0.0 ) || (
-                     a_tup.Qd != 0 || a_tup.Qd != 0.0 ) ]
+                     a_tup.Qd != 0 || a_tup.Qd != 0.0)]
 
     #--------------------------------------
-
-    # bus_SM =
-    #     [ a_tup.bus for a_tup in
-    #          mpc_gen_selected_data if
-    #              ( a_tup.Pg != 0 || a_tup.Pg != 0.0 ) ]
-
-    # bus_SC =
-    #     [ a_tup.bus for a_tup in
-    #          mpc_gen_selected_data if
-    #              ( a_tup.Pg == 0 || a_tup.Pg == 0.0 ) ]
 
     bus_SM =
         [ a_tup.bus for a_tup in
@@ -7914,14 +8198,6 @@ function create_a_default_case_dyn_plants_file(
         
     #--------------------------------------
 
-    # bus_SM_in_loc_load =
-    #     [ idx for idx in bus_SM
-    #          if idx ∈  bus_nodes_with_Pd_demands_idx ]
-
-    # bus_SC_in_loc_load = length(bus_SC) == 0 ? [] :
-    #     [ idx for idx in bus_SC
-    #          if idx ∈  bus_nodes_with_Pd_demands_idx]
-
     bus_SM_in_loc_load =
         [ idx for idx in bus_SM
              if idx ∈  bus_nodes_with_demands_idx ]
@@ -7934,27 +8210,43 @@ function create_a_default_case_dyn_plants_file(
     
     # gens_idx = sort(gens_idx)
 
-    Plant_type =
+    Plant_type = multi_gen_bool == false ?
         [ idx ∈ bus_SC_in_loc_load ?
         plant_no_gov_wt_loc_load :
         idx ∈ bus_SM_in_loc_load ?  plant_wt_loc_load  :
         idx ∈ bus_SC ? plant_no_gov : plant
-          for idx in gens_idx  ]
+          for idx in gens_idx  ] :
+    [ get_node_idx_multi(idx) ∈ bus_SC_in_loc_load ?
+      plant_no_gov_wt_loc_load :
+      get_node_idx_multi(idx) ∈ bus_SM_in_loc_load ?
+      plant_wt_loc_load :
+      get_node_idx_multi(idx) ∈ bus_SC ?
+      plant_no_gov : plant
+       for idx in gens_idx ]
+
     
-    Gen =
+    Gen = multi_gen_bool == false ?
         [ idx ∈ bus_SC_in_loc_load ?
         synchronous_condenser_wt_loc_load :
         idx ∈ bus_SM_in_loc_load ?
         synchronous_machine_wt_loc_load :
         idx ∈ bus_SC ? synchronous_condenser :
         synchronous_machine
+          for idx in gens_idx ] :
+              [get_node_idx_multi(idx) ∈ bus_SC_in_loc_load ?
+        synchronous_condenser_wt_loc_load :
+        get_node_idx_multi(idx) ∈ bus_SM_in_loc_load ?
+        synchronous_machine_wt_loc_load :
+        get_node_idx_multi(idx) ∈ bus_SC ?
+        synchronous_condenser : synchronous_machine
           for idx in gens_idx ]
 
-
-    isa_slack = [ a_type == 3 ? true : false
-                  for (idx, a_type) in
-                      zip( nodes_idx, nodes_type ) if
-                          idx ∈ gens_idx ]
+    isa_slack = multi_gen_bool == false ?
+        [ idx ∈ a_slack_bus_idx ? true : false
+                  for idx in gens_idx ] :
+              [ get_node_idx_multi(idx) ∈ a_slack_bus_idx ?
+                      true : false
+                  for idx in gens_idx ]
 
     Gov = [ idx ∈ bus_SC ?
         :nothing : gov_param
@@ -8023,17 +8315,6 @@ function create_a_default_case_net_data_xlsx_file(
     gov_param = "gov_t1_cb_sauer__1_param",
     
     by_components = true )
-
-    
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir",
-    #                  "converted_data",
-    #                  case_name )
-        
-    # end
 
     #--------------------------------------    
     
@@ -8234,8 +8515,6 @@ function create_a_default_case_net_data_xlsx_file(
     
 
     #--------------------------------------
-    #--------------------------------------
-
 
     mpc_branch_column_select =
         String["fbus", "tbus", "r", "x", "b",
@@ -8268,12 +8547,16 @@ function create_a_default_case_net_data_xlsx_file(
     # dyn_plants_data_types =
     #     [ Int, Symbol, Symbol, Bool, Symbol, Symbol]
 
+    (;multi_gen_bool,) =
+        NamedTupleTools.select(
+            check_multi_gens_bool_by_csv_file(
+                csv_gen_file),
+            (:multi_gen_bool,) )
 
-    dyn_gens_data_types =
-        [Int, String, String]
+    dyn_gens_data_types = multi_gen_bool == false ? [Int, String, String] : [String, String, String]
 
-    dyn_plants_data_types =
-        [ Int, String, String, Bool, String, String]
+    dyn_plants_data_types = multi_gen_bool == false ? [ Int, String, String, Bool, String, String] : 
+        [ String, String, String, Bool, String, String]
     
     #--------------------------------------
 
@@ -8402,17 +8685,6 @@ function create_a_default_case_net_data_xlsx_file(
     gov_param = "gov_t1_cb_sauer__1_param",
     
     by_components = true)
-
-    
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir",
-    #                  "converted_data",
-    #                  case_name )
-        
-    # end
  
     #--------------------------------------    
     
@@ -8795,17 +9067,6 @@ function create_default_static_net_json_data_by_xlsx(
     by_components = true,
     wt_plants_data_types_bool = true )
 
-
-    #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir = joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    
     #--------------------------------------
     
     if (components_libs_dir == "") || (
@@ -9195,15 +9456,6 @@ function create_default_static_net_json_data_by_mpc(
     by_components       = true,
     wt_plants_data_types_bool = true )
 
-
-    # #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir = joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
         
     #--------------------------------------
     
@@ -9517,20 +9769,6 @@ function create_a_default_case_net_data_json_file(
 
     by_xlsx_bool = false )
 
-
-    # #--------------------------------------
-    
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir",
-    #                  "converted_data",
-    #                  case_name )
-        
-    # end
-
-    # #--------------------------------------
     
     #--------------------------------------
     
@@ -10654,25 +10892,6 @@ function create_a_case_net_data_by_components_file(
     net_data_by_components_file = "")
 
     #--------------------------------------
-    #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir = joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    # #--------------------------------------
-
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # end
-    
-    #--------------------------------------
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -10762,6 +10981,7 @@ function create_a_case_net_data_by_components_file(
     
 end
 
+#---------------------------------------------------
 #---------------------------------------------------
 
 function create_a_case_net_data_by_components_file_by_xlsx(
@@ -10879,6 +11099,72 @@ end
 #---------------------------------------------------
 #---------------------------------------------------
 
+function check_multi_gens_bool_by_csv_file(
+    csv_gen_file)
+    
+    mpc_gen_selected_data =
+        CSV.File( csv_gen_file;
+               select = ["bus"] )
+
+    gens_idx = mpc_gen_selected_data.bus
+    
+    gens_countmap =
+        countmap(gens_idx)
+
+    multi_gens_nodes = [k for (k, v) in
+                           gens_countmap if v > 1]
+
+    multi_gen_bool =
+        length(multi_gens_nodes) == 0 ? false : true
+
+    return (;multi_gens_nodes,
+            multi_gen_bool,
+            gens_countmap)
+    
+end
+
+
+function check_multi_gens_bool_by_case(
+    case_name;
+    data_dir = "",
+    case_data_dir = "")
+
+    #--------------------------------------
+    
+    if (data_dir == "") || (data_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        data_dir = joinpath(package_dir,
+                     "data")
+        
+    end
+
+    
+    if (case_data_dir == "") || (case_data_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        data_dir = joinpath(package_dir,
+                     "data")
+        
+        case_data_dir =
+            joinpath(data_dir,
+                     "converted-data",
+                     case_name )
+        
+    end
+
+    
+    csv_gen_file =
+        joinpath(case_data_dir,
+                 "mpc_gen.csv")
+
+    return check_multi_gens_bool_by_csv_file(
+        csv_gen_file)
+
+end
+
 
 function get_node_idx_multi(idx)
 
@@ -10897,18 +11183,21 @@ end
 
 
 function get_multi_gens_idx_wt_multi_gen_bool(
-    mpc_gen)
+    mpc_gen;
+    sorted_bool = true )
 
     if typeof(mpc_gen) == DataFrame
 
         multi_gens_idx_in_bus_cvs =
-            sort( mpc_gen.bus )
+            sorted_bool == true ? sort(
+                mpc_gen.bus ) : mpc_gen.bus
         
     else                
 
-        multi_gens_idx_in_bus_cvs =
+        multi_gens_idx_in_bus_cvs = sorted_bool == true ? 
             sort([ a_tup.bus for a_tup in
-                      mpc_gen] )
+                      mpc_gen] ) : [ a_tup.bus for a_tup in
+                      mpc_gen] 
 
     end
     
@@ -10916,9 +11205,11 @@ function get_multi_gens_idx_wt_multi_gen_bool(
     gens_countmap =
         countmap(multi_gens_idx_in_bus_cvs)
 
-    multi_gens_nodes =
+    multi_gens_nodes = sorted_bool == true ?
         sort([k for (k, v) in
-                  gens_countmap if v > 1])
+                  gens_countmap if v > 1] ) :
+                      [k for (k, v) in
+                           gens_countmap if v > 1]
 
     multi_gen_bool =
         length(multi_gens_nodes) == 0 ? false : true
@@ -10927,7 +11218,7 @@ function get_multi_gens_idx_wt_multi_gen_bool(
         [ idxs ∈ multi_gens_nodes ?
             [ "$(idxs)-$(idx)"
               for idx in 1:gens_countmap[ idxs ]] :
-                  "$(idxs)"  for idxs in
+                  "$(idxs)" for idxs in
                       unique(multi_gens_idx_in_bus_cvs)]...;]
 
     return (; multi_gens_idx,
@@ -11039,7 +11330,8 @@ function get_multi_net_nodes_idxs_wt_n2s(
      gens_countmap) =
          NamedTupleTools.select(
              get_multi_gens_idx_wt_multi_gen_bool(
-                 mpc_gen),
+                 mpc_gen;
+             sorted_bool = false),
              (:multi_gens_idx,
               :multi_gen_bool,
               :multi_gens_nodes,
@@ -11125,18 +11417,6 @@ function create_a_default_case_dyn_multi_gens_file(
 
     #--------------------------------------
     
-    # if case_data_dir == "" || data_dir == ""
-        
-    #     case_data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir",
-    #                  "converted_data",
-    #                  case_name )
-        
-    # end
-
-    #--------------------------------------
-    
     if (data_dir == "") || (data_dir == nothing)
 
         package_dir = pkgdir(ePowerSim)
@@ -11216,9 +11496,13 @@ function create_a_default_case_dyn_multi_gens_file(
     gens_countmap =
         countmap(multi_gens_idx_in_bus_cvs)
 
+    # multi_gens_nodes =
+    #     sort([k for (k, v) in
+    #               gens_countmap if v > 1])
+
     multi_gens_nodes =
-        sort([k for (k, v) in
-                  gens_countmap if v > 1])
+        [k for (k, v) in
+                  gens_countmap if v > 1]
 
     multi_gen_bool =
         length(multi_gens_nodes) == 0 ?
@@ -11235,8 +11519,11 @@ function create_a_default_case_dyn_multi_gens_file(
           for a_tup in
               mpc_bus_selected_data ]
 
+    # nodes_idx_with_type =
+    #     sort( nodes_idx_with_type, by = x->x[ 1 ] )
+
     nodes_idx_with_type =
-        sort( nodes_idx_with_type, by = x->x[ 1 ] )
+        nodes_idx_with_type
 
     nodes_idx  = first.( nodes_idx_with_type  )
 
@@ -11258,9 +11545,9 @@ function create_a_default_case_dyn_multi_gens_file(
             unique(multi_gens_idx_in_bus_cvs)]...;]
     
     slack_nodes_idx_in_bus_cvs =
-        sort([a_tup.bus_i for a_tup in
+        [a_tup.bus_i for a_tup in
              mpc_bus_selected_data if
-                 a_tup.type == 3 ])
+                 a_tup.type == 3 ]
     
     #--------------------------------------
     
@@ -11273,16 +11560,16 @@ function create_a_default_case_dyn_multi_gens_file(
     #--------------------------------------
 
     bus_SM =
-        sort([ a_tup.bus for a_tup in
+        [ a_tup.bus for a_tup in
              mpc_gen_selected_data if (
                  (a_tup.bus ∈ slack_nodes_idx_in_bus_cvs) ||
-                     ( a_tup.Pg != 0 || a_tup.Pg != 0.0))])
+                     ( a_tup.Pg != 0 || a_tup.Pg != 0.0))]
 
     bus_SC =
-        sort([ a_tup.bus for a_tup in
+        [ a_tup.bus for a_tup in
              mpc_gen_selected_data if (
                  (a_tup.bus ∉ slack_nodes_idx_in_bus_cvs) &&
-                     ( a_tup.Pg == 0 || a_tup.Pg == 0.0 ))])
+                     ( a_tup.Pg == 0 || a_tup.Pg == 0.0 ))]
     
     #--------------------------------------
 
@@ -12763,6 +13050,19 @@ end
 #---------------------------------------------------
 #---------------------------------------------------
 
+"""
+    get_net_data_by_components_from_json_file(
+        net_data_by_components_file;
+        in_components_type_sym = false )
+
+Returns namedtuples of dynamic network data `plant_generators_data_from_json`, `plant_loads_data_from_json`, `plant_transmission_data_from_json`, `edge_data_from_json`, `shunt_data_from_json`, `baseMVA_data_from_json`, `gencost_data_from_json`.
+
+
+# Arguments
+- `net_data_by_components_file::String`: the path to network json file.
+- `in_components_type_sym::Bool=false`: the variable that determines how plants data are stored in json network file.
+
+"""
 function get_net_data_by_components_from_json_file(
     net_data_by_components_file;
     in_components_type_sym = false )
@@ -13233,25 +13533,6 @@ function get_net_data_by_components_by_mpc(
 
 
     #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    # #--------------------------------------
-
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # end
-    
-    #--------------------------------------
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -13505,24 +13786,8 @@ function get_net_data_by_static_components_by_xlsx(
     xlsx_data_file      = "" )
 
     #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir = joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    # #--------------------------------------
-
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # end
     
-    # #--------------------------------------
+    #--------------------------------------
 
     
     if (components_libs_dir == "") || (
@@ -13778,26 +14043,6 @@ function get_net_data_by_static_components_by_mpc(
 
 
     #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    # #--------------------------------------
-
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # end
-    
-    #--------------------------------------
-
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -14013,25 +14258,6 @@ function get_multi_gens_net_data_by_components_by_xlsx(
 
 
     #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir = joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    # #--------------------------------------
-
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # end
-    
-    #--------------------------------------
-
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -14341,25 +14567,6 @@ function get_multi_gens_net_data_by_components_by_mpc(
 
 
     #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir = joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    # #--------------------------------------
-
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # end
-    
-    #--------------------------------------
-
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -14602,7 +14809,6 @@ function get_multi_gens_net_data_by_components_by_mpc(
         :gencost => [dict_gencost])
     
 end
-
 
 #---------------------------------------------------
 #---------------------------------------------------
@@ -17293,7 +17499,8 @@ function get_gens_plant_instances(
 
     gens_nodes_static_tup_data =
         get_gen_nodes_static_tup_data_by_mpc(
-            mpc_bus, mpc_gen;
+            mpc_bus,
+            mpc_gen;
             mpc_baseMVA=mpc_baseMVA)
 
     #------------------------------------------
@@ -17674,26 +17881,6 @@ function get_Dyn_Nodes_Dyn_Branches_by_mpc(
     components_libs_dir = "" )
     
     #--------------------------------------
-
-    # src_dir =
-    #     joinpath(@__DIR__,"..","..","src")
-    
-    #--------------------------------------
-
-    # components_libs_dir =
-    #     joinpath(
-    #         lib_dir,
-    #         components_lib )
-
-    #--------------------------------------
-
-    # data_dir =
-    #     joinpath(src_dir,
-    #              "data-dir",
-    #              "converted_data",
-    #              "case9")
-
-    #--------------------------------------
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing )
@@ -17964,7 +18151,6 @@ end
 
 
 #---------------------------------------------------
-#---------------------------------------------------
 
 
 function get_Dyn_Nodes_Dyn_Branches_data_by_mpc(
@@ -17972,24 +18158,6 @@ function get_Dyn_Nodes_Dyn_Branches_data_by_mpc(
     data_dir = "",
     components_libs_dir = "",
     by_components = false )
-
-    #--------------------------------------
-
-    # if data_dir == ""
-        
-    #     data_dir = joinpath(@__DIR__,"..","..","src",
-    #                  "data-dir","converted_data" )
-        
-    # end
-
-    # #--------------------------------------
-
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib" )
-    # end
 
     #--------------------------------------
     
@@ -18645,22 +18813,6 @@ function get_net_powerflow_data_by_components_by_json(
     use_pu_in_PQ = true,
     line_data_in_pu = true )
 
-    #--------------------------------------
-
-    # case_name = "case14"
-
-    # data_dir =
-    #     joinpath(@__DIR__,"..","..","src","data-dir",
-    #              "converted_data" )
-    
-    #--------------------------------------
-    
-    # json_case_dir =
-    #     joinpath( data_dir, case_name, "json")
-
-    # net_data_by_components_file =
-    #     joinpath(json_case_dir,
-    #              "net_data_by_components_file.json")
     #--------------------------------------
     
     if (data_dir == "") || (data_dir == nothing)
@@ -21459,54 +21611,62 @@ function get_net_generic_parameters(
              selections =
                  ode_gens_generic_selections )
 
-    (H,
-     D,
-     ra,
-     xℓ,
-     X_d,
-     X_q,
+    # modified by AAY ePowerSim
+    
+    ode_gens_generic_para = namedtuple(
+        OrderedDict(a_sym => a_value
+             for (a_sym, a_value) in
+                    zip(ode_gens_generic_selections,
+                        ode_gens_generic_para)))
+
+    # (H,
+    #  D,
+    #  ra,
+    #  xℓ,
+    #  X_d,
+    #  X_q,
      
-     X_d_dash,
-     X_q_dash,
+    #  X_d_dash,
+    #  X_q_dash,
      
-     X_d_2dash,
-     X_q_2dash,
-     T_d_dash,
-     T_q_dash, Sn) =
-         NamedTupleTools.select(
-             ode_gens_generic_para,
-             (:H,
-              :D,
-              :ra,
-              :xℓ,
-              :X_d,
-              :X_q,
+    #  X_d_2dash,
+    #  X_q_2dash,
+    #  T_d_dash,
+    #  T_q_dash, Sn) =
+    #      NamedTupleTools.select(
+    #          ode_gens_generic_para,
+    #          (:H,
+    #           :D,
+    #           :ra,
+    #           :xℓ,
+    #           :X_d,
+    #           :X_q,
 
-              :X_d_dash,
-              :X_q_dash,
+    #           :X_d_dash,
+    #           :X_q_dash,
 
-              :X_d_2dash,
-              :X_q_2dash,
-              :T_d_dash,
-              :T_q_dash, :Sn))
+    #           :X_d_2dash,
+    #           :X_q_2dash,
+    #           :T_d_dash,
+    #           :T_q_dash, :Sn))
 
 
-    ode_gens_generic_para =
-        (;
-         H,
-         D,
-         ra,
-         xℓ,
-         X_d,
-         X_q,
+    # ode_gens_generic_para =
+    #     (;
+    #      H,
+    #      D,
+    #      ra,
+    #      xℓ,
+    #      X_d,
+    #      X_q,
 
-         X_d_dash,
-         X_q_dash,
+    #      X_d_dash,
+    #      X_q_dash,
 
-         X_d_2dash,
-         X_q_2dash,
-         T_d_dash,
-         T_q_dash, Sn) 
+    #      X_d_2dash,
+    #      X_q_2dash,
+    #      T_d_dash,
+    #      T_q_dash, Sn) 
 
 
     #------------------------------------------------
@@ -21537,35 +21697,44 @@ function get_net_generic_parameters(
             selections =
                 ode_gens_para_selections )
 
-    (H,
-     D,
-     X_d,
-     X_q,
-     X_d_dash,
-     X_q_dash,
-     T_d_dash,
-     T_q_dash, Sn ) =
-         NamedTupleTools.select(
-             ode_gens_para,
-             (:H,
-              :D,
-              :X_d,
-              :X_q,
-              :X_d_dash,
-              :X_q_dash,
-              :T_d_dash,
-              :T_q_dash  :Sn))
 
-    ode_gens_para =
-        (
-        ;H,
-        D,
-        X_d,
-        X_q,
-        X_d_dash,
-        X_q_dash,
-        T_d_dash,
-        T_q_dash, Sn )  
+    # modified by AAY ePowerSim
+    
+    ode_gens_para = namedtuple(
+        OrderedDict(a_sym => a_value
+             for (a_sym, a_value) in
+                    zip(ode_gens_para_selections,
+                        ode_gens_para)))
+    
+    # (H,
+    #  D,
+    #  X_d,
+    #  X_q,
+    #  X_d_dash,
+    #  X_q_dash,
+    #  T_d_dash,
+    #  T_q_dash, Sn ) =
+    #      NamedTupleTools.select(
+    #          ode_gens_para,
+    #          (:H,
+    #           :D,
+    #           :X_d,
+    #           :X_q,
+    #           :X_d_dash,
+    #           :X_q_dash,
+    #           :T_d_dash,
+    #           :T_q_dash  :Sn))
+
+    # ode_gens_para =
+    #     (
+    #     ;H,
+    #     D,
+    #     X_d,
+    #     X_q,
+    #     X_d_dash,
+    #     X_q_dash,
+    #     T_d_dash,
+    #     T_q_dash, Sn )  
     
     #------------------------------------------------
     
@@ -21577,13 +21746,22 @@ function get_net_generic_parameters(
             selections =
                 ode_spcm_gens_para_selections
                )
+
+
+    # modified by AAY ePowerSim
+
+    ode_spcm_gens_para = namedtuple(
+        OrderedDict(a_sym => a_value
+             for (a_sym, a_value) in
+                    zip(ode_spcm_gens_para_selections,
+                        ode_spcm_gens_para)))
     
-    ( H,
-      Xd_dash ) =  ode_spcm_gens_para
+    # ( H,
+    #   Xd_dash ) =  ode_spcm_gens_para
     
-    ode_spcm_gens_para =
-        ( ;H,
-          Xd_dash )
+    # ode_spcm_gens_para =
+    #     ( ;H,
+    #       Xd_dash )
     
     #------------------------------------------------
     
@@ -21595,12 +21773,20 @@ function get_net_generic_parameters(
           selections =
               ode_flux_decay_gens_para_selections )
 
+
+    # modified by AAY ePowerSim
+
+     ode_flux_decay_gens_para = namedtuple(
+        OrderedDict(a_sym => a_value
+             for (a_sym, a_value) in
+                    zip(ode_flux_decay_gens_para_selections,
+                         ode_flux_decay_gens_para)))
     
-    ( H, X_d, X_q, X_d_dash, T_d_dash ) =
-        ode_flux_decay_gens_para
+    # ( H, X_d, X_q, X_d_dash, T_d_dash ) =
+    #     ode_flux_decay_gens_para
     
-    ode_flux_decay_gens_para =
-        (; H, X_d, X_q, X_d_dash, T_d_dash ) 
+    # ode_flux_decay_gens_para =
+    #     (; H, X_d, X_q, X_d_dash, T_d_dash ) 
             
     #------------------------------------------------
     
@@ -21612,13 +21798,21 @@ function get_net_generic_parameters(
               selections =
                   ode_flux_decay_avrs_para_selections )
 
+
+    # modified by AAY ePowerSim
+
+     ode_flux_decay_avrs_para = namedtuple(
+        OrderedDict(a_sym => a_value
+             for (a_sym, a_value) in
+                    zip(ode_flux_decay_avrs_para_selections,
+                         ode_flux_decay_avrs_para)))
    
-   (Ka,
-    Ta) = ode_flux_decay_avrs_para
+   # (Ka,
+   #  Ta) = ode_flux_decay_avrs_para
 
    
-   ode_flux_decay_avrs_para = (; Ka,
-    Ta)  
+   # ode_flux_decay_avrs_para = (; Ka,
+   #  Ta)  
     
     generic_govs_para, generic_avrs_para =
         get_selected_comps_ode_para_by_json(

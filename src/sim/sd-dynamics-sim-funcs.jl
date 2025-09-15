@@ -275,8 +275,7 @@ function create_benchmarkgroups_admittance_vector_funcs(
         system_net_static_data =
             get_system_net_static_data(
                 case_name;
-                script_dir=
-                    script_dir,
+                script_dir="",
                 data_dir = data_dir,
                 json_net_data_by_components_file =
                     json_net_data_by_components_file,
@@ -448,8 +447,7 @@ function create_benchmarkgroups_pf_mismatch(
         system_net_static_data =
             get_system_net_static_data(
                 case_name;
-                script_dir=
-                    script_dir,
+                script_dir= "",
                 data_dir = data_dir,
                 json_net_data_by_components_file =
                    json_net_data_by_components_file,
@@ -1404,7 +1402,8 @@ function sim_full_model_distributed_slack_pf(
 
     if wt_network_loss_by_sta_pf_PQ_para_bool == true
 
-        ds_gens_Pg_inj = @set gens_Pg_inj[slack_gens_nodes_idx]=
+        ds_gens_Pg_inj = @set gens_Pg_inj[
+            slack_gens_nodes_idx]=
             gens_Pg_inj[slack_gens_nodes_idx] -
             get_total_P_network_loss_by_sta_pf_PQ_para(
                 sta_pf_PQ_para,
@@ -1412,7 +1411,8 @@ function sim_full_model_distributed_slack_pf(
         
     else
         
-        ds_gens_Pg_inj = @set gens_Pg_inj[slack_gens_nodes_idx]=
+        ds_gens_Pg_inj = @set gens_Pg_inj[
+            slack_gens_nodes_idx]=
             gens_Pg_inj[slack_gens_nodes_idx] -
             get_total_P_network_loss(
                 vh,
@@ -1534,7 +1534,7 @@ function sim_full_model_distributed_slack_pf(
 
     ds_vh =
         getproperty(
-            results_pf_red_sol_u,
+            results_conti_or_ds_pf_sol_u,
             :vh)
 
     ds_θh =
@@ -1598,12 +1598,15 @@ function sim_full_model_distributed_slack_pf(
     
     df_gens_with_loc_load  = DataFrames.DataFrame(
         ;Bus = gens_nodes_with_loc_loads_idx,
-        vh = round.(ds_vh[transformed_gens_nodes_with_loc_loads_idx];
+        vh = round.(ds_vh[
+            transformed_gens_nodes_with_loc_loads_idx];
                     digits = fractional_digits),
-        θh = round.(ds_θh[transformed_gens_nodes_with_loc_loads_idx];
+        θh = round.(ds_θh[
+            transformed_gens_nodes_with_loc_loads_idx];
                     digits = fractional_digits),
         θh_deg =
-            round.(ds_θh_deg[transformed_gens_nodes_with_loc_loads_idx];
+            round.(ds_θh_deg[
+                transformed_gens_nodes_with_loc_loads_idx];
                    digits = fractional_digits),
         Pll = round.(Pll;
                    digits = fractional_digits),
@@ -3290,42 +3293,6 @@ function sim_model_by_mass_matrix_ode_by_model_dynamics!(
 
     end
 
-    # #--------------------------------------    
-
-    # if (data_dir == "") || (data_dir == nothing)
-
-    #     package_dir = pkgdir(ePowerSim)
-
-    #     data_dir = joinpath(package_dir,
-    #                  "data")
-        
-    # end
-    
-    # #--------------------------------------
-
-    # json_case_dir =
-    #     joinpath(
-    #         data_dir,
-    #         "converted-data",
-    #         case_name,
-    #         "json")
-
-    # if  (json_net_data_by_components_file == "" ||
-    #     json_net_data_by_components_file == nothing) 
-
-    #     net_data_by_components_file =
-    #         joinpath(
-    #             json_case_dir,
-    #             "net_data_by_components_file.json")
-    # else
-
-    #     net_data_by_components_file =
-    #         joinpath(
-    #             json_case_dir,
-    #             json_net_data_by_components_file)
-
-    # end
-
     #--------------------------------------
 
     (u0_model_states_init,
@@ -3365,7 +3332,8 @@ function sim_model_by_mass_matrix_ode_by_model_dynamics!(
                               basekV,    
                               use_pu_in_PQ,
                               line_data_in_pu),
-                         :static_prefault_paras) ,             
+                         :static_prefault_paras),
+             
              (:u0_model_states_init,
               :model_syms,
               :model_mass_matrix,
@@ -5008,6 +4976,7 @@ function sim_sudden_load_change(
             sol_auxilliary_results,
             target_parameter_plot)
 
+    
 end
 
 
@@ -8803,45 +8772,6 @@ function sim_sudden_load_change(
     end
 
     #---------------------------------------------------
-
-    # json_net_data_by_components_file =
-    #     "net-static-data-avr-sauer-gov-sauer.json"
-
-
-    # components_libs_dir =
-    #     joinpath(script_dir,"..","..","src",
-    #              "components-lib")
-
-    # data_dir =
-    #     joinpath(
-    #         script_dir,
-    #         "..","..","src",
-    #         "data-dir",
-    #         "converted_data" )
-
-
-    # json_case_dir =
-    #     joinpath(
-    #         data_dir,
-    #         case_name,
-    #         "json")
-
-    # if json_net_data_by_components_file == nothing
-
-    #     net_data_by_components_file =
-    #         joinpath(
-    #             json_case_dir,
-    #             "net_data_by_components_file.json")
-    # else
-
-    #     net_data_by_components_file =
-    #         joinpath(
-    #             json_case_dir,
-    #             json_net_data_by_components_file)
-
-    # end
-
-    #--------------------------------------
     
     if (components_lib == "") || (
         components_lib == nothing)
@@ -8890,7 +8820,7 @@ function sim_sudden_load_change(
             
         net_data_by_components_file =
             joinpath(json_case_dir,
-                     net_data_by_components_file)
+                     json_net_data_by_components_file)
         
     end
 

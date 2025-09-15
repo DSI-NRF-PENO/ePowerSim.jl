@@ -1,0 +1,303 @@
+{
+    "plant_generators": [
+        {
+            "idx": 1,
+            "plant_type": "plant_wt_loc_load_v6",
+            "additional_data": {
+                "isa_slack": true,
+                "p_order": 1,
+                "v_ref": 1,
+                "ω_ref": 376.99111843077515
+            },
+            "components_type": {
+                "gen": "SM_2axis_wt_loc_load_cb_v6",
+                "gov": "gov_t1_cb_sauer",
+                "avr": "avr_t1_cb_sauer",
+                "loc_load": "loc_Load_t1"
+            },
+            "components_data": {
+                "gen": {
+                    "T_d_dash": 7.4,
+                    "X_d_dash": 0.2995,
+                    "D": 0,
+                    "X_d": 0.8979,
+                    "Ωb": 376.99111843077515,
+                    "T_q_dash": 0.3,
+                    "X_q_dash": 0.646,
+                    "ra": 0,
+                    "X_q": 0.646,
+                    "X_q_2dash": 0.4,
+                    "ωs": 376.99111843077515,
+                    "xℓ": 0.2396,
+                    "T_d_2dash": 0.03,
+                    "H": 5.148,
+                    "T_q_2dash": 0.033,
+                    "X_d_2dash": 0.23,
+                    "Bus": "bus1",
+                    "P": 318,
+                    "Q": 0,
+                    "vh": 1.02,
+                    "vmax": 1.1,
+                    "vmin": 0.9,
+                    "Qmax": 100,
+                    "Qmin": -100,
+                    "Pmax": 318,
+                    "Pmin": 0,
+                    "Sn": 333.35266610603253
+                },
+                "gov": {
+                    "p_max": 2.2,
+                    "R": 0.02,
+                    "p_min": 0.1,
+                    "Ts": 0.2,
+                    "Tc": 0.4
+                },
+                "avr": {
+                    "V_R_max": 5.2,
+                    "Tf": 0.35,
+                    "Be": 1.555,
+                    "Tr": 0.001,
+                    "Ka": 20,
+                    "Kf": 0.063,
+                    "Ta": 0.2,
+                    "Ae": 0.0039,
+                    "Te": 0.314,
+                    "V_R_min": -4.16,
+                    "Ke": 1
+                },
+                "loc_load": {
+                    "Bus": "bus1",
+                    "loc_P": 50,
+                    "loc_Q": 30.99
+                }
+            }
+        },
+        {
+            "idx": 4,
+            "plant_type": "plant_wt_loc_load_v6",
+            "additional_data": {
+                "isa_slack": false,
+                "p_order": 1,
+                "v_ref": 1,
+                "ω_ref": 376.99111843077515
+            },
+            "components_type": {
+                "gen": "SM_2axis_wt_loc_load_cb_v6",
+                "gov": "gov_t1_cb_sauer",
+                "avr": "avr_t1_cb_sauer",
+                "loc_load": "loc_Load_t1"
+            },
+            "components_data": {
+                "gen": {
+                    "T_d_dash": 7.4,
+                    "X_d_dash": 0.2995,
+                    "D": 0,
+                    "X_d": 0.8979,
+                    "Ωb": 376.99111843077515,
+                    "T_q_dash": 0.3,
+                    "X_q_dash": 0.646,
+                    "ra": 0,
+                    "X_q": 0.646,
+                    "X_q_2dash": 0.4,
+                    "ωs": 376.99111843077515,
+                    "xℓ": 0.2396,
+                    "T_d_2dash": 0.03,
+                    "H": 5.148,
+                    "T_q_2dash": 0.033,
+                    "X_d_2dash": 0.23,
+                    "Bus": "bus4",
+                    "P": 0,
+                    "Q": 0,
+                    "vh": 1,
+                    "vmax": 1.1,
+                    "vmin": 0.9,
+                    "Qmax": 100,
+                    "Qmin": -100,
+                    "Pmax": 0,
+                    "Pmin": 0,
+                    "Sn": 100
+                },
+                "gov": {
+                    "p_max": 2.2,
+                    "R": 0.02,
+                    "p_min": 0.1,
+                    "Ts": 0.2,
+                    "Tc": 0.4
+                },
+                "avr": {
+                    "V_R_max": 5.2,
+                    "Tf": 0.35,
+                    "Be": 1.555,
+                    "Tr": 0.001,
+                    "Ka": 20,
+                    "Kf": 0.063,
+                    "Ta": 0.2,
+                    "Ae": 0.0039,
+                    "Te": 0.314,
+                    "V_R_min": -4.16,
+                    "Ke": 1
+                },
+                "loc_load": {
+                    "Bus": "bus4",
+                    "loc_P": 80,
+                    "loc_Q": 49.58
+                }
+            }
+        }
+    ],
+    "plant_loads": [
+        {
+            "idx": 2,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus2",
+                    "P": 170,
+                    "Q": 105.35
+                }
+            }
+        },
+        {
+            "idx": 3,
+            "plant_type": "plant_PQ_Const_I",
+            "components_type": {
+                "load": "PQ_Const_I"
+            },
+            "components_data": {
+                "load": {
+                    "Bus": "bus3",
+                    "P": 200,
+                    "Q": 123.94
+                }
+            }
+        }
+    ],
+    "plant_transmissions": [
+    ],
+    "branches": [
+        {
+            "idx": 1,
+            "components_data": {
+                "fbus": 1,
+                "tbus": 2,
+                "r": 0.01008,
+                "x": 0.0504,
+                "b": 0.1025,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 2,
+            "components_data": {
+                "fbus": 1,
+                "tbus": 3,
+                "r": 0.00744,
+                "x": 0.0372,
+                "b": 0.0775,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 3,
+            "components_data": {
+                "fbus": 2,
+                "tbus": 4,
+                "r": 0.00744,
+                "x": 0.0372,
+                "b": 0.0775,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        {
+            "idx": 4,
+            "components_data": {
+                "fbus": 3,
+                "tbus": 4,
+                "r": 0.01272,
+                "x": 0.0636,
+                "b": 0.1275,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        }
+    ],
+    "shunt": [
+        {
+            "shunt_idx": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "shunt_Gs": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "shunt_Bs": [
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    ],
+    "baseMVA": [
+        100
+    ],
+    "gencost": [
+        {
+            "startup": [
+                0,
+                0
+            ],
+            "n": [
+                2,
+                2
+            ],
+            "shutdown": [
+                0,
+                0
+            ],
+            "c_1": [
+                0,
+                0
+            ],
+            "c_0": [
+                null,
+                null
+            ],
+            "cost_type": [
+                2,
+                2
+            ],
+            "c_n_1": [
+                14,
+                15
+            ]
+        }
+    ]
+}

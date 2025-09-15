@@ -679,40 +679,6 @@ function get_generic_network_fault_pertubation_by_cb(
 
     #----------------------------------
     
-    # if components_libs_dir == nothing
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..",
-    #                  "src",
-    #                  "components-lib")
-    # end
-    
-
-    # if data_dir == nothing
-
-    #     data_dir =
-    #         joinpath(@__DIR__,"..","..",
-    #                  "src","data-dir",
-    #                  "converted_data" )
-        
-    # end
-    
-    # json_case_dir =
-    #     joinpath( data_dir, case_name, "json")
-
-    # if json_net_data_by_components_file == nothing
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  "net_data_by_components_file.json")
-    # else
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  json_net_data_by_components_file)
-
-    # end
-    
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
 

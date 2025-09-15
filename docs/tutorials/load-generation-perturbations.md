@@ -1,0 +1,8 @@
+
+# [Load-Generation Pertubation](@id load-generation-perturbations)
+
+Demonstrates how to formulate a load pertubation in form of a sudden change in load or generation.
+
+
+
+

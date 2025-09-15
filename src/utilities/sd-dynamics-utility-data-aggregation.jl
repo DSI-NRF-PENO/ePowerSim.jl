@@ -12,7 +12,23 @@
 # ---------------------------------------------------
 #####################################################
 
+"""
+    get_renewable_energy_net_optimisation_parameters(
+        case_file,
 
+        wind_gens_cost_scale,    
+        solar_gens_cost_scale,
+
+        wind_gens_capacity_scale,    
+        solar_gens_capacity_scale,
+
+        active_power_demand_deviation_scale,
+        reactive_power_demand_deviation_scale)
+
+Return renewable energy network optimisation parameters for optimal power flow, unit commitment or economic dispatch
+
+
+"""
 function get_renewable_energy_net_optimisation_parameters(
     case_file,
     
@@ -448,6 +464,12 @@ function get_renewable_energy_net_optimisation_parameters(
 end
 
 
+"""
+    get_opf_net_optimisation_parameters(
+        case_file )
+
+Returns network optimisation parameters for optimal power flow, unit commitment or economic dispatch
+"""
 function get_opf_net_optimisation_parameters(
         case_file )
 
@@ -802,6 +824,28 @@ end
 
 
 
+"""
+    get_system_net_data_wt_static_parameters(
+        case_name;
+        <keyword arguments>)
+
+
+It is used to simplify static model parameters or data of a system that are needed for static analyses.
+
+
+# Arguments
+
+-`case_name`: the case name
+- `script_dir::String=""`: working folder
+- `data_dir::String=""`: data folder where all cases are stored
+- `json_net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+`pf_alg`: power flow solver
+
+"""
 function get_system_net_data_wt_static_parameters(
     case_name
     ;script_dir = "",
@@ -815,29 +859,6 @@ function get_system_net_data_wt_static_parameters(
 
     #----------------------------------------    
 
-    
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(script_dir,"..","..","src",
-    #                  "components-lib")
-
-    # end
-    
-    # if data_dir == ""
-
-    #     data_dir =
-    #         joinpath(
-    #             script_dir,
-    #             "..","..","src",
-    #             "data-dir",
-    #             "converted_data" )
-
-    # end
-
-    # json_case_dir =
-    #     joinpath(data_dir,
-    #              case_name, "json")
 
     
     if (components_libs_dir == "") || (
@@ -1422,6 +1443,32 @@ function get_system_net_data_wt_static_parameters(
 end
 
 
+"""
+    get_system_net_static_data(
+        case_name;
+        <keyword arguments>)
+
+
+It is used to simplify static model parameters or data of a system that are needed for static analyses.
+
+
+# Arguments
+
+-`case_name`: the case name
+- `script_dir::String=""`: working folder
+- `data_dir::String=""`: data folder where all cases are stored
+- `json_net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
+
+`pf_alg`: power flow solver
+`no_lines_fault`: the number of faults
+"""
 function get_system_net_static_data(
     case_name
     ;script_dir = "",
@@ -1436,26 +1483,6 @@ function get_system_net_static_data(
     no_lines_fault = 1 )
 
     #----------------------------------------    
-
-    
-    # if components_libs_dir == ""
-
-    #     components_libs_dir =
-    #         joinpath(script_dir,"..","..","src",
-    #                  "components-lib")
-
-    # end
-    
-    # if data_dir == ""
-
-    #     data_dir =
-    #         joinpath(
-    #             script_dir,
-    #             "..","..","src",
-    #             "data-dir",
-    #             "converted_data" )
-    # end
-
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -1987,6 +2014,31 @@ function get_system_net_static_data(
 end
 
 
+
+"""
+    get_generic_system_simulation_parameters(
+        net_data_by_components_file;
+        <keyword arguments>)
+
+It is used to simplify generation of parameters or data of a system that are needed for optimal power flow analyses.
+
+
+# Arguments
+
+- `net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
+
+`pf_alg`: power flow solver
+`ode_alg`: ode solver`
+`dae_alg`: dae solver
+
+"""
 function get_generic_system_simulation_parameters(
     net_data_by_components_file;
     components_libs_dir =
@@ -3122,6 +3174,33 @@ end
 # ---------------------------------------------------
 #####################################################
 
+
+"""
+    get_system_simulation_parameters(
+        net_data_by_components_file,
+        nothing;
+        <keyword arguments>)
+
+It is used to simplify generation of parameters or data of a system that are needed for simulation.
+
+
+# Arguments
+
+- `net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
+
+`pf_alg`: power flow solver
+
+`abstol`: the absolute error tolerance
+`reltol`: the relative error tolerance
+
+"""
 function get_system_simulation_parameters(
     net_data_by_components_file,
     nothing;
@@ -3945,7 +4024,31 @@ function get_system_simulation_parameters(
 end
 
 
+"""
+    get_system_simulation_parameters(
+        net_data_by_components_file;
+        <keyword arguments>)
 
+It is used to simplify generation of parameters or data of a system that are needed for simulation.
+
+
+# Arguments
+
+- `net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
+
+`pf_alg`: power flow solver
+
+`abstol`: the absolute error tolerance
+`reltol`: the relative error tolerance
+
+"""
 function get_system_simulation_parameters(
     net_data_by_components_file;
     components_libs_dir = nothing,
@@ -4902,29 +5005,69 @@ function get_system_simulation_parameters(
 end
 
 
+# """
+#     get_status_steady_state_parameters(
+#         net_data_by_components_file;
+#         <keyword arguments>)
+
+# These functions are used to simplify  generation of
+# parameters or data of a system that are needed for
+# simulation.
+
+
+# The parameters are pre-fault
+# state steady state parameters, fault
+# state steady state parameters, post-fault
+# state steady state parameters,
+
+# `get_Yint_and_Yred_matrices`
+
+# `get_net_status_Yint_and_Yred_matrices`
+
+# `get_a_status_Yint_Yred`
+
+# `get_status_steady_state_parameters`,
+
+# `get_a_status_steady_state_data`
+
+# """
+
 """
+    get_status_steady_state_parameters(
+        net_data_by_components_file;
+        <keyword arguments>)
 
-These functions are used to simplify  generation of
-parameters or data of a system that are needed for
-simulation.
+It is used to simplify generation of parameters or data of a system that are needed for simulation.
 
-The parameters are pre-fault
-state steady state parameters, fault
-state steady state parameters, post-fault
-state steady state parameters,
 
-`get_Yint_and_Yred_matrices`
+# Arguments
 
-`get_net_status_Yint_and_Yred_matrices`
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
 
-`get_a_status_Yint_Yred`
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
 
-`get_status_steady_state_parameters`,
+`pf_alg`: power flow solver
 
-`get_a_status_steady_state_data`
+`abstol`: the absolute error tolerance
+`reltol`: the relative error tolerance
+
+`on_fault_time`: the on fault time
+`clear_fault_time`: the clear fault time
+
+`list_fault_point_from_node_a::Vector{Float64}=[0.3]`: the list containing a ratio of the fault point from the source (from) orientation of lines
+`list_fault_resistance::Vector{Float64} = [0.001]`: the list containing fault resistances of each fault in the network.
+`list_no_line_circuit::Vector{Float64} = [4]`: the list containing the number of circuits per faulted lines.
+
+`list_edges_to_have_fault::Vector{Int64} = [2]`: the list containing indices of lines that should have a fault.  
+`clear_fault_selection_list::Vector{Int64} = [1]`: the list containing indices of faulted lines to be cleared in `list_edges_to_have_fault`.
+
+`with_faults::Bool=false`: a legacy boolean variable.
 
 """
-
 function get_status_steady_state_parameters(
     net_data_by_components_file;
     components_libs_dir = nothing,
@@ -5889,6 +6032,45 @@ end
 
 # ------------------------------------------------------
 
+"""
+    get_a_status_steady_state_data(
+        system_status;
+        <keyword arguments>)
+
+It is used to simplify generation of parameters or data of a system that are needed for simulation.
+
+# Arguments
+
+- `net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
+`pf_alg`: power flow solver
+`abstol`: the absolute error tolerance
+`reltol`: the relative error tolerance
+`on_fault_time`: the on fault time
+`clear_fault_time`: the clear fault time
+`list_fault_point_from_node_a::Vector{Float64}=[0.3]`: the list containing a ratio of the fault point from the source (from) orientation of lines
+`list_fault_resistance::Vector{Float64} = [0.001]`: the list containing fault resistances of each fault in the network.
+`list_no_line_circuit::Vector{Float64} = [4]`: the list containing the number of circuits per faulted lines
+`list_edges_to_have_fault::Vector{Int64} = [2]`: the list containing indices of lines that should have a fault.  
+`clear_fault_selection_list::Vector{Int64} = [1]`: the list containing indices of faulted lines to be cleared in `list_edges_to_have_fault`.
+`ode_alg`: the ode solver.
+dae_alg: the dae solver.
+dt: the solve interval.
+`with_faults::Bool=false`: a legacy boolean variable.
+
+
+- `system_status`: can take the form of the following
+   - `:pre_fault_state`
+   - `:fault_state` 
+   - `:post_fault_state`
+
+"""
 function get_a_status_steady_state_data(
     system_status;
     with_faults =
@@ -5941,7 +6123,7 @@ function get_a_status_steady_state_data(
     abstol        = 1e-12,
     reltol        = 1e-12,
     
-    dt            = 0.01)
+    dt            = 0.01 )
 
     #--------------------------------------
     
@@ -5962,65 +6144,6 @@ function get_a_status_steady_state_data(
 
     #--------------------------------------
 
-    # """
-    # case_name = "case9"
-
-    # case_name = "case14"
-
-    # json_net_data_by_components_file =
-    #     "net-static-data-avr-sauer-gov-sauer.json"
-
-    # timespan         = 10.0
-    # on_fault_time    = 9.0
-    # clear_fault_time = 9.001
-
-    # with_faults      = false
-    
-    # list_fault_point_from_node_a = [0.3]
-    # list_fault_resistance        = [0.001]
-    # list_no_line_circuit         =  [4]
-
-    # list_edges_to_have_fault   = [ 2 ]
-    # clear_fault_selection_list = [1]
-    
-    # basekV          = 1.0    
-    # use_pu_in_PQ    = true
-    # line_data_in_pu = true
-  
-
-    # """
-    #--------------------------------------
-    
-    # basekV = 1.0
-
-    # use_pu_in_PQ = true
-    
-    # line_data_in_pu = true 
-    
-    # #--------------------------------------    
-
-    # use_init_u0 = false
-    
-    # use_nlsolve = false
-    
-    # pf_alg        = NewtonRaphson()
-
-    # #--------------------------------------    
-    
-    # ode_alg       = Rodas4()
-    # # ode_alg     = FBDF()
-    # # ode_alg     = QNDF()
-    # # ode_alg     = radau()
-    # # ode_alg     = RadauIIA5()
-    # # ode_alg     = DFBDF()
-
-    # dae_alg       = IDA()
-    
-    # abstol        = 1e-12
-    # reltol        = 1e-12
-    
-    # dt            = 0.01
-    # # timespan      = 10.0
     
     tspan         = (0.0, timespan)
     
@@ -6028,34 +6151,6 @@ function get_a_status_steady_state_data(
     
     plot_timespan = (0.0, timespan)
     
-    #--------------------------------------
-    
-    # """
-    # components_libs_dir =
-    #     joinpath(@__DIR__,"..","..","src",
-    #              "components-lib")
-
-    # data_dir =
-    #     joinpath(@__DIR__,"..","..","src","data-dir",
-    #              "converted_data" )
-    
-    # json_case_dir =
-    #     joinpath( data_dir, case_name, "json")
-
-    # if json_net_data_by_components_file == nothing
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  "net_data_by_components_file.json")
-    # else
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  json_net_data_by_components_file)
-        
-    # end
-
-    # """
     #----------------------------------------        
     
     fault_status =
@@ -7113,7 +7208,8 @@ function get_a_status_steady_state_data(
         fault_algeb_init =
             [sol[dyn_pf_vhf_Idxs];
              sol[dyn_pf_θhf_Idxs] ]
-    else
+        
+    elseif system_status ==  :post_fault_state
             
         dyn_pf_sol_u =
             get_generic_results_dyn_pf_sol_u(
@@ -7125,7 +7221,10 @@ function get_a_status_steady_state_data(
                     baseMVA,
                 basekV =
                     basekV )
+    else
+
         
+        return  (;static_prefault_paras, )         
                 
     end
         
@@ -7395,14 +7494,48 @@ function get_a_status_steady_state_data(
  
     # (; static_prefault_paras, dynamic_status_paras )
 
-    return system_status == :pre_fault_state ?
-        (;static_prefault_paras, ) : (
-            ;dynamic_status_paras, )
-    
+    # return system_status == :pre_fault_state ?
+    #     (;static_prefault_paras, ) : (
+    #         ;dynamic_status_paras, )
+
+
+    return  (; dynamic_status_paras, )
+
 end
 
 # ---------------------------------------------------
 
+
+"""
+    get_ntuple_status_steady_state_data(
+        ;<keyword arguments>)
+
+Returns namedtuples of data for network status in `list_network_status`. The network status in the list are `:pre_fault_state`, `:fault_state`, `:post_fault_state`.
+
+
+# Arguments
+
+- `net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+`pf_alg`: power flow solver
+`abstol`: the absolute error tolerance
+`reltol`: the relative error tolerance
+`on_fault_time`: the on fault time
+`clear_fault_time`: the clear fault time
+`list_fault_point_from_node_a::Vector{Float64}=[0.3]`: the list containing a ratio of the fault point from the source (from) orientation of lines
+`list_fault_resistance::Vector{Float64} = [0.001]`: the list containing fault resistances of each fault in the network.
+`list_no_line_circuit::Vector{Float64} = [4]`: the list containing the number of circuits per faulted lines
+`list_edges_to_have_fault::Vector{Int64} = [2]`: the list containing indices of lines that should have a fault.  
+`clear_fault_selection_list::Vector{Int64} = [1]`: the list containing indices of faulted lines to be cleared in `list_edges_to_have_fault`.
+`with_faults::Bool=false`: a legacy boolean variable.
+`timespan`: the simulation time.
+`list_network_status`: the list of network status.
+
+
+"""
 function get_ntuple_status_steady_state_data(
     ;with_faults =
         false,

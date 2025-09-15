@@ -1,0 +1,276 @@
+{
+    "loc_loads_exist": [
+        true
+    ],
+    "transmission_nodes_exist": [
+        false
+    ],
+    "plant_generators": {
+        "1-1": {
+            "Bus": "bus1-1",
+            "P": 0.4,
+            "Q": 0,
+            "vh": 1,
+            "vmax": 1.1,
+            "vmin": 0.9,
+            "Qmax": 0.3,
+            "Qmin": -0.3,
+            "Pmax": 0.4,
+            "Pmin": 0,
+            "Sn": 0.5
+        },
+        "1-2": {
+            "Bus": "bus1-2",
+            "P": 1.7,
+            "Q": 0,
+            "vh": 1,
+            "vmax": 1.1,
+            "vmin": 0.9,
+            "Qmax": 1.275,
+            "Qmin": -1.275,
+            "Pmax": 1.7,
+            "Pmin": 0,
+            "Sn": 2.125
+        },
+        "3": {
+            "Bus": "bus3",
+            "P": 3.2349,
+            "Q": 0,
+            "vh": 1,
+            "vmax": 1.1,
+            "vmin": 0.9,
+            "Qmax": 3.9,
+            "Qmin": -3.9,
+            "Pmax": 5.2,
+            "Pmin": 0,
+            "Sn": 6.5
+        },
+        "4": {
+            "Bus": "bus4",
+            "P": 0,
+            "Q": 0,
+            "vh": 1,
+            "vmax": 1.1,
+            "vmin": 0.9,
+            "Qmax": 1.5,
+            "Qmin": -1.5,
+            "Pmax": 2,
+            "Pmin": 0,
+            "Sn": 2.5
+        },
+        "5": {
+            "Bus": "bus5",
+            "P": 4.6651,
+            "Q": 0,
+            "vh": 1,
+            "vmax": 1.1,
+            "vmin": 0.9,
+            "Qmax": 4.5,
+            "Qmin": -4.5,
+            "Pmax": 6,
+            "Pmin": 0,
+            "Sn": 7.5
+        }
+    },
+    "plant_loc_loads": {
+        "2": {
+            "Bus": "bus2",
+            "P": 3,
+            "Q": 0.9861
+        }
+    },
+    "plant_loads": [
+        [
+            2,
+            [
+                2,
+                {
+                    "Bus": "bus2",
+                    "P": 3,
+                    "Q": 0.9861
+                },
+                "load"
+            ]
+        ]
+    ],
+    "plant_transmission": null,
+    "branches": {
+        "1": {
+            "idx": 1,
+            "components_data": {
+                "fbus": 1,
+                "tbus": 2,
+                "r": 0.00281,
+                "x": 0.0281,
+                "b": 0.00712,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        "2": {
+            "idx": 2,
+            "components_data": {
+                "fbus": 1,
+                "tbus": 4,
+                "r": 0.00304,
+                "x": 0.0304,
+                "b": 0.00658,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        "3": {
+            "idx": 3,
+            "components_data": {
+                "fbus": 1,
+                "tbus": 5,
+                "r": 0.00064,
+                "x": 0.0064,
+                "b": 0.03126,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        "4": {
+            "idx": 4,
+            "components_data": {
+                "fbus": 2,
+                "tbus": 3,
+                "r": 0.00108,
+                "x": 0.0108,
+                "b": 0.01852,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        "5": {
+            "idx": 5,
+            "components_data": {
+                "fbus": 3,
+                "tbus": 4,
+                "r": 0.00297,
+                "x": 0.0297,
+                "b": 0.00674,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        },
+        "6": {
+            "idx": 6,
+            "components_data": {
+                "fbus": 4,
+                "tbus": 5,
+                "r": 0.00297,
+                "x": 0.0297,
+                "b": 0.00674,
+                "ratio": 0,
+                "angle": 0,
+                "status": 1
+            },
+            "components_type": {
+                "edge_type": "PiModelLine"
+            }
+        }
+    },
+    "shunt": [
+        {
+            "shunt_idx": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "shunt_Gs": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "shunt_Bs": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        }
+    ],
+    "baseMVA": [
+        100
+    ],
+    "gencost": [
+        {
+            "startup": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "n": [
+                2,
+                2,
+                2,
+                2,
+                2
+            ],
+            "shutdown": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "c_1": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "c_0": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "cost_type": [
+                2,
+                2,
+                2,
+                2,
+                2
+            ],
+            "c_n_1": [
+                14,
+                15,
+                30,
+                40,
+                10
+            ]
+        }
+    ]
+}

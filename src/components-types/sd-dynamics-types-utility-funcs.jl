@@ -4,7 +4,7 @@
 #  System Dynamics Data Type Utility fubctions
 # ------------------------------------------------------
 ########################################################
-
+using InteractiveUtils
 
 """
 ```Julia
@@ -24,12 +24,18 @@ end
 
 
 """
-```ComponentsSymbols``` is a struct used to pack all types of components symbols stored in dictionary of symbols dict_syms.
+It is used to pack all types of components symbols stored in dictionary of symbols `dict_syms`.
 
-The struct is designed to make a clean implementation of ```symbolof(name)```.
+
+The struct is designed to make a clean implementation of `symbolof(name)`.
 
 It is a callable struct.
 """
+
+"""
+It is used to pack all types of components symbols stored in dictionary of symbols `dict_syms`.
+"""
+
 struct ComponentsSymbols
     dict_syms::Dict{Symbol, Dict{String, Vector{Symbol}}}
 end

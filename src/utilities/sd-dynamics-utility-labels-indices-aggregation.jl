@@ -12,6 +12,1101 @@
 # ---------------------------------------------------
 #####################################################
 
+"""
+    get_plants_states_syms(
+        gens_govs_avrs_states_syms)
+
+
+Return plants states variables symbols per plant for all generator plants in a vector of vectors.
+
+A generator plant consist of a generator, automatic voltage regulator, governor etc.
+
+"""
+function get_plants_states_syms(
+    gens_govs_avrs_states_syms)
+
+    return [ :nothing ∈ an_item.gov ?
+        [an_item.gen; an_item.avr ] :
+        [an_item.gen; an_item.avr; an_item.gov ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+
+end
+
+
+"""
+    get_generic_state_sym(
+        gens_govs_avrs_states_syms,
+        gens_nodes_idx;
+        label_prefix = "bus")
+
+Return plants states variables symbols or lables for all generator plants  in a flattened
+vector.
+
+A generator plant consist of a generator, automatic voltage regulator, governor etc.
+
+"""
+function get_generic_state_sym(
+    gens_govs_avrs_states_syms,
+    gens_nodes_idx;
+    label_prefix = "bus")
+
+
+    plants_states_syms =
+        get_plants_states_syms(
+            gens_govs_avrs_states_syms)
+
+    # generic_state_sym =
+    #     get_labels_by_nodes_idxs_and_vec_vec_syms(
+    #         gens_nodes_idx,
+    #         plants_states_syms;
+    #         label_prefix = "bus" )
+
+    return get_labels_by_nodes_idxs_and_vec_vec_syms(
+            gens_nodes_idx,
+            plants_states_syms;
+            label_prefix = "bus" ) 
+    
+end
+
+
+"""
+    get_state_labels(
+        gens_govs_avrs_states_syms,
+        gens_nodes_idx;
+        label_prefix = "bus",
+        plants_states_by_per_comp = false,
+        plants_states_by_per_plant = true )
+
+Return plants states variables symbols or lables for all generator plants  in a flattened
+vector.
+
+A generator plant consist of a generator, automatic voltage regulator, governor etc.
+
+"""
+function get_state_labels(
+    gens_govs_avrs_states_syms,
+    gens_nodes_idx;
+    label_prefix = "bus",
+    plants_states_by_per_comp = false,
+    plants_states_by_per_plant = true )
+
+
+    plants_states_syms =
+        get_plants_states_syms(
+            gens_govs_avrs_states_syms)
+
+    
+    if( plants_states_by_per_comp == true &&
+        plants_states_by_per_plant == false)
+
+        plants_states_syms =
+            [ :nothing ∈ a_comp.gov ?
+            [a_comp.gen; a_comp.avr ] :
+            [a_comp.gen; a_comp.avr; a_comp.gov ]
+             for a_comp in
+                 plants_states_syms ]
+
+        # state_labels =
+         return get_labels_by_nodes_idxs_and_vec_vec_syms(
+                gens_nodes_idx,
+                plants_states_syms;
+                label_prefix = label_prefix )
+        
+    elseif (plants_states_by_per_plant == true &&
+        plants_states_by_per_comp == false)
+    
+        # state_labels =
+        return get_labels_by_nodes_idxs_and_vec_vec_syms(
+                gens_nodes_idx,
+                plants_states_syms;
+                label_prefix = label_prefix )
+
+    else
+            
+        # state_labels =
+        return generate_labels_by_nodes_idxs_and_vars(
+                gens_nodes_idx,
+                plants_states_syms;
+                label_prefix = label_prefix )
+        
+    end
+    
+    #----------------------------------------
+    
+end
+
+
+"""
+    get_algebraic_vars_labels(
+        dyn_pf_fun_kwd_net_idxs;
+        label_prefix = "bus" )
+
+Return plants algebraic variable symbols or lables for all generator plants  in a flattened vector.
+
+
+# Arguments
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `label_prefix::String="bus"`: the label that should be used as a prefix.
+
+
+"""
+function get_algebraic_vars_labels(
+    dyn_pf_fun_kwd_net_idxs;
+    label_prefix = "bus" )
+
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
+     all_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
+              :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
+
+    # algebraic_vars_labels =
+    return [generate_labels_by_nodes_idxs_and_vars(
+            all_nodes_idx,
+            [:vh];
+            label_prefix = label_prefix);
+         generate_labels_by_nodes_idxs_and_vars(
+            all_nodes_idx,
+            [:θh];
+             label_prefix = label_prefix);
+         generate_labels_by_nodes_idxs_and_vars(
+            gens_nodes_idx,
+            [:id];
+             label_prefix = label_prefix);
+         generate_labels_by_nodes_idxs_and_vars(
+            gens_nodes_idx,
+            [:iq];
+             label_prefix = label_prefix ) ]
+
+        
+end
+
+
+"""
+    get_network_vars_labels(
+        gens_govs_avrs_states_syms,
+        dyn_pf_fun_kwd_net_idxs;
+        label_prefix = "bus",
+        plants_states_by_per_comp = false,
+        plants_states_by_per_plant = true )
+
+
+Return a system network states and algebraic variables label in a flatted.
+
+
+# Arguments
+- `gens_govs_avrs_states_syms`: the namedtuple of states variables symbols  of generator,
+   governors and automatic voltage regulator.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `label_prefix::String="bus"`: the label that should be used as a prefix.
+
+
+"""
+function get_network_vars_labels(
+    gens_govs_avrs_states_syms,
+    dyn_pf_fun_kwd_net_idxs;
+    label_prefix = "bus",
+    plants_states_by_per_comp = false,
+    plants_states_by_per_plant = true )
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
+     all_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
+              :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
+
+    return [get_state_labels(
+        gens_govs_avrs_states_syms,
+        gens_nodes_idx);
+            
+            get_algebraic_vars_labels(
+                dyn_pf_fun_kwd_net_idxs;
+                label_prefix =
+                    label_prefix) ]
+
+    
+end
+
+"""
+    get_state_vars_idx(
+        gens_govs_avrs_states_syms)
+
+
+Return indices of states  variables in the system in a flatted.
+
+
+# Arguments
+- `gens_govs_avrs_states_syms`: the namedtuple of states variables symbols  of generator,
+   governors and automatic voltage regulator.
+
+"""
+function get_state_vars_idx(
+    gens_govs_avrs_states_syms)
+
+    vec_dims_gens_govs_avrs_states_syms =
+        [:nothing ∈ an_item.gov ?
+        [length(an_item.gen),
+         length(an_item.avr)] :
+             [length(an_item.gen),
+              length(an_item.avr),
+              length(an_item.gov) ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+    dims_gens_govs_avrs_states_syms =
+        sum.(vec_dims_gens_govs_avrs_states_syms)
+   
+    # state_vars_idx =
+    #     get_vars_or_paras_Idxs_in_flattend(
+    #         dims_gens_govs_avrs_states_syms;
+    #         dims_given = true )
+
+    return get_vars_or_paras_Idxs_in_flattend(
+            dims_gens_govs_avrs_states_syms;
+            dims_given = true )
+    
+end
+
+
+"""
+    get_plants_states_syms_and_labels(
+        gens_govs_avrs_states_syms,
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs)
+
+Return a system namedtuple of `state_vars_idx`, `vec_comp_states_Idx`, `plants_states_syms`,
+`generic_state_sym`, `state_labels`, `algebraic_vars_labels`, and `network_vars_labels`.
+
+
+# Arguments
+- `gens_govs_avrs_states_syms`: the namedtuple of states variables symbols  of generator,
+   governors and automatic voltage regulator.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+
+"""
+function get_plants_states_syms_and_labels(
+    gens_govs_avrs_states_syms,
+    dyn_pf_fun_kwd_net_idxs,
+    dyn_pf_fun_kwd_n2s_idxs)
+
+    #-------------------------------
+    
+    gens_nodes_idx =
+        getproperty(dyn_pf_fun_kwd_net_idxs,
+                    :gens_nodes_idx )
+    
+    #-------------------------------
+
+    vec_vec_gens_govs_avrs_states_syms =
+        [ :nothing ∈ an_item.gov ?
+        [an_item.gen, an_item.avr ] :
+        [an_item.gen, an_item.avr, an_item.gov ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+    vec_dims_gens_govs_avrs_states_syms =
+        [:nothing ∈ an_item.gov ?
+        [length(an_item.gen),
+         length(an_item.avr)] :
+             [length(an_item.gen),
+              length(an_item.avr),
+              length(an_item.gov) ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+    dims_gens_govs_avrs_states_syms =
+        sum.(vec_dims_gens_govs_avrs_states_syms)
+
+    state_vars_idx =
+        get_vars_or_paras_Idxs_in_flattend(
+            dims_gens_govs_avrs_states_syms;
+            dims_given = true )
+
+    vec_comp_states_Idx =
+        map((x) ->
+        get_vars_or_paras_Idxs_in_flattend(
+            x;
+            dims_given = true ),
+            vec_dims_gens_govs_avrs_states_syms )
+
+    plants_states_syms =
+        [ :nothing ∈ an_item.gov ?
+        [an_item.gen; an_item.avr ] :
+        [an_item.gen; an_item.avr; an_item.gov ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+    generic_state_sym =
+        get_labels_by_nodes_idxs_and_vec_vec_syms(
+            gens_nodes_idx,
+            plants_states_syms;
+            label_prefix = "bus" ) 
+    
+    (;state_labels,
+     algebraic_vars_labels,
+     network_vars_labels) =
+        NamedTupleTools.select(
+            get_generic_network_vars_labels(
+                plants_states_syms,
+                dyn_pf_fun_kwd_net_idxs,
+                dyn_pf_fun_kwd_n2s_idxs;
+                label_prefix =
+                    "bus",
+                plants_states_by_per_comp =
+                    false,
+                plants_states_by_per_plant =
+                    true,),
+            (:state_labels,
+             :algebraic_vars_labels,
+             :network_vars_labels))
+        
+    return (;state_vars_idx,
+            vec_comp_states_Idx,
+            plants_states_syms,
+            generic_state_sym,
+            state_labels,
+            algebraic_vars_labels,
+            network_vars_labels)
+end
+
+
+"""
+    get_plants_states_syms_wt_labels_wt_names(
+        gens_govs_avrs_states_syms,
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs)
+
+
+Return a system namedtuple of `state_vars_idx`, `vec_comp_states_Idx`, `plants_states_syms`,
+`generic_state_sym`, `state_labels`, `algebraic_vars_labels`, `network_vars_labels`,
+`model_syms`, `nodes_names`, `gens_nodes_names`, `non_gens_nodes_names`, `SM_gens_nodes_names`,
+ and `SC_gens_nodes_names`.
+
+
+# Arguments
+- `gens_govs_avrs_states_syms`: the namedtuple of states variables symbols  of generator,
+   governors and automatic voltage regulator.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+
+"""
+function get_plants_states_syms_wt_labels_wt_names(
+    gens_govs_avrs_states_syms,
+    dyn_pf_fun_kwd_net_idxs,
+    dyn_pf_fun_kwd_n2s_idxs)
+
+    #-------------------------------
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
+     all_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
+              :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
+
+
+    (;n2s_gens_idx,
+    n2s_non_gens_idx,
+    n2s_gens_with_loc_load_idxs,
+    n2s_all_nodes_idx ) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_n2s_idxs,
+            (:n2s_gens_idx,
+             :n2s_non_gens_idx,
+             :n2s_gens_with_loc_load_idxs,
+             :n2s_all_nodes_idx))
+    
+    #-------------------------------
+
+    vec_vec_gens_govs_avrs_states_syms =
+        [ :nothing ∈ an_item.gov ?
+        [an_item.gen, an_item.avr ] :
+        [an_item.gen, an_item.avr, an_item.gov ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+    vec_dims_gens_govs_avrs_states_syms =
+        [:nothing ∈ an_item.gov ?
+        [length(an_item.gen),
+         length(an_item.avr)] :
+             [length(an_item.gen),
+              length(an_item.avr),
+              length(an_item.gov) ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+    dims_gens_govs_avrs_states_syms =
+        sum.(vec_dims_gens_govs_avrs_states_syms)
+
+    state_vars_idx =
+        get_vars_or_paras_Idxs_in_flattend(
+            dims_gens_govs_avrs_states_syms;
+            dims_given = true )
+
+    vec_comp_states_Idx =
+        map((x) ->
+        get_vars_or_paras_Idxs_in_flattend(
+            x;
+            dims_given = true ),
+            vec_dims_gens_govs_avrs_states_syms )
+
+    plants_states_syms =
+        [ :nothing ∈ an_item.gov ?
+        [an_item.gen; an_item.avr ] :
+        [an_item.gen; an_item.avr; an_item.gov ]
+         for an_item in
+             gens_govs_avrs_states_syms]
+
+    generic_state_sym =
+        get_labels_by_nodes_idxs_and_vec_vec_syms(
+            gens_nodes_idx,
+            plants_states_syms;
+            label_prefix = "bus" ) 
+    
+    (;state_labels,
+     algebraic_vars_labels,
+     network_vars_labels) =
+        NamedTupleTools.select(
+            get_generic_network_vars_labels(
+                plants_states_syms,
+                dyn_pf_fun_kwd_net_idxs,
+                dyn_pf_fun_kwd_n2s_idxs;
+                label_prefix =
+                    "bus",
+                plants_states_by_per_comp =
+                    false,
+                plants_states_by_per_plant =
+                    true,),
+            (:state_labels,
+             :algebraic_vars_labels,
+             :network_vars_labels))
+        
+    #----------------------------------------
+    # Labels, syms and nodes names
+    #----------------------------------------
+
+    model_syms =
+        [state_labels;
+         algebraic_vars_labels]
+
+    #----------------------------------------
+        
+    nodes_names =
+        ["bus$(n2s_all_nodes_idx[idx])"
+         for idx in all_nodes_idx ]
+
+            
+    gens_nodes_names = nodes_names[ [n2s_all_nodes_idx[idx]
+                     for idx in gens_nodes_idx] ]
+            
+    non_gens_nodes_names =
+        nodes_names[ [n2s_all_nodes_idx[idx]
+                     for idx in non_gens_nodes_idx] ]
+    
+            
+    # gens_nodes_names =
+    #     nodes_names[ gens_nodes_idx ]
+
+            
+    # non_gens_nodes_names =
+    #     nodes_names[ non_gens_nodes_idx ]
+    
+    #-------------------------------
+    # I need to get the indices of SM and SC gens
+
+    SM_gens_idx = [ idx
+         for (idx, an_item) in
+                    enumerate(gens_govs_avrs_states_syms)
+                    if  :nothing ∉ an_item.gov ]
+
+
+    SC_gens_idx = [ idx
+         for (idx, an_item) in
+                    enumerate(gens_govs_avrs_states_syms)
+                    if  :nothing ∈ an_item.gov ]
+
+    SM_gens_nodes_names =
+        gens_nodes_names[ SM_gens_idx ]
+
+    SC_gens_nodes_names =
+        gens_nodes_names[ SC_gens_idx]
+
+
+
+    
+    return (;state_vars_idx,
+            vec_comp_states_Idx,
+            plants_states_syms,
+            generic_state_sym,
+            state_labels,
+            algebraic_vars_labels,
+            network_vars_labels,
+            
+            model_syms,
+            nodes_names,
+            gens_nodes_names,
+            non_gens_nodes_names,
+            SM_gens_nodes_names,
+            SC_gens_nodes_names )
+end
+
+
+"""
+    get_model_syms(
+        state_labels,
+        dyn_pf_fun_kwd_net_idxs;
+        label_prefix = "bus")
+
+
+Return a system model symbols or labels for state and algebraic variables in a flattened vector.
+
+# Arguments
+- `state_labels`: the system state variables labels.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `label_prefix::String="bus"`: the label that should be used as a prefix.
+
+"""
+function get_model_syms(
+    state_labels,
+    dyn_pf_fun_kwd_net_idxs;
+    label_prefix = "bus")
+
+    #----------------------------------------
+    # Labels, syms and nodes names
+    #----------------------------------------
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
+     all_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
+              :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
+
+    
+    algebraic_vars_labels =
+        [generate_labels_by_nodes_idxs_and_vars(
+            all_nodes_idx,
+            [:vh];
+            label_prefix = label_prefix);
+         generate_labels_by_nodes_idxs_and_vars(
+            all_nodes_idx,
+            [:θh];
+             label_prefix = label_prefix);
+         generate_labels_by_nodes_idxs_and_vars(
+            gens_nodes_idx,
+            [:id];
+             label_prefix = label_prefix);
+         generate_labels_by_nodes_idxs_and_vars(
+            gens_nodes_idx,
+            [:iq];
+             label_prefix = label_prefix) ]
+
+    #----------------------------------------
+    
+    return [state_labels;
+         algebraic_vars_labels]
+    
+
+end
+
+
+"""
+    get_dynamic_comps_init_out_dyn_callback_funcs(
+        gens_govs_avrs_types)
+
+Returns namedtuples of dynamic components functions `comps_callback_paras_funs`, `comps_init_funs`, `comps_output_funs`, `ode_comps_dyn_funs`, `dae_comps_dyn_funs`, `comps_dyn_funs`.
+
+
+# Arguments
+- ``gens_govs_avrs_states_syms`: the namedtuple of states variables symbols of generators, governors and automatic voltage regulators. 
+"""
+function get_dynamic_comps_init_out_dyn_callback_funcs(
+    gens_govs_avrs_types)
+
+    list_gens_type_syms =
+        Symbol.([a_type.gen for a_type in
+             gens_govs_avrs_types])
+
+
+    list_govs_type_syms =
+        Symbol.([a_type.gov for a_type in
+             gens_govs_avrs_types])
+
+
+    list_avrs_type_syms =
+        Symbol.([a_type.avr for a_type in
+             gens_govs_avrs_types])
+
+    #----------------------------------------
+
+    gens_cb_paras_func =
+        get_gens_callback_paras_func(
+         list_gens_type_syms)
+
+    gens_init_func =
+        get_gens_init_func(
+         list_gens_type_syms)
+    
+    gens_output_func =
+        get_gens_output_func(
+            list_gens_type_syms)
+    
+    ode_gens_dyn_func =
+        get_gens_dyn_func(
+            list_gens_type_syms,
+            :ode)
+
+    
+    dae_gens_dyn_func =
+        get_gens_dyn_func(
+            list_gens_type_syms,
+            :dae)
+
+    
+    gens_dyn_func =
+        get_gens_dyn_func(
+            list_gens_type_syms)
+    
+    
+    govs_cb_paras_func =
+        get_govs_callback_paras_func(
+            list_govs_type_syms)
+    
+    govs_init_func =
+        get_govs_init_func(
+         list_govs_type_syms)
+    
+    govs_output_func =
+        get_govs_output_func(
+            list_govs_type_syms)
+    
+    ode_govs_dyn_func =
+        get_govs_dyn_func(
+            list_govs_type_syms,
+            :ode)
+
+    
+    dae_govs_dyn_func =
+        get_govs_dyn_func(
+            list_govs_type_syms,
+            :dae)
+
+    
+    govs_dyn_func =
+        get_govs_dyn_func(
+            list_govs_type_syms)
+    
+    
+    ##
+
+    
+    avrs_cb_paras_func =
+        get_avrs_callback_paras_func(
+            list_avrs_type_syms)
+    
+    avrs_init_func =
+        get_avrs_init_func(
+         list_avrs_type_syms)
+    
+    avrs_output_func =
+        get_avrs_output_func(
+            list_avrs_type_syms)
+
+    
+    ode_avrs_dyn_func =
+        get_avrs_dyn_func(
+            list_avrs_type_syms,
+            :ode)
+
+    
+    dae_avrs_dyn_func =
+        get_avrs_dyn_func(
+            list_avrs_type_syms,
+            :dae)
+    
+    avrs_dyn_func =
+        get_avrs_dyn_func(
+            list_avrs_type_syms)
+
+    
+    #----------------------------------------
+
+    return (comps_callback_paras_funs = [
+        (gen_cb_paras_fun = a_gen_fun,
+         avr_cb_paras_fun = a_avr_fun,
+         gov_cb_paras_fun = a_gov_fun) 
+        for (a_gen_fun,
+             a_avr_fun,
+             a_gov_fun)
+            in zip( gens_cb_paras_func,
+                    avrs_cb_paras_func,
+                    govs_cb_paras_func)],
+
+    comps_init_funs = [
+        (gen_init_fun = a_gen_fun,
+         avr_init_fun = a_avr_fun,
+         gov_init_fun = a_gov_fun)
+        for (a_gen_fun,
+             a_avr_fun,
+             a_gov_fun)
+            in zip( gens_init_func,
+                    avrs_init_func,
+                    govs_init_func)],
+
+    
+    comps_output_funs = [
+        (gen_output_fun = a_gen_fun,
+         avr_output_fun = a_avr_fun,
+         gov_output_fun = a_gov_fun) 
+        for (a_gen_fun,
+             a_avr_fun,
+             a_gov_fun)
+            in zip( gens_output_func,
+                    avrs_output_func,
+                    govs_output_func)],
+
+
+    
+    ode_comps_dyn_funs = [
+        (gen_dyn_fun = a_gen_fun,
+         avr_dyn_fun = a_avr_fun,
+         gov_dyn_fun = a_gov_fun)
+        for (a_gen_fun,
+             a_avr_fun,
+             a_gov_fun)
+            in zip( ode_gens_dyn_func,
+                    ode_avrs_dyn_func,
+                    ode_govs_dyn_func)],
+
+    
+    dae_comps_dyn_funs = [
+        (gen_dyn_fun = a_gen_fun,
+         avr_dyn_fun = a_avr_fun,
+         gov_dyn_fun = a_gov_fun)
+        for (a_gen_fun,
+             a_avr_fun,
+             a_gov_fun)
+            in zip( dae_gens_dyn_func,
+                    dae_avrs_dyn_func,
+                    dae_govs_dyn_func)],
+    
+    comps_dyn_funs = [
+        (gen_dyn_fun = a_gen_fun,
+         avr_dyn_fun = a_avr_fun,
+         gov_dyn_fun = a_gov_fun)
+        for (a_gen_fun,
+             a_avr_fun,
+             a_gov_fun)
+            in zip( gens_dyn_func,
+                    avrs_dyn_func,
+                    govs_dyn_func)])
+
+end
+
+
+"""
+    get_state_and_algebraic_vars_Idx_in_state(
+        state_labels,
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs;
+        no_lines_fault = 1 )
+
+
+Return indices of state and algebraic variables for a normal system and faulted system states in a flattened vector.
+
+
+ `state_vars_and_i_dq_Idx_in_state`, `state_vars_and_i_dq_wt_fault_Idx_in_state`, `state_algebraic_vars_Idx_in_state`, and `state_algebraic_vars_wt_fault_Idx_in_state`.
+
+# Arguments
+- `state_labels`: the system state variables labels.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+- `no_lines_fault::Int64 = 1`: the number of lines faults.
+
+"""
+function get_state_and_algebraic_vars_Idx_in_state(
+    state_labels,
+    dyn_pf_fun_kwd_net_idxs,
+    dyn_pf_fun_kwd_n2s_idxs;
+    no_lines_fault = 1 )
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
+     all_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
+              :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
+
+     (;n2s_gens_idx,
+     n2s_non_gens_idx,
+     n2s_gens_with_loc_load_idxs,
+     n2s_all_nodes_idx ) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_n2s_idxs,
+             (:n2s_gens_idx,
+              :n2s_non_gens_idx,
+              :n2s_gens_with_loc_load_idxs,
+              :n2s_all_nodes_idx))
+    
+    state_vars_and_i_dq_Idx_in_state =
+        get_state_vars_and_i_dq_Idx_in_state(
+            state_labels,
+            gens_nodes_idx,
+            all_nodes_idx )
+
+    state_vars_and_i_dq_wt_fault_Idx_in_state =
+        get_state_vars_and_i_dq_wt_fault_Idx_in_state(
+            state_labels,
+            gens_nodes_idx,
+            all_nodes_idx;
+            no_lines_fault =
+                no_lines_fault)
+
+    state_algebraic_vars_Idx_in_state =
+        get_state_algebraic_vars_Idx_in_state(
+            state_labels,
+            gens_nodes_idx,
+            all_nodes_idx )
+
+    state_algebraic_vars_wt_fault_Idx_in_state =
+        get_state_algebraic_vars_wt_fault_Idx_in_state(
+            state_labels,
+            gens_nodes_idx,
+            all_nodes_idx;
+            no_lines_fault =
+                no_lines_fault)
+
+    return (;state_vars_and_i_dq_Idx_in_state,
+            state_vars_and_i_dq_wt_fault_Idx_in_state,
+            state_algebraic_vars_Idx_in_state,
+            state_algebraic_vars_wt_fault_Idx_in_state)
+    
+end
+
+
+"""
+    get_model_nodes_types_names(
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs )
+
+
+Returns nodes labels for generator buses, non-generator buses and all buses.
+
+# Arguments
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+
+"""
+function get_model_nodes_types_names(
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs )
+
+
+    (gens_nodes_idx,
+     non_gens_nodes_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
+     all_nodes_idx) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_net_idxs,
+             (:gens_nodes_idx,
+              :non_gens_nodes_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
+              :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
+
+
+     (;n2s_gens_idx,
+     n2s_non_gens_idx,
+     n2s_gens_with_loc_load_idxs,
+     n2s_all_nodes_idx ) =
+         NamedTupleTools.select(
+             dyn_pf_fun_kwd_n2s_idxs,
+             (:n2s_gens_idx,
+              :n2s_non_gens_idx,
+              :n2s_gens_with_loc_load_idxs,
+              :n2s_all_nodes_idx))
+    
+    nodes_names =
+        ["bus$(n2s_all_nodes_idx[idx])"
+         for idx in all_nodes_idx ]
+            
+    gens_nodes_names = nodes_names[ [n2s_all_nodes_idx[idx]
+                     for idx in gens_nodes_idx] ]
+            
+    non_gens_nodes_names =
+        nodes_names[ [n2s_all_nodes_idx[idx]
+                     for idx in non_gens_nodes_idx] ]
+
+    return (;nodes_names,
+            gens_nodes_names,
+            non_gens_nodes_names)
+
+end
+
+
+function get_model_states_comp_idxs_in_Idx(
+        network_vars_labels,
+        all_nodes_idx,
+        n2s_all_nodes_idx;
+    vars =
+        [:δ, :ω, :ed_dash, :eq_dash] )
+    
+    nodes_names =
+        ["bus$(n2s_all_nodes_idx[idx])"
+         for idx in all_nodes_idx ]
+
+    # δ_ω_ed_dash_eq_dash_indices =
+    #     get_nodes_state_algb_vars_indices_in_system(
+    #         ;network_vars_labels =
+    #             network_vars_labels,
+    #         nodes_name = nodes_names,
+    #         vars = vars )
+      
+    # δ_idx_in_state =
+    #     [idx for idx in
+    #          first.(δ_ω_ed_dash_eq_dash_indices)]
+    
+    # ω_idx_in_state =
+    #     [idx for idx in
+    #          second.(δ_ω_ed_dash_eq_dash_indices)]
+    
+    # ed_dash_idx_in_state =
+    #     [idx for idx in
+    #          third.(δ_ω_ed_dash_eq_dash_indices)]
+    
+    # eq_dash_idx_in_state =
+    #     [idx for idx in
+    #          fourth.(δ_ω_ed_dash_eq_dash_indices)]
+    
+    selected_states_indices =
+        get_nodes_state_algb_vars_indices_in_system(
+            ;network_vars_labels =
+                network_vars_labels,
+            nodes_name = nodes_names,
+            vars = vars )
+
+    # @show length(selected_states_indices)    
+    # @show length(selected_states_indices[1])
+    
+    dict_nth_funs =
+        get_dict_first_to_tenth_funs(
+        length(selected_states_indices[1]) )
+    
+    nt_names = Symbol.([ "$(a_var)_idx_in_state"
+                         for a_var in vars ])
+
+    vec_vec_state_idx_in_state =
+        [ [idx for idx in (dict_nth_funs[a_var_idx]).(
+               selected_states_indices) ]
+          for a_var_idx in 1:length(vars) ]
+
+    return namedtuple(
+        OrderedDict( a_sym => vec_idx
+             for (a_sym, vec_idx) in
+                     zip(nt_names,
+                         vec_vec_state_idx_in_state) ))
+
+
+end
+
+
+"""
+    get_mass_matrix_and_bool_dae_vars(
+        state_labels,
+        algebraic_vars_labels)
+
+
+Returnsfor a system and generator mass matrices and dae boolean variables `model_mass_matrix`, `model_bool_dae_vars`, `ode_gens_mass_matrix`, `ode_gens_bool_dae_vars`.
+
+"""
+function get_mass_matrix_and_bool_dae_vars(
+    state_labels,
+    algebraic_vars_labels)
+
+    
+    model_mass_matrix =
+        DAE_MassMatrix(
+            length(state_labels),
+            length(algebraic_vars_labels) )
+    
+    model_bool_dae_vars =
+        DAE_BoolVector(
+            length(state_labels),
+            length(algebraic_vars_labels) )
+        
+    ode_gens_mass_matrix =
+        DAE_MassMatrix(
+            length(state_labels),
+            0 )
+    
+    ode_gens_bool_dae_vars =
+        DAE_BoolVector(
+            length(state_labels),
+            0 )
+
+    return (;
+            model_mass_matrix,
+            model_bool_dae_vars,
+            ode_gens_mass_matrix,
+            ode_gens_bool_dae_vars)
+
+end
+
 
 #---------------------------------------------------
 # indexing of states, parameters and functions
@@ -229,14 +1324,30 @@ function get_generic_red_vh_θh_wt_slack_value_Idx(
         
 end
 
+"""
+    get_slack_gens_vh_θh_gens_vh_non_slack_gens_vh(
+        vh,
+        θh,
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs)
 
+
+Returns `slack_gens_vh`, `slack_gens_θh`, `gens_vh`, and `non_slack_gens_vh`.
+
+# Arguments
+- `vh`: the network nodes voltage magnitudes.
+- `θh`: the network nodes voltage angles.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+
+"""
 function get_slack_gens_vh_θh_gens_vh_non_slack_gens_vh(
     vh,
     θh,
     dyn_pf_fun_kwd_net_idxs,
     dyn_pf_fun_kwd_n2s_idxs)
 
-
+    
     (slack_gens_nodes_idx,
     non_slack_gens_nodes_idx,
     gens_nodes_idx,
@@ -314,6 +1425,19 @@ function get_slack_gens_vh_θh_gens_vh_non_slack_gens_vh(
 end
 
 
+"""
+    get_pf_vh_θh_idx_and_idx2Idx(
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs)
+
+
+Returns indices of `vh`, `θh`, and indices transformation dictionaries.
+
+# Arguments
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+
+"""
 function get_pf_vh_θh_idx_and_idx2Idx(
     dyn_pf_fun_kwd_n2s_idxs,
     dyn_pf_fun_kwd_net_idxs)
@@ -339,7 +1463,8 @@ function get_pf_vh_θh_idx_and_idx2Idx(
      gens_nodes_idx,
      non_gens_nodes_idx,
      gens_with_loc_load_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
         NamedTupleTools.select(
             dyn_pf_fun_kwd_net_idxs,
@@ -348,9 +1473,12 @@ function get_pf_vh_θh_idx_and_idx2Idx(
              :gens_nodes_idx,
              :non_gens_nodes_idx,
              :gens_with_loc_load_idx,
-             :gens_nodes_with_loc_loads_idx,
+             # :gens_nodes_with_loc_loads_idx,
+             :gens_with_loc_loads_idx,
              :all_nodes_idx))
 
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
     #-------------------------------
 
     non_slack_gens_and_non_gens_idx =
@@ -668,7 +1796,20 @@ function get_pf_vh_θh_idx_and_idx2Idx(
 end
 
 
+"""
+    get_labels_by_nodes_idxs_and_vec_vec_syms(
+        nodes_idxs,
+        plants_states_syms;
+        label_prefix = "bus" )
 
+
+Returns labels for state variables for a list of nodes in `nodes_idxs`.
+
+# Arguments
+- `nodes_idxs`: the list of nodes indices.
+- `plants_states_syms`: the state variables symbols per plant for all plants.
+
+"""
 function get_labels_by_nodes_idxs_and_vec_vec_syms(
     nodes_idxs,
     plants_states_syms;
@@ -693,9 +1834,16 @@ end
 #-----------------------------------------------------
 
 
+
 """
-`generate_labels_by_nodes_idxs_and_vars` return labels
-for nodes variables
+    generate_labels_by_nodes_idxs_and_vars(
+        nodes_idxs,
+        nodes_vars_syms;
+        label_prefix = "bus" )
+
+Return labels for nodes variables.
+
+# Example
 
 t_gens_nodes_idx = [1, 2, 3]
 
@@ -728,7 +1876,14 @@ end
 
 
 """
-`get_idxs_in_flattened_by_nodes_idx_wt_vars_syms` returns Idxs of variables per node based on a list of variables
+    get_idxs_in_flattened_by_nodes_idx_wt_vars_syms(
+        list_state_vars_syms,
+        gens_nodes_idx )
+
+
+Returns Idxs of variables per node based on a list of variables.
+
+# Example
 
 t_gens_nodes_idx = [1, 2, 3]
 
@@ -759,6 +1914,13 @@ function get_idxs_in_flattened_by_nodes_idx_wt_vars_syms(
 end
 
 
+"""
+    get_states_idx_by_nodes_idx_wt_vars_syms(
+        vec_nodes_states_vars_syms )
+
+
+Returns indices of state variables provided in `vec_nodes_states_vars_syms` in in the network. 
+"""
 function get_states_idx_by_nodes_idx_wt_vars_syms(
     vec_nodes_states_vars_syms )
 
@@ -776,6 +1938,15 @@ end
 #-------------------------------------------
 
 
+"""
+    get_generic_flat_vh_flat_θh_Idx(
+        gens_nodes_idx,
+        all_nodes_idx)
+
+
+Returns a flattend vector of indices of nodes voltages magnitude and nodes voltages angle.
+
+"""
 function get_generic_flat_vh_flat_θh_Idx(
     gens_nodes_idx,
     all_nodes_idx)
@@ -817,6 +1988,14 @@ end
 
 
 
+"""
+    get_generic_flat_vh_flat_θh_Idx(
+        all_nodes_idx)
+
+
+Returns a flattend vector of indices of nodes voltages magnitude and nodes voltages angle.
+
+"""
 function get_generic_flat_vh_flat_θh_Idx(
     all_nodes_idx)
 
@@ -853,7 +2032,15 @@ function get_generic_flat_vh_flat_θh_Idx(
 end
 
 
+"""
+    get_generic_flat_vh_flat_θh_id_iq_Idx(
+        gens_nodes_idx,
+        all_nodes_idx)
 
+
+Returns a flattend vector of indices of nodes voltages magnitude `vh`, nodes voltages angle `θh`, generators direct-axis currents `id`, generators quadrature axix currents `iq`.
+
+"""
 function get_generic_flat_vh_flat_θh_id_iq_Idx(
     gens_nodes_idx,
     all_nodes_idx)
@@ -897,7 +2084,12 @@ function get_generic_flat_vh_flat_θh_id_iq_Idx(
 end
 
 
+"""
+    get_generic_flat_vh_flat_θh_wt_slack_value_Idx(
+        all_nodes_idx)
 
+Returns a flattend vector of indices of nodes voltages magnitude `vh`, nodes voltages angle `θh`, and `slack` variable`. 
+"""
 function get_generic_flat_vh_flat_θh_wt_slack_value_Idx(
     all_nodes_idx)
 
@@ -935,7 +2127,15 @@ function get_generic_flat_vh_flat_θh_wt_slack_value_Idx(
 end
 
 
+"""
+    get_generic_vh_θh_id_iq_vhf_θhf_Idx(
+        gens_nodes_idx,
+        all_nodes_idx;
+        no_lines_fault = 1)
 
+
+Returns a flattend vector of indices of nodes voltages magnitude `vh`, nodes voltages angle `θh`, generators direct-axis currents `id`, generators quadrature axix currents `iq`, fault node voltages magnitude `vhf`, fault nodes voltage angle `θhf`.
+"""
 function get_generic_vh_θh_id_iq_vhf_θhf_Idx(
     gens_nodes_idx,
     all_nodes_idx;
@@ -984,7 +2184,15 @@ function get_generic_vh_θh_id_iq_vhf_θhf_Idx(
 end
 
 
+"""
+    get_generic_vh_vhf_θh_θhf_id_iq_Idx(
+        gens_nodes_idx,
+        all_nodes_idx;
+        no_lines_fault = 1)
 
+
+Returns a flattend vector of indices of nodes voltages magnitude `vh`, nodes voltages angle `θh`, generators direct-axis currents `id`, generators quadrature axix currents `iq`, fault node voltages magnitude `vhf`, fault nodes voltage angle `θhf`.
+"""
 function get_generic_vh_vhf_θh_θhf_id_iq_Idx(
     gens_nodes_idx,
     all_nodes_idx;
@@ -1033,7 +2241,14 @@ function get_generic_vh_vhf_θh_θhf_id_iq_Idx(
 end
 
 
+"""
+    get_generic_vh_vhf_Idx(
+        all_nodes_idx;
+        no_lines_fault = 1)
 
+
+Returns a flattend vector of indices of nodes voltages magnitude `vh`, and fault node voltages magnitude `vhf`.
+"""
 function get_generic_vh_vhf_Idx(
     all_nodes_idx;
     no_lines_fault = 1)
@@ -1070,6 +2285,14 @@ function get_generic_vh_vhf_Idx(
 end
 
 
+"""
+    get_generic_θh_θhf_Idx(
+        all_nodes_idx;
+        no_lines_fault = 1)
+
+
+Returns a flattend vector of indices of nodes voltages angle `θh`, fault nodes voltage angle `θhf`.
+"""
 function get_generic_θh_θhf_Idx(
     all_nodes_idx;
     no_lines_fault = 1)
@@ -1106,21 +2329,31 @@ function get_generic_θh_θhf_Idx(
 end
 
 
+"""
+    get_generic_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
 
+
+Returns indices of non-generator nodes active power demand `Png`, non-generator nodes reactive power demand `Qng`, generator nodes local active power demand `Pll`, generator nodes local reactive power demand `Qll` in a flattened `Png_Qng_Pll_Qll` vector.
+"""
 function get_generic_Png_Qng_Pll_Qll_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_loads_idx,
               :all_nodes_idx))
 
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
     #----------------------------------------
 
     dim_gens =
@@ -1165,21 +2398,32 @@ function get_generic_Png_Qng_Pll_Qll_Idx(
 
 end
 
+"""
+    get_generic_Pg_Qg_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
 
+
+Returns indices of generator nodes active power generation `Pg`, generator nodes reactive power generation `Qg`, non-generator nodes active power demand `Png`, non-generator nodes reactive power demand `Qng`, generator nodes local active power demand `Pll`, generator nodes local reactive power demand `Qll` in a flattened `Pg_Qg_Png_Qng_Pll_Qll` vector.
+"""
 function get_generic_Pg_Qg_Png_Qng_Pll_Qll_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
 
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
+    
     #----------------------------------------
 
     dim_gens =
@@ -1229,19 +2473,31 @@ function get_generic_Pg_Qg_Png_Qng_Pll_Qll_Idx(
 end
 
 
+"""
+    get_generic_scale_Pg_Qg_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
+
+
+Returns indices of scale variable `scale`, generator nodes active power generation `Pg`, generator nodes reactive power generation `Qg`, non-generator nodes active power demand `Png`, non-generator nodes reactive power demand `Qng`, generator nodes local active power demand `Pll`, generator nodes local reactive power demand `Qll` in a flattened `scale_Pg_Qg_Png_Qng_Pll_Qll` vector.
+"""
 function get_generic_scale_Pg_Qg_Png_Qng_Pll_Qll_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -1294,20 +2550,31 @@ function get_generic_scale_Pg_Qg_Png_Qng_Pll_Qll_Idx(
 end
 
 
+"""
+    get_generic_Pg_Png_Qng_Idx(
+        dyn_pf_fun_kwd_net_idxs)
 
+
+Returns indices of generator nodes active power generation `Pg`, generator nodes reactive power generation `Qg`, non-generator nodes active power demand `Png`, non-generator nodes reactive power demand `Qng` in a flattened `Pg_Png_Qng` vector.
+"""
 function get_generic_Pg_Png_Qng_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -1352,19 +2619,31 @@ function get_generic_Pg_Png_Qng_Idx(
 end
 
 
+"""
+    get_generic_scale_Pg_Png_Qng(
+        dyn_pf_fun_kwd_net_idxs)
+
+
+Returns indices of scale variable `scale`, generator nodes active power generation `Pg`, non-generator nodes active power demand `Png`, non-generator nodes reactive power demand `Qng` in a flattened `scale_Pg_Qg_Png_Qng` vector.
+"""
 function get_generic_scale_Pg_Png_Qng_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -1411,7 +2690,12 @@ function get_generic_scale_Pg_Png_Qng_Idx(
 end
 
 
+"""
+    get_edges_r_x_b_ratio_angle_idx(
+        edges_size)
 
+Returns indices of `r`, `x`, `b`, `ratio` and `angle` in a flattened vector `edges_r_x_b_ratio_angle`.
+"""
 function get_edges_r_x_b_ratio_angle_idx(
     edges_size)
 
@@ -1444,7 +2728,13 @@ function get_edges_r_x_b_ratio_angle_idx(
 end
 
 
+"""
+    get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend(
+        Ynet)
 
+
+Returns namedtuples of `Ynet_rows_Idxs_in_flattend`, and  `Ynet_real_imag_Idxs_in_flattend`.
+"""
 function get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend(
     Ynet)
 
@@ -1482,20 +2772,31 @@ function get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend(
 end
 
 
+"""
+    get_dyn_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
 
+
+Returns indices of `v_ref`, `p_order`, `Png`, `Qng`, `Pll`, `Qll` in a flattened vector `v_ref_p_order_Png_Qng_Pll_Qll`.
+"""
 function get_dyn_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -1537,19 +2838,31 @@ function get_dyn_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
 end
 
 
+"""
+    get_dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
+
+
+Returns indices of `ω_ref`, `v_ref`, `p_order`, `Png`, `Qng`, `Pll`, `Qll` in a flattened vector `v_ref_p_order_Png_Qng_Pll_Qll`.
+"""
 function get_dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -1595,20 +2908,31 @@ function get_dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
 end
 
 
+"""
+    get_dyn_δ_eq_dash_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
 
+
+Returns indices of `δ`, `eq_dash`, `Png`, `Qng`, `Pll`, `Qll` in a flattened vector `δ_eq_dash_Png_Qng_Pll_Qll`.
+"""
 function get_dyn_δ_eq_dash_Png_Qng_Pll_Qll_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -1650,20 +2974,31 @@ function get_dyn_δ_eq_dash_Png_Qng_Pll_Qll_Idx(
 
 end
 
+"""
+    get_dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
 
+
+Returns indices of `δ`, `ed_dash`, `eq_dash`, `Png`, `Qng`, `Pll`, `Qll` in a flattened vector `δ_ed_dash_eq_dash_Png_Qng_Pll_Qll`.
+"""
 function get_dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx(
     dyn_pf_fun_kwd_net_idxs)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -1708,7 +3043,14 @@ function get_dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx(
 
 end
 
+"""
+    get_dyn_vh_id_iq_V_ref_Tm_Idx(
+        gens_nodes_idx;
+        reverse_idx = false)
 
+
+Returns indices of `vh`, `id`, `iq`, `V_ref`, `Tm` in a flattened vector `vh_id_iq_V_ref_Tm`.
+"""
 function get_dyn_vh_id_iq_V_ref_Tm_Idx(
     gens_nodes_idx;
     reverse_idx = false)
@@ -1761,7 +3103,13 @@ function get_dyn_vh_id_iq_V_ref_Tm_Idx(
 end
 
 
+"""
+    get_dyn_vh_id_iq_V_ref_Tm_Idx(
+        gens_nodes_idx)
 
+
+Returns indices of `V_ref`, `Tm`, `vh`, `id`, `iq` in a flattened vector `V_ref_Tm_vh_id_iq`.
+"""
 function get_dyn_V_ref_Tm_vh_id_iq_Idx(
     gens_nodes_idx)
 
@@ -1794,6 +3142,14 @@ function get_dyn_V_ref_Tm_vh_id_iq_Idx(
 end
 
 
+"""
+    get_dyn_vh_id_iq_ωref0_vref0_porder0_Idx(
+        gens_nodes_idx;
+        reverse_idx = false)
+
+
+Returns indices of `vh`, `id`, `iq`, `ωref0`, `vref0`, `porder0` in a flattened vector `vh_id_iq_ωref0_vref0_porder0`.
+"""
 function get_dyn_vh_id_iq_ωref0_vref0_porder0_Idx(
     gens_nodes_idx;
     reverse_idx = false )
@@ -1852,6 +3208,13 @@ function get_dyn_vh_id_iq_ωref0_vref0_porder0_Idx(
 end
 
 
+"""
+    get_ωref0_vref0_porder0_id_iq_vh_Idx(
+        gens_nodes_idx)
+
+
+Returns indices of `ωref0`, `vref0`, `porder0`, `id`, `iq`, `vh` in a flattened vector `ωref0_vref0_porder0_id_iq_vh`.
+"""
 function get_ωref0_vref0_porder0_id_iq_vh_Idx(
     gens_nodes_idx)
 
@@ -1891,7 +3254,13 @@ function get_ωref0_vref0_porder0_id_iq_vh_Idx(
 end
 
 
+"""
+    get_dyn_ωref0_vref0_porder0_id_iq_vh_Idx(
+        gens_nodes_idx)
 
+
+Returns indices of `ωref0`, `vref0`, `porder0`, `id`, `iq`, `vh` in a flattened vector `ωref0_vref0_porder0_id_iq_vh`.
+"""
 function get_dyn_ωref0_vref0_porder0_id_iq_vh_Idx(
     gens_nodes_idx)
 
@@ -1931,6 +3300,13 @@ function get_dyn_ωref0_vref0_porder0_id_iq_vh_Idx(
 end
 
 
+"""
+    get_id_iq_pg_vh_Idx(
+        gens_nodes_idx)
+
+
+Returns indices of `id`, `iq`, `pg`, `vh` in a flattened vector `id_iq_pg_vh`.
+"""
 function get_id_iq_pg_vh_Idx(
     gens_nodes_idx)
 
@@ -2009,14 +3385,19 @@ function get_generic_n_gens_paras_wt_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -2082,44 +3463,73 @@ end
 #-----------------------------------------------------
 #-----------------------------------------------------
 
+"""
+    get_generic_algebraic_state_sym(
+        gens_nodes_idx,
+        all_nodes_idx)
 
+
+
+Returns algebraic variables symbols.
+"""
 function get_generic_algebraic_state_sym(
-    all_nodes_idx)
+    gens_nodes_idx,
+    all_nodes_idx;
+    label_prefix = "bus")
 
     return  [generate_labels_by_nodes_idxs_and_vars(
             all_nodes_idx,
             [:vh];
-            label_prefix = "bus");
+            label_prefix = label_prefix);
          generate_labels_by_nodes_idxs_and_vars(
             all_nodes_idx,
             [:θh];
-             label_prefix = "bus");
+             label_prefix = label_prefix);
          generate_labels_by_nodes_idxs_and_vars(
             gens_nodes_idx,
             [:id];
-             label_prefix = "bus");
+             label_prefix = label_prefix);
          generate_labels_by_nodes_idxs_and_vars(
             gens_nodes_idx,
             [:iq];
-             label_prefix = "bus") ]
+             label_prefix = label_prefix) ]
 
 
 end
 
+"""
+    get_generic_nodes_names(
+        dyn_pf_fun_kwd_net_idxs,
+        n2s_all_nodes_idx)
+
+
+Returns namedtuples of nodes types names `all_nodes_names`, `gens_nodes_names`, `non_gens_nodes_names`.
+
+
+# Arguments
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+
+"""
 function get_generic_nodes_names(
     dyn_pf_fun_kwd_net_idxs,
     n2s_all_nodes_idx)
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
     
     all_nodes_names =
         ["bus$(n2s_all_nodes_idx[idx])"
@@ -2143,8 +3553,28 @@ end
 
 
 #-----------------------------------------------------
-#-----------------------------------------------------
 
+
+"""
+    get_generic_network_vars_labels(
+        plants_states_syms,
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs
+        ;label_prefix = "bus",
+        plants_states_by_per_comp = false,
+        plants_states_by_per_plant = false
+        )
+
+
+Returns namedtuples of `state_labels`, `algebraic_vars_labels`, `network_vars_labels`.
+
+
+# Arguments
+- `plants_states_syms`: the plants states variables symbols per plant for all generator plants. 
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+
+"""
 function get_generic_network_vars_labels(
     plants_states_syms,
     dyn_pf_fun_kwd_net_idxs,
@@ -2156,14 +3586,19 @@ function get_generic_network_vars_labels(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
 
    (;n2s_gens_idx,
@@ -2178,7 +3613,8 @@ function get_generic_network_vars_labels(
              :n2s_all_nodes_idx))
     
     
-    if plants_states_by_per_comp == true
+    if( plants_states_by_per_comp == true &&
+        plants_states_by_per_plant == false)
 
         plants_states_syms =
             [ :nothing ∈ a_comp.gov ?
@@ -2193,7 +3629,8 @@ function get_generic_network_vars_labels(
                 plants_states_syms;
                 label_prefix = label_prefix )
         
-    elseif plants_states_by_per_plant == true
+    elseif (plants_states_by_per_plant == true &&
+        plants_states_by_per_comp == false)
     
         state_labels =
             get_labels_by_nodes_idxs_and_vec_vec_syms(
@@ -2217,19 +3654,19 @@ function get_generic_network_vars_labels(
         [generate_labels_by_nodes_idxs_and_vars(
             all_nodes_idx,
             [:vh];
-            label_prefix = "bus");
+            label_prefix = label_prefix);
          generate_labels_by_nodes_idxs_and_vars(
             all_nodes_idx,
             [:θh];
-             label_prefix = "bus");
+             label_prefix = label_prefix);
          generate_labels_by_nodes_idxs_and_vars(
             gens_nodes_idx,
             [:id];
-             label_prefix = "bus");
+             label_prefix = label_prefix);
          generate_labels_by_nodes_idxs_and_vars(
             gens_nodes_idx,
             [:iq];
-             label_prefix = "bus") ]
+             label_prefix = label_prefix) ]
 
     #----------------------------------------
 
@@ -2237,7 +3674,7 @@ function get_generic_network_vars_labels(
         [state_labels;
          algebraic_vars_labels]
 
-    return (; state_labels,
+    return (;state_labels,
             algebraic_vars_labels,
             network_vars_labels)
     
@@ -2245,8 +3682,28 @@ function get_generic_network_vars_labels(
 end
 
 #-----------------------------------------------------
-#-----------------------------------------------------
 
+
+"""
+    get_gens_state_vars_idx_in_state(
+        network_vars_labels,
+        # all_nodes_idx,
+        dyn_pf_fun_kwd_net_idxs,
+        n2s_all_nodes_idx;
+        selected_gens_state_vars_syms =
+            (:δ, :ed_dash, :eq_dash) )
+
+
+Returns state variables indices in the state for a selected set of variables in `selected_gens_state_vars_syms`.
+
+
+# Arguments
+- `network_vars_labels`: the system variables labels.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `selected_gens_state_vars_syms::Tuple{Symbol}=(:δ, :ed_dash, :eq_dash)`: the selected
+   state variables. 
+
+"""
 function get_gens_state_vars_idx_in_state(
     network_vars_labels,
     # all_nodes_idx,
@@ -2311,6 +3768,22 @@ function get_gens_state_vars_idx_in_state(
 end
 
 
+"""
+    get_state_vars_and_i_dq_Idx_in_state(
+        generic_state_labels,
+        gens_nodes_idx,
+        all_nodes_idx )
+
+
+Returns state variables, nodes voltage magnitudes, nodes voltage angles,  generators direct axix current id, and generators quadrature axis current indices in the state.
+
+
+# Arguments
+- `network_vars_labels`: the system variables labels.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `selected_gens_state_vars_syms::Tuple{Symbol}=(:δ, :ed_dash, :eq_dash)`:  
+
+"""
 function get_state_vars_and_i_dq_Idx_in_state(
     generic_state_labels,
     gens_nodes_idx,
@@ -2351,7 +3824,21 @@ function get_state_vars_and_i_dq_Idx_in_state(
 end
 
 
+"""
+    get_state_vars_and_i_dq_wt_fault_Idx_in_state(
+        generic_state_labels,
+        gens_nodes_idx,
+        all_nodes_idx;
+        no_lines_fault = 1)
 
+
+Returns state variables, nodes voltage magnitudes, nodes voltage angles,  generators direct axix current id, and generators quadrature axis current, fault node voltage magnitudes, fault node voltage angles,  indices in the state.
+
+
+# Arguments
+- `generic_state_labels`: the states variables labels.  
+
+"""
 function get_state_vars_and_i_dq_wt_fault_Idx_in_state(
     generic_state_labels,
     gens_nodes_idx,
@@ -2400,6 +3887,20 @@ end
 
 
 
+"""
+    get_state_algebraic_vars_Idx_in_state(
+        generic_state_labels,
+        gens_nodes_idx,
+        all_nodes_idx)
+
+
+Returns state variables, and algebraic variables indices in the state.
+
+
+# Arguments
+- `generic_state_labels`: the states variables labels.  
+
+"""
 function get_state_algebraic_vars_Idx_in_state(
     generic_state_labels,
     gens_nodes_idx,
@@ -2433,7 +3934,21 @@ function get_state_algebraic_vars_Idx_in_state(
 end
 
 
+"""
+    get_state_algebraic_vars_wt_fault_Idx_in_state(
+        generic_state_labels,
+        gens_nodes_idx,
+        all_nodes_idx;
+        no_lines_fault = 1)
 
+
+Returns state variables, and algebraic variables with fault nodes algebraic variables indices in the state.
+
+
+# Arguments
+- `generic_state_labels`: the states variables labels.  
+
+"""
 function get_state_algebraic_vars_wt_fault_Idx_in_state(
     generic_state_labels,
     gens_nodes_idx,
@@ -2469,31 +3984,48 @@ function get_state_algebraic_vars_wt_fault_Idx_in_state(
 end
 
 
-
 # ------------------------------------------------------
 # ------------------------------------------------------
 # Static algebraic, parameter and  indices aggregation
 # ------------------------------------------------------
 # ------------------------------------------------------
 
+"""
+    get_static_Idx_and_syms(
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs;
+        no_lines_fault = 1)
 
+
+Returns  states variables indices, algebraic variables indices, states variables labels, algebraic variables labels and most parameters indices.
+
+
+# Arguments
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+"""
 function get_static_Idx_and_syms(
     dyn_pf_fun_kwd_net_idxs,
     dyn_pf_fun_kwd_n2s_idxs;
     no_lines_fault = 1)
     
     #-------------------------------
-    
+
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
 
    (;n2s_gens_idx,
@@ -2671,9 +4203,28 @@ end
 # ------------------------------------------------------
 # States, algebraic, parameter and function aggregation
 # ------------------------------------------------------
-# ------------------------------------------------------
+# ----------------------------------------------------
+
+"""
+    get_states_Idx_syms_wt_functions(
+        net_data_by_components_file,    
+        dyn_pf_fun_kwd_net_idxs,
+        dyn_pf_fun_kwd_n2s_idxs;
+        components_libs_dir =
+            nothing,
+        no_lines_fault = 1 )
 
 
+Returns dynamic functions of components, states variables indices, algebraic variables indices, states variables labels, algebraic variables labels and most parameters indices.
+
+
+# Arguments
+- `net_data_by_components_file`: the network data file.
+- `dyn_pf_fun_kwd_net_idxs`: the namedtuple of node's type indices.
+- `dyn_pf_fun_kwd_n2s_idxs`: the namedtuple of node's type indices translation dictionaries.
+- `components_libs_dir`: the components library folder.
+
+"""
 function get_states_Idx_syms_wt_functions(
     net_data_by_components_file,    
     dyn_pf_fun_kwd_net_idxs,
@@ -2700,17 +4251,22 @@ function get_states_Idx_syms_wt_functions(
     end
     
     #-------------------------------
-    
+
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
+     # gens_nodes_with_loc_loads_idx,
+     gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
+              # :gens_nodes_with_loc_loads_idx,
+              gens_with_loc_loads_idx,
               :all_nodes_idx))
+
+    gens_nodes_with_loc_loads_idx =
+        gens_with_loc_loads_idx
 
 
    (;n2s_gens_idx,
@@ -3036,12 +4592,19 @@ function get_states_Idx_syms_wt_functions(
          for idx in all_nodes_idx ]
 
             
-    gens_nodes_names =
-        nodes_names[ gens_nodes_idx ]
-
+    gens_nodes_names = nodes_names[ [n2s_all_nodes_idx[idx]
+                     for idx in gens_nodes_idx] ]
             
     non_gens_nodes_names =
-        nodes_names[ non_gens_nodes_idx ]
+        nodes_names[ [n2s_all_nodes_idx[idx]
+                     for idx in non_gens_nodes_idx] ]
+            
+    # gens_nodes_names =
+    #     nodes_names[ gens_nodes_idx ]
+
+            
+    # non_gens_nodes_names =
+    #     nodes_names[ non_gens_nodes_idx ]
 
 
     #-------------------------------
@@ -3128,7 +4691,6 @@ function get_states_Idx_syms_wt_functions(
         (;state_var_Idx_in_state,
          vh_Idx_in_state,
          θh_Idx_in_state )
-
 
     #--------------------------------------
     

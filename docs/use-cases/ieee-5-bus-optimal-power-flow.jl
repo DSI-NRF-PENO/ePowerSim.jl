@@ -1,0 +1,395 @@
+#=
+# [Example of Optimal Power Flow with IEEE 5 Bus Test System](@id ieee-5-bus-optimal-power-flow)
+
+=#
+
+#---------------------------------------------------
+#---------------------------------------------------
+
+using Revise
+
+# using Pkg
+
+using ePowerSim
+
+#---------------------------------------------------
+#---------------------------------------------------
+
+using SciMLBase
+
+using SciMLNLSolve: NLSolveJL
+
+using NLSolvers
+
+using NLsolve: nlsolve, converged, OnceDifferentiable
+
+using NLsolve
+
+using NonlinearSolve
+
+using NonlinearSolve: TrustRegion
+
+#---------------------------------------------------
+
+using DifferentialEquations
+
+using OrdinaryDiffEq, Sundials, ODEInterfaceDiffEq
+
+using FiniteDiff, LinearSolve
+
+using ForwardDiff, Zygote
+
+using DiffRules
+
+using PreallocationTools
+
+#---------------------------------------------------
+
+using LinearAlgebra, GenericSchur, Arblib
+
+#---------------------------------------------------
+
+using OrderedCollections: OrderedDict
+
+using Permutations
+
+using SparseArrays, StaticArrays, ComponentArrays
+
+using DataFrames, DataFramesMeta
+
+using JSONTables, JSON, JSON3
+
+using Query, CSV, Tables, XLSX
+
+using JLD2
+
+#---------------------------------------------------
+
+using Optimization
+
+using OptimizationOptimJL
+
+using JuMP
+
+using HiGHS
+
+import Clarabel
+
+import Ipopt
+
+import PATHSolver
+
+#---------------------------------------------------
+
+using Graphs
+
+#---------------------------------------------------
+
+using StatsBase
+
+using Plots
+
+import StatsPlots
+
+using Latexify
+
+using LatexPrint
+
+#---------------------------------------------------
+
+using BenchmarkTools, BenchmarkPlots
+
+#---------------------------------------------------
+
+using NamedTupleTools
+
+using Accessors, AccessorsExtra 
+
+#---------------------------------------------------
+#---------------------------------------------------
+
+
+package_dir = pkgdir(ePowerSim)
+
+
+data =
+    joinpath( package_dir, "data")
+
+data_dir = joinpath(data,
+             "converted-data")
+src_dir =
+    joinpath(package_dir, "src")
+
+components_libs_dir =
+    joinpath(src_dir,
+             "components-lib")
+
+script_dir = @__DIR__
+
+
+#---------------------------------------------------
+#---------------------------------------------------
+# Reading network data
+#---------------------------------------------------
+#---------------------------------------------------
+
+net_type = "dynamic-net-data"
+
+gen_type = "gen-sauer"
+
+avr_type = "avr-t1-cb-sauer"
+
+gov_type = "gov-t1-cb-sauer"
+
+data_ext = "json"
+
+dynamic_net_data_by_components_file =
+    "$(net_type)-"*
+    "$(gen_type)-"*
+    "$(avr_type)-"*
+    "$(gov_type)"*
+    ".$(data_ext)"
+
+
+json_net_data_by_components_file =
+    dynamic_net_data_by_components_file
+
+#---------------------------------------------------
+
+
+
+case_name = "case4"
+
+
+case_data_dir =
+   joinpath( data_dir,
+             case_name,)
+
+json_case_dir = joinpath(case_data_dir, "json" )
+
+
+if  (json_net_data_by_components_file == "" ||
+    json_net_data_by_components_file == nothing) 
+
+    net_data_by_components_file =
+        joinpath(
+            json_case_dir,
+            "net_data_by_components_file.json")
+else
+
+    net_data_by_components_file =
+        joinpath(
+            json_case_dir,
+            json_net_data_by_components_file)
+
+end
+
+#---------------------------------------------------
+
+
+sim_type  = "sim-optimal-powerflow"
+
+cd(script_dir)
+
+results_dir =
+    joinpath(
+        script_dir,
+        "results",
+        sim_type)
+
+if !(isdir(results_dir))
+    
+    mkpath(results_dir)
+    
+end
+
+figure_dir =
+    joinpath(
+        script_dir,
+        "figure",
+        sim_type)
+
+if !(isdir(figure_dir))
+    
+    mkpath(figure_dir)
+    
+end
+
+tex_filename =
+    joinpath(results_dir,
+             "$(case_name)-" *
+                 "$(sim_type)-" *
+                 "sim-results.tex")
+
+sd_dynamics_sim_csv_filename =
+    joinpath(
+        results_dir,
+        "$(case_name)-" *
+            "$(sim_type)-" *
+            "sim-results.csv")
+
+#---------------------------------------------------
+
+basekV = 1.0
+
+#---------------------------------------------------
+# base setting and some booleans 
+#---------------------------------------------------
+
+use_pu_in_PQ    = true
+
+line_data_in_pu = true
+
+use_init_u0     = false
+
+use_nlsolve     = false
+
+with_faults     = false
+
+#---------------------------------------------------
+## solvers and settings
+#---------------------------------------------------
+
+pf_alg      = NewtonRaphson()
+
+
+abstol      = 1e-12
+
+reltol      = 1e-12
+
+
+#---------------------------------------------------
+# generic system simulation parameters 
+#---------------------------------------------------
+
+(;dynamic_parameters,
+ pf_parameters,
+ opf_parameters,
+ states_Idx_syms_wt_functions) =
+     NamedTupleTools.select(
+         generic_system_simulation_parameters = 
+             get_generic_system_simulation_parameters(
+                 net_data_by_components_file;
+                 components_libs_dir =
+                     components_libs_dir,
+                 basekV = 1.0,    
+                 use_pu_in_PQ      = true,
+                 opf_use_pu_in_PQ  = true,
+                 line_data_in_pu   = true,
+                 with_faults       = false,
+                 pf_alg            = NewtonRaphson(),
+                 ode_alg           = Rodas4(),
+                 dae_alg           = IDA() ),
+         (:dynamic_parameters,
+          :pf_parameters,
+          :opf_parameters,
+          :states_Idx_syms_wt_functions))
+
+#---------------------------------------------------
+# Optimal powerflow generic system simulation parameters
+#---------------------------------------------------
+
+(df_opf,
+ opf_objval_solution,
+ opf_status) =
+     NamedTupleTools.select(
+         get_opf_wt_generic_system_simulation_parameters(
+             net_data_by_components_file;
+             components_libs_dir ),
+         (:df_opf,
+          :objval_solution,
+          :status))
+
+
+opf_sim_type = "opf"
+
+opf_sim_csv_filename =
+    joinpath(
+        results_dir,
+        "$(case_name)-" *
+            "$(sim_type)-" *
+            "$(opf_sim_type).csv")
+
+
+
+CSV.write(opf_sim_csv_filename,
+          df_opf )
+
+
+
+open( tex_filename , "a") do file_handle
+
+    write(file_handle,"\n" )
+
+    write(file_handle," Optimial power flow type: $(opf_sim_type)" )
+
+    write(file_handle,"\n" )
+    
+    write(file_handle,"Objective value $(opf_objval_solution)" )
+    
+    write(file_handle,"\n" )
+    
+    write(file_handle,"Solution status $(opf_status)" )
+
+    write(file_handle,"\n" )
+        
+    write(file_handle,
+          get_df2tex(
+              df_opf) )
+    
+end
+
+#---------------------------------------------------
+# Optimal powerflow relaxation generic system simulation parameters
+#---------------------------------------------------
+
+(df_opf_by_relaxation,
+ sdp_relaxation_lower_bound,
+ pf_by_relaxation_status ) =
+     NamedTupleTools.select(
+         get_opf_by_relaxation_wt_generic_system_simulation_parameters(
+             net_data_by_components_file;
+             components_libs_dir ),
+         (:df_opf_by_relaxation,
+          :sdp_relaxation_lower_bound,
+          :status ))
+
+
+opf_relax_sim_type = "opf-relaxation"
+
+
+opf_relax_sim_csv_filename =
+    joinpath(
+        results_dir,
+        "$(case_name)-" *
+            "$(sim_type)-" *
+            "$(opf_relax_sim_type).csv")
+
+
+
+CSV.write(opf_relax_sim_csv_filename ,
+          df_opf_by_relaxation )
+
+
+open( tex_filename , "a") do file_handle
+
+    write(file_handle,"\n" )
+
+    write(file_handle," Optimial power flow type: $(opf_relax_sim_type)" )
+
+    write(file_handle,"\n" )
+    
+    write(file_handle,"Objective value $(sdp_relaxation_lower_bound)" )
+    
+    write(file_handle,"\n" )
+    
+    write(file_handle,"Solution status $(pf_by_relaxation_status)" )
+
+    write(file_handle,"\n" )
+        
+    write(file_handle,
+          get_df2tex(
+              df_opf_by_relaxation) )
+    
+end
+
