@@ -1,0 +1,17 @@
+# [API](@id api)
+
+Types and functions documentation in ePowerSim.
+
+## Module Index
+
+<!-- ```@index -->
+<!--    Modules = [ ePowerSim] -->
+<!--    Order   = [:constant, :type, :function, :macro] -->
+<!-- ``` -->
+
+## Detailed API
+
+```@autodocs
+   Modules = [ePowerSim]
+   Order   = [:constant, :type, :function, :macro]
+``` 
