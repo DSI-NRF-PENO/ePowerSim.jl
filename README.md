@@ -32,5 +32,5 @@ Foundation (NRF) under  South African Research Chair Initiative
 (SARChi) in Power, Energy, Network and Optimnisation  (Grant Numbers 150572, 2023-2027).
 
 ```@raw html
-<img src="docs/src/assets/dsi-nrf-umisa-red.png"  width="20%" height="20%"/>
+<img src="docs/src/assets/dsi-nrf-umisa-red.png" width="20%" height="20%"/>
 ```

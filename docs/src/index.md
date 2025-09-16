@@ -15,13 +15,13 @@ ePowerSim.jl is a Julia package for modeling,  simulation and analysis of electr
 
 This package requires Julia >= v1.11.4 
 
-To install it, please run:
+To install it, run:
 
 `] add https://github.com/DSI-NRF-PENO/ePowerSim.jl.git`
 
 
 !!! note "Installation of ePowerSim"
-    **It is highly suggested that ePoweSim is installed in a new environment.**
+    **It is highly recommended that ePoweSim is installed in a new environment.**
 	
 
 ## Getting Started
