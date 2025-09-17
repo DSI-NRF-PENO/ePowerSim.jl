@@ -2015,12 +2015,1314 @@ end
 
 
 
+
+"""
+    get_pf_streamedlined_simulation_parameters(
+        net_data_by_components_file;
+        <keyword arguments>)
+
+It is used to simplify generation of parameters or data of a system that are needed for  power flow analyses.
+
+
+# Arguments
+
+- `net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
+
+`pf_alg`: power flow solver
+
+"""
+function get_pf_streamedlined_simulation_parameters(
+    net_data_by_components_file;
+    components_libs_dir =
+        nothing,
+    basekV = 1.0,    
+    use_pu_in_PQ      = true,
+    line_data_in_pu   = true,
+    with_faults       = false,
+    pf_alg            = NewtonRaphson(),
+    no_lines_fault    = 1)
+    
+    #--------------------------------------    
+    
+    if (components_libs_dir == "") || (
+        components_libs_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        src_dir =
+            joinpath( package_dir, "src")
+        
+        components_libs_dir =
+            joinpath(
+                src_dir,
+                "components-lib")
+
+    end
+
+    #--------------------------------------
+
+    (;plant_generators_data_from_json,
+     plant_loads_data_from_json,
+     plant_transmission_data_from_json,
+     edge_data_from_json,
+     shunt_data_from_json,
+     baseMVA_data_from_json,
+     gencost_data_from_json) =
+        NamedTupleTools.select(
+            get_net_data_by_components_from_json_file(
+                net_data_by_components_file;
+                in_components_type_sym =
+                    false ),
+            (:plant_generators_data_from_json,
+             :plant_loads_data_from_json,
+             :plant_transmission_data_from_json,
+             :edge_data_from_json,
+             :shunt_data_from_json,
+             :baseMVA_data_from_json,
+             :gencost_data_from_json))
+
+    baseMVA = baseMVA_data_from_json
+
+    #------------------------------------------------
+    #------------------------------------------------
+        
+    net_nodes_type_idxs =
+        get_net_nodes_type_idxs_by_json(
+            plant_generators_data_from_json,
+            plant_loads_data_from_json,
+            plant_transmission_data_from_json )
+    
+    #------------------------------------------------
+    
+    gencost_data =
+        get_gencost_data_by_json(
+            gencost_data_from_json)
+
+    gens_cost_coeff_ascen =
+        get_gens_cost_coeff_in_ascen(
+            gencost_data )
+        
+    
+    gens_cost_coeff_decen =
+        get_gens_cost_coeff_in_decen(
+            gencost_data)
+
+    #------------------------------------------------
+
+
+    (;edges_orientation,
+     edges_Ybr_cal,
+     Ybr_cal_and_edges_orientation,
+     Ynet_wt_nodes_idx_wt_adjacent_nodes) =
+         NamedTupleTools.select(
+             get_transmission_network_parameters_by_json(
+                 plant_generators_data_from_json,
+                 plant_loads_data_from_json,
+                 plant_transmission_data_from_json,
+                 edge_data_from_json,
+                 shunt_data_from_json;
+                 baseMVA =
+                     baseMVA,
+                 basekV =
+                     basekV,
+                 use_pu_in_PQ =
+                     use_pu_in_PQ,
+                 line_data_in_pu =
+                     line_data_in_pu ),
+             (:edges_orientation,
+              :edges_Ybr_cal,
+              :Ybr_cal_and_edges_orientation,
+              :Ynet_wt_nodes_idx_wt_adjacent_nodes))
+    
+    # Ynet_wt_nodes_idx_wt_adjacent_nodes = 
+    #     get_Ynet(
+    #         edge_data_from_json,
+    #         shunt_data_from_json;
+    #         baseMVA = baseMVA,
+    #         basekV = basekV,
+    #         baseShunt = baseMVA ,
+    #         line_data_in_pu = line_data_in_pu)
+
+    #------------------------------------------------
+    
+    Ybus =
+        get_Ybus(
+            edge_data_from_json,
+            shunt_data_from_json;
+            basekV = basekV,
+            baseMVA = baseMVA,
+            line_data_in_pu =
+                line_data_in_pu )
+
+    #------------------------------------------------
+    
+    (branches_fbus,
+     branches_tbus,
+     branches_r,
+     branches_x,
+     branches_b,
+     branches_ratio,
+     branches_angle,
+     branches_type) =
+     get_edges_ftbus_and_generic_data_by_json(
+         edge_data_from_json )
+
+    
+    (edges_fbus, edges_tbus) =
+         get_edges_fbus_tbus_by_json(
+             edge_data_from_json)    
+    
+    #------------------------------------------------
+    
+    (;P_gens,
+     Q_gens,
+     P_non_gens,
+     Q_non_gens,
+     P_g_loc_load,
+     Q_g_loc_load,
+     loc_load_exist ) =
+         get_pf_PQ_param_by_json(
+             plant_generators_data_from_json,
+             plant_loads_data_from_json,
+             plant_transmission_data_from_json;
+             baseMVA =
+                 baseMVA,
+             use_pu_in_PQ =
+                 use_pu_in_PQ )
+        
+    #------------------------------------------------
+    #------------------------------------------------
+    
+    (Ynet,
+     nodes_idx_with_adjacent_nodes_idx) =
+         Ynet_wt_nodes_idx_wt_adjacent_nodes
+
+    #------------------------------------------------
+        
+    no_edges = edges_size = length(edges_fbus)
+
+    edges_r_x_b_ratio_angle_idx =
+        get_edges_r_x_b_ratio_angle_idx(
+            edges_size)
+
+    #------------------------------------------------
+    #------------------------------------------------
+    
+    ode_gens_para_selections  =
+        (:H,
+         :D,
+         :X_d,
+         :X_q,                  
+         :X_d_dash,
+         :X_q_dash,
+         :T_d_dash,
+         :T_q_dash, :Sn )
+
+    ode_gens_para_sequence_order =
+        (:components_data,
+         :gen)
+        
+    ode_gens_generic_selections =
+        (:H,
+         :D,
+         :ra,
+         :xℓ,
+         :X_d,
+         :X_q,
+         
+         :X_d_dash,
+         :X_q_dash,
+         
+         :X_d_2dash,
+         :X_q_2dash,
+         
+         :T_d_dash,
+         :T_q_dash,
+         
+         :Sn,
+         
+         :T_d_2dash,
+         :T_q_2dash,
+         
+         :vh,
+         :P,
+         :Q,
+         
+         :Pmin,
+         :Pmax,
+         :Qmin,
+         :Qmax,
+         :vmin,
+         :vmax )
+
+    ode_gens_generic_sequence_order =
+        (:components_data, :gen)
+        
+    govs_and_avrs_sequence_order =
+        ( :components_data,)
+    
+    govs_and_avrs_selections =
+        ( :gov, :avr )
+    
+    #----------------------------------------
+    
+    ode_gens_generic_para =
+         get_ode_gens_generic_para(
+             plant_generators_data_from_json;
+             sequence_order =
+                 ode_gens_generic_sequence_order,
+             selections =
+                 ode_gens_generic_selections)
+
+    #------------------------------------------------
+
+    
+    # ode_gens_para =
+    #     NamedTupleTools.select(
+    #         ode_gens_generic_para,
+    #         (:H,
+    #          :D,
+    #          :X_d,
+    #          :X_q,
+    #          :X_d_dash,
+    #          :X_q_dash,
+    #          :T_d_dash,
+    #          :T_q_dash, :Sn))
+    
+    #------------------------------------------------
+
+    (;generic_gens_para,) =
+        NamedTupleTools.select(
+            get_generic_gens_avr_gov_para(
+                plant_generators_data_from_json;
+                gens_sequence_order =
+                    ode_gens_generic_sequence_order,
+                gens_selections =
+                    ode_gens_generic_selections,
+                govs_and_avrs_sequence_order =
+                    govs_and_avrs_sequence_order,
+                govs_and_avrs_selections =
+                    govs_and_avrs_selections),
+                (:generic_gens_para,))
+
+    #------------------------------------------------
+
+     pf_generic_gens_para =
+        NamedTupleTools.select(
+            get_selected_vec_nt_to_vec_vec(
+                generic_gens_para,
+                nothing;
+                selections =
+                    (:ra,
+                     :X_d,
+                     :X_q,     
+                     :X_d_dash,
+                     :X_q_dash, :Sn ),
+                vec_datatype = Float64 ),
+            (:ra,
+             :X_d,
+             :X_q,     
+             :X_d_dash,
+             :X_q_dash, :Sn ) )
+
+    
+    #------------------------------------------------
+    #------------------------------------------------
+
+    (;Ynet_rows_Idxs_in_flattend,
+     Ynet_real_imag_Idxs_in_flattend ) =
+         NamedTupleTools.select(
+             get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend(
+                 getproperty(
+                     Ynet_wt_nodes_idx_wt_adjacent_nodes,
+                     :Ynet)),
+             (:Ynet_rows_Idxs_in_flattend,
+              :Ynet_real_imag_Idxs_in_flattend) )
+
+    #------------------------------------------------
+    #------------------------------------------------
+    
+    dyn_pf_fun_kwd_net_idxs =
+        NamedTupleTools.select(
+            net_nodes_type_idxs,
+            (:slack_gens_nodes_idx,
+             :non_slack_gens_nodes_idx,
+             :gens_nodes_idx,
+             :non_gens_nodes_idx,
+             :gens_with_loc_load_idx,
+             :gens_nodes_with_loc_loads_idx,
+             :all_nodes_idx,
+             :nodes_with_demands_idx))
+    
+    dyn_pf_fun_kwd_n2s_idxs =
+        NamedTupleTools.select(
+            get_dict_net_streamlined_idx_by_nodes_type_idxs(
+                net_nodes_type_idxs ),
+            (:n2s_slack_gens_idx,
+             :n2s_non_slack_gens_idx,
+             :n2s_gens_idx,
+             :n2s_non_gens_idx,
+             :n2s_gens_with_loc_load_idxs,
+             :n2s_all_nodes_idx,
+             :n2s_nodes_with_demands_idx))
+
+    #------------------------------------------------
+    
+    (;slack_gens_nodes_idx,
+     non_slack_gens_nodes_idx,
+     gens_nodes_idx,
+     non_gens_nodes_idx,
+     gens_with_loc_load_idx,
+     gens_nodes_with_loc_loads_idx,
+     all_nodes_idx,
+     nodes_with_demands_idx) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_net_idxs,
+            (:slack_gens_nodes_idx,
+             :non_slack_gens_nodes_idx,
+             :gens_nodes_idx,
+             :non_gens_nodes_idx,
+             :gens_with_loc_load_idx,
+             :gens_nodes_with_loc_loads_idx,
+             :all_nodes_idx,
+             :nodes_with_demands_idx))
+
+    
+   (;n2s_slack_gens_idx,
+    n2s_non_slack_gens_idx,
+    n2s_gens_idx,
+    n2s_non_gens_idx,
+    n2s_gens_with_loc_load_idxs,
+    n2s_all_nodes_idx,
+    n2s_nodes_with_demands_idx) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_n2s_idxs,
+            (:n2s_slack_gens_idx,
+             :n2s_non_slack_gens_idx,
+             :n2s_gens_idx,
+             :n2s_non_gens_idx,
+             :n2s_gens_with_loc_load_idxs,
+             :n2s_all_nodes_idx,
+             :n2s_nodes_with_demands_idx))
+
+    #------------------------------------------------
+        
+    no_nodes = nodes_size = length(all_nodes_idx)
+
+    no_gens  = length(gens_nodes_idx )
+    
+    #------------------------------------------------    
+    
+    dyn_pf_mismatch_vars_kwd_para =
+        (;Ynet_wt_nodes_idx_wt_adjacent_nodes,
+          ode_gens_para = pf_generic_gens_para  )
+
+    sta_pf_PQ_para =
+        get_pf_PQ_param_by_json(
+            plant_generators_data_from_json,
+            plant_loads_data_from_json,
+            plant_transmission_data_from_json;
+            baseMVA =
+                baseMVA,
+            use_pu_in_PQ =
+                use_pu_in_PQ)
+
+    
+    slack_gens_vh_θh_gens_vh_non_slack_gens_vh = gens_vh_slack_θh_para =
+        get_gens_vh_slack_θh_para_by_json(
+            plant_generators_data_from_json )
+
+    
+    sta_pf_vars_and_paras_idx =
+        get_sta_pf_vars_and_paras_idx_by_json(
+            plant_generators_data_from_json,
+            plant_loads_data_from_json,
+            plant_transmission_data_from_json )
+
+    
+    pf_sta_ΔPQ_mismatch_parameters =
+        get_pf_sta_ΔPQ_mismatch_parameters_by_json(
+            plant_generators_data_from_json,
+            plant_loads_data_from_json,
+            plant_transmission_data_from_json,
+            edge_data_from_json,
+            shunt_data_from_json;
+            baseMVA = baseMVA,
+            basekV = basekV,
+            use_pu_in_PQ = use_pu_in_PQ,
+            line_data_in_pu = line_data_in_pu)
+    
+    #----------------------------------------
+    # Yred and Yint
+    #----------------------------------------
+
+    # X_d_dash =
+    #     getproperty(
+    #         ode_gens_para,
+    #         :X_d_dash) 
+
+    X_d_dash =
+        getproperty(
+            pf_generic_gens_para,
+            :X_d_dash) 
+
+    y_aug_kw_para =
+        (;loc_load_exist,
+         X_d_dash,    
+         dyn_pf_fun_kwd_n2s_idxs,
+         dyn_pf_fun_kwd_net_idxs)
+
+    #----------------------------------------
+    # 
+    #----------------------------------------
+
+    (gens_vh,
+     sch_Pg, sch_Qg,
+     gens_Pmin, gens_Pmax,
+     gens_Qmin, gens_Qmax) =
+         NamedTupleTools.select(
+             opf_generic_gens_para,
+             (:vh,
+              :P, :Q,
+              :Pmin, :Pmax,
+              :Qmin, :Qmax) )
+
+
+    
+    if use_pu_in_PQ == true
+
+        sch_Pg = sch_Pg ./baseMVA
+        sch_Qg = sch_Qg ./baseMVA
+
+        gens_Pmax = gens_Pmax ./baseMVA
+        gens_Pmin = gens_Pmin ./baseMVA
+
+        gens_Qmax = gens_Qmax ./baseMVA
+        gens_Qmin = gens_Qmin ./baseMVA
+        
+    end
+        
+    gens_installed_capacity =
+        copy(gens_Pmax)
+
+    
+    gens_Pmax =
+        [(sch_Pg[idx] == 0.0 || sch_Pg[idx] == 0 ) ?
+        sch_Pg[idx] : pg for (idx, pg) in
+            enumerate(gens_Pmax)]
+    
+    #--------------------------------------
+
+    nodes_Pd = loc_load_exist == true ?
+        [ idx ∈ gens_nodes_with_loc_loads_idx ?
+        P_g_loc_load[n2s_gens_with_loc_load_idxs[idx]] : 
+        P_non_gens[n2s_non_gens_idx[idx]] 
+        
+                 for idx in nodes_with_demands_idx ] : [
+        P_non_gens[n2s_non_gens_idx[idx]] 
+                 for idx in nodes_with_demands_idx  ] 
+
+    nodes_Qd = loc_load_exist == true ?
+        [ idx ∈ gens_nodes_with_loc_loads_idx ?
+        Q_g_loc_load[n2s_gens_with_loc_load_idxs[idx]] :
+        Q_non_gens[n2s_non_gens_idx[idx]] 
+        
+                 for idx in nodes_with_demands_idx ] : [
+        Q_non_gens[n2s_non_gens_idx[idx]] 
+                 for idx in nodes_with_demands_idx  ] 
+
+    if use_pu_in_PQ == false
+
+        nodes_Pd = nodes_Pd .* baseMVA
+        nodes_Qd = nodes_Qd .* baseMVA
+        
+    end
+    
+
+    #--------------------------------------
+    #----------------------------------------    
+    # Indicies
+    #----------------------------------------
+
+
+    Pg_Qg_Png_Qng_Pll_Qll_Idx = 
+        get_generic_Png_Qng_Pll_Qll_Idx(
+            dyn_pf_fun_kwd_net_idxs)
+    
+
+    Png_Qng_Pll_Qll_Idx = 
+        get_generic_Png_Qng_Pll_Qll_Idx(
+            dyn_pf_fun_kwd_net_idxs)
+
+    
+    Pg_Png_Qng_Idx = 
+    get_generic_Pg_Png_Qng_Idx(
+       dyn_pf_fun_kwd_net_idxs)
+
+    
+    pf_vh_θh_idx_and_idx2Idx =
+        get_pf_vh_θh_idx_and_idx2Idx(
+            dyn_pf_fun_kwd_n2s_idxs,
+            dyn_pf_fun_kwd_net_idxs)
+    
+    
+    dyn_pf_flat_vh_flat_θh_Idx =
+        get_generic_flat_vh_flat_θh_Idx(
+            all_nodes_idx)
+    
+    
+    dyn_pf_flat_vh_flat_θh_id_iq_Idx =
+        get_generic_flat_vh_flat_θh_id_iq_Idx(
+            gens_nodes_idx,
+            all_nodes_idx)
+
+    
+    dyn_pf_vh_θh_id_iq_vhf_θhf_Idx =
+        get_generic_vh_θh_id_iq_vhf_θhf_Idx(
+            gens_nodes_idx,
+            all_nodes_idx;
+            no_lines_fault = no_lines_fault)
+
+    
+    dyn_pf_vh_vhf_θh_θhf_id_iq_Idx =
+         get_generic_vh_vhf_θh_θhf_id_iq_Idx(
+            gens_nodes_idx,
+            all_nodes_idx;
+            no_lines_fault = no_lines_fault)
+
+    
+    dyn_pf_vh_vhf_Idx =
+        get_generic_vh_vhf_Idx(
+            all_nodes_idx;
+            no_lines_fault = no_lines_fault)
+    
+
+    dyn_pf_θh_θhf_Idx =
+        get_generic_θh_θhf_Idx(
+            all_nodes_idx;
+            no_lines_fault = no_lines_fault)
+    
+
+    id_iq_pg_vh_Idx = 
+    get_id_iq_pg_vh_Idx(
+        gens_nodes_idx)
+    
+    scale_Pg_Qg_Png_Qng_Pll_Qll_Idx = 
+    get_generic_scale_Pg_Qg_Png_Qng_Pll_Qll_Idx(
+        dyn_pf_fun_kwd_net_idxs)
+
+    scale_Pg_Png_Qng_Idx = 
+    get_generic_scale_Pg_Png_Qng_Idx(
+        dyn_pf_fun_kwd_net_idxs)
+
+    
+    dyn_pf_flat_vh_flat_θh_wt_slack_value_Idx =
+        get_generic_flat_vh_flat_θh_wt_slack_value_Idx(
+            all_nodes_idx)
+    
+    #--------------------------------------
+
+    (;dyn_pf_vh_Idxs,
+     dyn_pf_θh_Idxs) =
+        NamedTupleTools.select(
+            dyn_pf_flat_vh_flat_θh_Idx,
+            (:dyn_pf_vh_Idxs,
+             :dyn_pf_θh_Idxs))
+
+
+    (;dyn_slack_value_Idxs,) =
+        NamedTupleTools.select(
+            dyn_pf_flat_vh_flat_θh_wt_slack_value_Idx,
+            (:dyn_slack_value_Idxs, ))
+
+    #----------------------------------------
+
+
+    transformed_slack_gens_nodes_idx = [
+        n2s_all_nodes_idx[idx]
+        for idx in slack_gens_nodes_idx ]
+
+    transformed_non_slack_gens_nodes_idx = [
+        n2s_all_nodes_idx[idx]
+        for idx in non_slack_gens_nodes_idx ]
+
+    transformed_gens_nodes_idx = [
+        n2s_all_nodes_idx[idx]
+        for idx in gens_nodes_idx ]
+
+    transformed_non_gens_nodes_idx = [
+        n2s_all_nodes_idx[idx]
+        for idx in non_gens_nodes_idx ]
+
+    transformed_gens_with_loc_load_idx = [
+        n2s_all_nodes_idx[idx]
+        for idx in gens_with_loc_load_idx ]
+        
+    # transformed_non_slack_gens_and_non_gens_idx = [
+    #     n2s_all_nodes_idx[idx]
+    #     for idx in non_slack_gens_and_non_gens_idx]
+    
+    transformed_nodes_with_demands_idx = [
+        n2s_all_nodes_idx[idx]
+        for idx in nodes_with_demands_idx ]
+    
+    transformed_all_nodes_idx = [
+        n2s_all_nodes_idx[idx]
+        for idx in all_nodes_idx ]
+
+
+    vars_and_paras_Idx =
+        (; Pg_Qg_Png_Qng_Pll_Qll_Idx,
+         Png_Qng_Pll_Qll_Idx,
+         Pg_Png_Qng_Idx,
+         pf_vh_θh_idx_and_idx2Idx,
+
+         dyn_pf_flat_vh_flat_θh_Idx,
+
+         dyn_pf_flat_vh_flat_θh_id_iq_Idx,
+
+         dyn_pf_vh_θh_id_iq_vhf_θhf_Idx,
+         dyn_pf_vh_vhf_θh_θhf_id_iq_Idx,
+
+         dyn_pf_vh_vhf_Idx,
+         dyn_pf_θh_θhf_Idx,
+
+         id_iq_pg_vh_Idx,
+
+         scale_Pg_Qg_Png_Qng_Pll_Qll_Idx,
+         scale_Pg_Png_Qng_Idx,
+         dyn_pf_flat_vh_flat_θh_wt_slack_value_Idx,
+
+         dyn_pf_vh_Idxs,
+         dyn_pf_θh_Idxs,
+         dyn_slack_value_Idxs,
+
+         transformed_slack_gens_nodes_idx,
+         transformed_non_slack_gens_nodes_idx,
+         transformed_gens_nodes_idx,
+         transformed_non_gens_nodes_idx,
+         transformed_gens_with_loc_load_idx,
+         # transformed_non_slack_gens_and_non_gens_idx,
+         transformed_nodes_with_demands_idx,
+         transformed_all_nodes_idx )    
+
+    
+    #----------------------------------------    
+    # Static power flow
+    #----------------------------------------
+
+    (pf_kw_para,
+     red_types_Idxs_etc,
+     pf_PQ_param) =
+         NamedTupleTools.select(
+             pf_sta_ΔPQ_mismatch_parameters,
+             (:pf_kw_para,
+              :red_types_Idxs_etc,
+              :pf_PQ_param) )
+
+    (red_vh_Idxs,
+     red_θh_Idxs) =
+         NamedTupleTools.select(
+             red_types_Idxs_etc,
+             (:red_vh_Idxs,
+              :red_θh_Idxs) )
+    
+    #----------------------------------------
+    
+    sta_red_vh_θh_0 =
+        [ ones(length(red_vh_Idxs));
+          zeros(length(red_θh_Idxs))]
+          
+    #----------------------------------------
+    # Powerflow func and prob
+    #----------------------------------------
+    
+     kwd_sta_sta_ΔPQ_sol_by_json =
+        (;
+         pf_alg,
+         pf_kw_para,
+         red_vh_Idxs,
+         red_θh_Idxs,
+         sta_red_vh_θh_0) 
+    
+    #----------------------------------------
+    # Results    
+    #----------------------------------------
+    
+    generic_red_sol_kwd_para =
+        (;Ybr_cal_and_edges_orientation,
+          sta_pf_PQ_para,
+          ode_gens_generic_para,
+          pf_kw_para ) 
+    
+    generic_dyn_sol_kwd_para =
+        (;loc_load_exist,
+         sta_pf_PQ_para,
+         ode_gens_generic_para,
+         dyn_pf_flat_vh_flat_θh_id_iq_Idx,
+         dyn_pf_fun_kwd_n2s_idxs,
+         dyn_pf_fun_kwd_net_idxs)
+
+
+    #--------------------------------------
+
+
+    return (;baseMVA,
+            basekV,
+            vars_and_paras_Idx,
+            slack_gens_nodes_idx,
+            non_slack_gens_nodes_idx,
+            gens_nodes_idx,
+            non_gens_nodes_idx,
+            gens_nodes_with_loc_loads_idx,
+            all_nodes_idx,
+
+            nodes_with_demands_idx,
+
+            dyn_pf_fun_kwd_net_idxs,
+            dyn_pf_fun_kwd_n2s_idxs,
+
+            no_nodes,
+            no_gens,
+            no_edges,
+
+            generic_gens_para,
+            ode_gens_generic_para,
+            # ode_gens_para,
+
+            gens_vh,
+            gens_vh_slack_θh_para,
+            
+            slack_gens_vh_θh_gens_vh_non_slack_gens_vh,
+
+            pf_sta_ΔPQ_mismatch_parameters,
+            sta_pf_PQ_para,
+            pf_PQ_param,
+            pf_generic_gens_para,
+            
+            gens_installed_capacity,
+
+            gens_Pmax,
+            gens_Pmin,
+            gens_Qmax,
+            gens_Qmin,
+
+            sch_Pg,
+            sch_Qg,
+            nodes_Pd,
+            nodes_Qd,
+
+            branches_fbus,
+            branches_tbus,
+            branches_r,
+            branches_x,
+            branches_b,
+            branches_ratio,
+            branches_angle,
+            branches_type,
+
+            edges_orientation,
+
+            Ybus,
+            Ynet_wt_nodes_idx_wt_adjacent_nodes)
+
+end
+
+
+
+
+
+"""
+    get_opf_streamedlined_simulation_parameters(
+        net_data_by_components_file;
+        <keyword arguments>)
+
+It is used to simplify generation of parameters or data of a system that are needed for optimal power flow analyses.
+
+
+# Arguments
+
+- `net_data_by_components_file`: the network data file
+- `components_libs_dir`: the components library folder
+- `basekV`: the base voltage
+- `use_pu_in_PQ`: the boolean variable that determines if PQ should be in pu.
+- `line_data_in_pu`: the boolean variable that informs if line data are in pu,
+
+`use_init_u0`: the boolean variable that determines if initial state u0 should be used in a power flow.
+`use_nlsolve`: the boolean variable that determines if `nlsolve` should be used in power flow.
+
+`pf_alg`: power flow solver
+
+"""
+function get_opf_streamedlined_simulation_parameters(
+    net_data_by_components_file;
+    components_libs_dir =
+        nothing,
+    basekV = 1.0,    
+    use_pu_in_PQ      = true,
+    opf_use_pu_in_PQ  = true,
+    line_data_in_pu   = true,
+    with_faults       = false )
+    
+    #--------------------------------------    
+    
+    if (components_libs_dir == "") || (
+        components_libs_dir == nothing)
+
+        package_dir = pkgdir(ePowerSim)
+
+        src_dir =
+            joinpath( package_dir, "src")
+        
+        components_libs_dir =
+            joinpath(
+                src_dir,
+                "components-lib")
+
+    end
+
+    #--------------------------------------
+
+    (;plant_generators_data_from_json,
+     plant_loads_data_from_json,
+     plant_transmission_data_from_json,
+     edge_data_from_json,
+     shunt_data_from_json,
+     baseMVA_data_from_json,
+     gencost_data_from_json) =
+        NamedTupleTools.select(
+            get_net_data_by_components_from_json_file(
+                net_data_by_components_file;
+                in_components_type_sym =
+                    false ),
+            (:plant_generators_data_from_json,
+             :plant_loads_data_from_json,
+             :plant_transmission_data_from_json,
+             :edge_data_from_json,
+             :shunt_data_from_json,
+             :baseMVA_data_from_json,
+             :gencost_data_from_json))
+
+    baseMVA = baseMVA_data_from_json
+
+    #------------------------------------------------
+    #------------------------------------------------
+        
+    net_nodes_type_idxs =
+        get_net_nodes_type_idxs_by_json(
+            plant_generators_data_from_json,
+            plant_loads_data_from_json,
+            plant_transmission_data_from_json )
+    
+    #------------------------------------------------
+    
+    gencost_data =
+        get_gencost_data_by_json(
+            gencost_data_from_json)
+
+    gens_cost_coeff_ascen =
+        get_gens_cost_coeff_in_ascen(
+            gencost_data )
+        
+    
+    gens_cost_coeff_decen =
+        get_gens_cost_coeff_in_decen(
+            gencost_data)
+
+    #------------------------------------------------
+
+
+    # (;edges_orientation,
+    #  edges_Ybr_cal,
+    #  Ybr_cal_and_edges_orientation,
+    #  Ynet_wt_nodes_idx_wt_adjacent_nodes) =
+    #      NamedTupleTools.select(
+    #          get_transmission_network_parameters_by_json(
+    #              plant_generators_data_from_json,
+    #              plant_loads_data_from_json,
+    #              plant_transmission_data_from_json,
+    #              edge_data_from_json,
+    #              shunt_data_from_json;
+    #              baseMVA =
+    #                  baseMVA,
+    #              basekV =
+    #                  basekV,
+    #              use_pu_in_PQ =
+    #                  use_pu_in_PQ,
+    #              line_data_in_pu =
+    #                  line_data_in_pu ),
+    #          (:edges_orientation,
+    #           :edges_Ybr_cal,
+    #           :Ybr_cal_and_edges_orientation,
+    #           :Ynet_wt_nodes_idx_wt_adjacent_nodes))
+    
+    Ynet_wt_nodes_idx_wt_adjacent_nodes = 
+        get_Ynet(
+            edge_data_from_json,
+            shunt_data_from_json;
+            baseMVA = baseMVA,
+            basekV = basekV,
+            baseShunt = baseMVA ,
+            line_data_in_pu = line_data_in_pu)
+
+    #------------------------------------------------
+    
+    Ybus =
+        get_Ybus(
+            edge_data_from_json,
+            shunt_data_from_json;
+            basekV = basekV,
+            baseMVA = baseMVA,
+                line_data_in_pu = line_data_in_pu )
+
+    #------------------------------------------------
+    
+    (branches_fbus,
+     branches_tbus,
+     branches_r,
+     branches_x,
+     branches_b,
+     branches_ratio,
+     branches_angle,
+     branches_type) =
+     get_edges_ftbus_and_generic_data_by_json(
+         edge_data_from_json )
+
+    
+    (edges_fbus, edges_tbus) =
+         get_edges_fbus_tbus_by_json(
+             edge_data_from_json)    
+    
+    #------------------------------------------------
+    
+    (;P_gens,
+     Q_gens,
+     P_non_gens,
+     Q_non_gens,
+     P_g_loc_load,
+     Q_g_loc_load,
+     loc_load_exist ) =
+         get_pf_PQ_param_by_json(
+             plant_generators_data_from_json,
+             plant_loads_data_from_json,
+             plant_transmission_data_from_json;
+             baseMVA =
+                 baseMVA,
+             use_pu_in_PQ =
+                 use_pu_in_PQ )
+        
+    #------------------------------------------------
+    #------------------------------------------------
+    
+    (Ynet,
+     nodes_idx_with_adjacent_nodes_idx) =
+         Ynet_wt_nodes_idx_wt_adjacent_nodes
+
+    #------------------------------------------------
+        
+    no_edges = edges_size = length(edges_fbus)
+
+    edges_r_x_b_ratio_angle_idx =
+        get_edges_r_x_b_ratio_angle_idx(
+            edges_size)
+
+    #------------------------------------------------
+
+    ode_gens_para_selections  =
+        (:vh,
+         :P, :Q,
+         :Pmin, :Pmax,
+         :Qmin, :Qmax,
+         :vmin, :vmax,
+         :Sn   )
+
+    ode_gens_para_sequence_order =
+        (:components_data,
+         :gen)
+    
+    #----------------------------------------
+    
+    opf_generic_gens_para =
+         get_ode_gens_generic_para(
+             plant_generators_data_from_json;
+             sequence_order =
+                 ode_gens_para_sequence_order,
+             selections =
+                 ode_gens_para_selections )
+    
+    #------------------------------------------------
+    #------------------------------------------------
+
+    (;Ynet_rows_Idxs_in_flattend,
+     Ynet_real_imag_Idxs_in_flattend ) =
+         NamedTupleTools.select(
+             get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend(
+                 getproperty(
+                     Ynet_wt_nodes_idx_wt_adjacent_nodes,
+                     :Ynet)),
+             (:Ynet_rows_Idxs_in_flattend,
+              :Ynet_real_imag_Idxs_in_flattend) )
+
+    
+    #----------------------------------------    
+    #----------------------------------------    
+    
+    dyn_pf_fun_kwd_net_idxs =
+        NamedTupleTools.select(
+            net_nodes_type_idxs,
+            (:slack_gens_nodes_idx,
+             :non_slack_gens_nodes_idx,
+             :gens_nodes_idx,
+             :non_gens_nodes_idx,
+             :gens_with_loc_load_idx,
+             :gens_nodes_with_loc_loads_idx,
+             :all_nodes_idx,
+             :nodes_with_demands_idx))
+    
+    dyn_pf_fun_kwd_n2s_idxs =
+        NamedTupleTools.select(
+            get_dict_net_streamlined_idx_by_nodes_type_idxs(
+                net_nodes_type_idxs ),
+            (:n2s_slack_gens_idx,
+             :n2s_non_slack_gens_idx,
+             :n2s_gens_idx,
+             :n2s_non_gens_idx,
+             :n2s_gens_with_loc_load_idxs,
+             :n2s_all_nodes_idx,
+             :n2s_nodes_with_demands_idx))
+
+    #------------------------------------------------
+
+    
+    (;slack_gens_nodes_idx,
+     non_slack_gens_nodes_idx,
+     gens_nodes_idx,
+     non_gens_nodes_idx,
+     gens_with_loc_load_idx,
+     gens_nodes_with_loc_loads_idx,
+     all_nodes_idx,
+     nodes_with_demands_idx) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_net_idxs,
+            (:slack_gens_nodes_idx,
+             :non_slack_gens_nodes_idx,
+             :gens_nodes_idx,
+             :non_gens_nodes_idx,
+             :gens_with_loc_load_idx,
+             :gens_nodes_with_loc_loads_idx,
+             :all_nodes_idx,
+             :nodes_with_demands_idx))
+
+    
+   (;n2s_slack_gens_idx,
+    n2s_non_slack_gens_idx,
+    n2s_gens_idx,
+    n2s_non_gens_idx,
+    n2s_gens_with_loc_load_idxs,
+    n2s_all_nodes_idx,
+    n2s_nodes_with_demands_idx) =
+        NamedTupleTools.select(
+            dyn_pf_fun_kwd_n2s_idxs,
+            (:n2s_slack_gens_idx,
+             :n2s_non_slack_gens_idx,
+             :n2s_gens_idx,
+             :n2s_non_gens_idx,
+             :n2s_gens_with_loc_load_idxs,
+             :n2s_all_nodes_idx,
+             :n2s_nodes_with_demands_idx))
+    
+    #------------------------------------------------
+    
+    no_nodes = nodes_size = length(all_nodes_idx)
+
+    no_gens  = length(gens_nodes_idx )
+
+    #------------------------------------------------
+
+
+    (gens_vh,
+     sch_Pg, sch_Qg,
+     gens_Pmin, gens_Pmax,
+     gens_Qmin, gens_Qmax) =
+         NamedTupleTools.select(
+             opf_generic_gens_para,
+             (:vh,
+              :P, :Q,
+              :Pmin, :Pmax,
+              :Qmin, :Qmax) )
+
+
+    
+    if opf_use_pu_in_PQ == true
+
+        sch_Pg = sch_Pg ./baseMVA
+        sch_Qg = sch_Qg ./baseMVA
+
+        gens_Pmax = gens_Pmax ./baseMVA
+        gens_Pmin = gens_Pmin ./baseMVA
+
+        gens_Qmax = gens_Qmax ./baseMVA
+        gens_Qmin = gens_Qmin ./baseMVA
+        
+    end
+        
+    gens_installed_capacity =
+        copy(gens_Pmax)
+
+    
+    gens_Pmax =
+        [(sch_Pg[idx] == 0.0 || sch_Pg[idx] == 0 ) ?
+        sch_Pg[idx] : pg for (idx, pg) in
+            enumerate(gens_Pmax)]
+    
+    #--------------------------------------
+
+    nodes_Pd = loc_load_exist == true ?
+        [ idx ∈ gens_nodes_with_loc_loads_idx ?
+        P_g_loc_load[n2s_gens_with_loc_load_idxs[idx]] : 
+        P_non_gens[n2s_non_gens_idx[idx]] 
+        
+                 for idx in nodes_with_demands_idx ] : [
+        P_non_gens[n2s_non_gens_idx[idx]] 
+                 for idx in nodes_with_demands_idx  ] 
+
+    nodes_Qd = loc_load_exist == true ?
+        [ idx ∈ gens_nodes_with_loc_loads_idx ?
+        Q_g_loc_load[n2s_gens_with_loc_load_idxs[idx]] :
+        Q_non_gens[n2s_non_gens_idx[idx]] 
+        
+                 for idx in nodes_with_demands_idx ] : [
+        Q_non_gens[n2s_non_gens_idx[idx]] 
+                 for idx in nodes_with_demands_idx  ] 
+
+    if opf_use_pu_in_PQ == false
+
+        nodes_Pd = nodes_Pd .* baseMVA
+        nodes_Qd = nodes_Qd .* baseMVA
+        
+    end
+    
+   #--------------------------------------
+
+
+    P_Gen_lb =
+        SparseArrays.sparsevec(
+            gens_nodes_idx, gens_Pmin, no_nodes)
+
+    P_Gen_ub =
+        SparseArrays.sparsevec(
+            gens_nodes_idx, gens_Pmax, no_nodes)
+
+    #--------------------------------------
+
+
+    Q_Gen_lb =
+        SparseArrays.sparsevec(
+            gens_nodes_idx, gens_Qmin, no_nodes)
+
+    Q_Gen_ub =
+        SparseArrays.sparsevec(
+            gens_nodes_idx, gens_Qmax, no_nodes)
+    
+    P_Demand =
+        SparseArrays.sparsevec(
+            nodes_with_demands_idx, nodes_Pd , no_nodes )
+
+    Q_Demand =
+        SparseArrays.sparsevec(
+            nodes_with_demands_idx, nodes_Qd , no_nodes)
+
+    S_Demand = P_Demand + im * Q_Demand
+
+    #--------------------------------------
+    #--------------------------------------
+
+
+    return (;baseMVA,
+            basekV,
+            slack_gens_nodes_idx,
+            non_slack_gens_nodes_idx,
+            gens_nodes_idx,
+            non_gens_nodes_idx,
+            gens_nodes_with_loc_loads_idx,
+            all_nodes_idx,
+
+            nodes_with_demands_idx,
+
+            dyn_pf_fun_kwd_net_idxs,
+            dyn_pf_fun_kwd_n2s_idxs,
+
+            
+
+            no_nodes,
+            no_gens,
+            no_edges,
+
+            gens_vh,
+            # ds_generic_gens_para,
+            gens_vh_slack_θh_para,
+
+            opf_generic_gens_para,
+
+            gencost_data,
+
+            gens_cost_coeff_ascen,
+            gens_cost_coeff_decen,
+
+            gens_installed_capacity,
+
+            gens_Pmax,
+            gens_Pmin,
+            gens_Qmax,
+            gens_Qmin,
+
+            sch_Pg,
+            sch_Qg,
+            nodes_Pd,
+            nodes_Qd,
+
+            P_Gen_lb,
+            P_Gen_ub,
+            Q_Gen_lb,
+            Q_Gen_ub,
+
+            P_Demand,
+            Q_Demand,
+            S_Demand,
+
+            branches_fbus,
+            branches_tbus,
+            branches_r,
+            branches_x,
+            branches_b,
+            branches_ratio,
+            branches_angle,
+            branches_type,
+
+            edges_orientation,
+
+            Ybus,
+            Ynet_wt_nodes_idx_wt_adjacent_nodes)
+
+
+end
+
+
+
+
 """
     get_generic_system_simulation_parameters(
         net_data_by_components_file;
         <keyword arguments>)
 
-It is used to simplify generation of parameters or data of a system that are needed for optimal power flow analyses.
+It is used to simplify generation of parameters or data of a system that are needed for simulation.
 
 
 # Arguments

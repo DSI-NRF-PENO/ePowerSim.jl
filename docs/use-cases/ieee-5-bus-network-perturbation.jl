@@ -103,6 +103,22 @@ using NamedTupleTools
 
 using Accessors, AccessorsExtra 
 
+
+#---------------------------------------------------
+# global settings
+#---------------------------------------------------
+
+freq = 60
+
+Ωb = 2 * pi * freq
+
+ωs = Ωb 
+
+ω_ref0 = ωs
+
+basekV = 1.0
+
+#---------------------------------------------------
 #---------------------------------------------------
 
 package_dir = pkgdir(ePowerSim)
@@ -157,10 +173,10 @@ json_net_data_by_components_file =
 #---------------------------------------------------
 #---------------------------------------------------
 
-# case_name = "case9"
+case_name = "case9"
 
 
-case_name = "case14"
+# case_name = "case14"
 
 
 case_data_dir =
@@ -375,7 +391,7 @@ sim_line_outage_pertubation_by_mm_ode(
     list_no_line_circuit  = [1],
 
     list_edges_to_have_fault  = [ 8 ],
-    clear_fault_selection_list = [1] ),
+    clear_fault_selection_list = [1] )
 
 
 #----------------------------------------
@@ -424,6 +440,175 @@ ntuple_status_steady_state_data =
             list_network_status )
 
 
+pre_fault_steady_state_data =
+    get_a_status_steady_state_data(
+        :pre_fault_state;
+        with_faults =
+            false,
+
+        # :pre_fault_state
+        # :fault_state 
+        # :post_fault_state ,
+        # system_status = :pre_fault_state,
+
+        net_data_by_components_file =
+            net_data_by_components_file,
+        components_libs_dir =
+            components_libs_dir,
+
+        timespan         = 10.0,
+        on_fault_time    = 9.0,
+        clear_fault_time = 9.001,
+
+        list_fault_point_from_node_a = [0.3],
+        list_fault_resistance        = [0.001],
+        list_no_line_circuit         =  [4],
+
+        list_edges_to_have_fault   = [ 2 ],
+        clear_fault_selection_list = [1],
+
+        basekV          = 1.0,    
+        use_pu_in_PQ    = true,
+        line_data_in_pu = true,
+
+        #--------------------------------------    
+
+        use_init_u0 = false,
+
+        use_nlsolve = false,
+
+        pf_alg        = NewtonRaphson(),
+
+        #--------------------------------------    
+
+        ode_alg       = Rodas4(),
+        # ode_alg     = FBDF()
+        # ode_alg     = QNDF()
+        # ode_alg     = radau()
+        # ode_alg     = RadauIIA5()
+        # ode_alg     = DFBDF()
+
+        dae_alg       = IDA(),
+
+        abstol        = 1e-12,
+        reltol        = 1e-12,
+
+        dt            = 0.01)
+
+#--------------
+
+fault_steady_state_data =
+    get_a_status_steady_state_data(
+        :fault_state;
+        with_faults =
+            false,
+        
+        # :pre_fault_state
+        # :fault_state 
+        # :post_fault_state ,
+        # system_status = :pre_fault_state,
+
+        net_data_by_components_file =
+            net_data_by_components_file,
+        components_libs_dir =
+            components_libs_dir,
+
+        timespan         = 10.0,
+        on_fault_time    = 9.0,
+        clear_fault_time = 9.001,
+
+        list_fault_point_from_node_a = [0.3],
+        list_fault_resistance        = [0.001],
+        list_no_line_circuit         =  [4],
+
+        list_edges_to_have_fault   = [ 2 ],
+        clear_fault_selection_list = [1],
+
+        basekV          = 1.0,    
+        use_pu_in_PQ    = true,
+        line_data_in_pu = true,
+
+        #--------------------------------------    
+
+        use_init_u0 = false,
+
+        use_nlsolve = false,
+
+        pf_alg        = NewtonRaphson(),
+
+        #--------------------------------------    
+
+        ode_alg       = Rodas4(),
+        # ode_alg     = FBDF()
+        # ode_alg     = QNDF()
+        # ode_alg     = radau()
+        # ode_alg     = RadauIIA5()
+        # ode_alg     = DFBDF()
+
+        dae_alg       = IDA(),
+
+        abstol        = 1e-12,
+        reltol        = 1e-12,
+
+        dt            = 0.01)
+
+#--------------
+
+post_fault_steady_state_data =
+    get_a_status_steady_state_data(
+        :post_fault_state;
+        with_faults =
+            false,
+
+        # :pre_fault_state
+        # :fault_state 
+        # :post_fault_state ,
+        # system_status = :pre_fault_state,
+
+        net_data_by_components_file =
+            net_data_by_components_file,
+        components_libs_dir =
+            components_libs_dir,
+
+        timespan         = 10.0,
+        on_fault_time    = 9.0,
+        clear_fault_time = 9.001,
+
+        list_fault_point_from_node_a = [0.3],
+        list_fault_resistance        = [0.001],
+        list_no_line_circuit         =  [4],
+
+        list_edges_to_have_fault   = [ 2 ],
+        clear_fault_selection_list = [1],
+
+        basekV          = 1.0,    
+        use_pu_in_PQ    = true,
+        line_data_in_pu = true,
+
+        #--------------------------------------    
+
+        use_init_u0 = false,
+
+        use_nlsolve = false,
+
+        pf_alg        = NewtonRaphson(),
+
+        #--------------------------------------    
+
+        ode_alg       = Rodas4(),
+        # ode_alg     = FBDF()
+        # ode_alg     = QNDF()
+        # ode_alg     = radau()
+        # ode_alg     = RadauIIA5()
+        # ode_alg     = DFBDF()
+
+        dae_alg       = IDA(),
+
+        abstol        = 1e-12,
+        reltol        = 1e-12,
+
+        dt            = 0.01)
+
 # status_steady_state_parameters =
 #     get_status_steady_state_parameters(
 #         net_data_by_components_file;
@@ -471,175 +656,6 @@ ntuple_status_steady_state_data =
 #         with_faults = false )
 
 # #----------------------------------------
-
-# pre_fault_steady_state_data =
-#     get_a_status_steady_state_data(
-#         :pre_fault_state;
-#         with_faults =
-#             false,
-
-#         # :pre_fault_state
-#         # :fault_state 
-#         # :post_fault_state ,
-#         # system_status = :pre_fault_state,
-
-#         net_data_by_components_file =
-#             net_data_by_components_file,
-#         components_libs_dir =
-#             components_libs_dir,
-
-#         timespan         = 10.0,
-#         on_fault_time    = 9.0,
-#         clear_fault_time = 9.001,
-
-#         list_fault_point_from_node_a = [0.3],
-#         list_fault_resistance        = [0.001],
-#         list_no_line_circuit         =  [4],
-
-#         list_edges_to_have_fault   = [ 2 ],
-#         clear_fault_selection_list = [1],
-
-#         basekV          = 1.0,    
-#         use_pu_in_PQ    = true,
-#         line_data_in_pu = true,
-
-#         #--------------------------------------    
-
-#         use_init_u0 = false,
-
-#         use_nlsolve = false,
-
-#         pf_alg        = NewtonRaphson(),
-
-#         #--------------------------------------    
-
-#         ode_alg       = Rodas4(),
-#         # ode_alg     = FBDF()
-#         # ode_alg     = QNDF()
-#         # ode_alg     = radau()
-#         # ode_alg     = RadauIIA5()
-#         # ode_alg     = DFBDF()
-
-#         dae_alg       = IDA(),
-
-#         abstol        = 1e-12,
-#         reltol        = 1e-12,
-
-#         dt            = 0.01)
-
-# #--------------
-
-# fault_steady_state_data =
-#     get_a_status_steady_state_data(
-#         :fault_state;
-#         with_faults =
-#             false,
-        
-#         # :pre_fault_state
-#         # :fault_state 
-#         # :post_fault_state ,
-#         # system_status = :pre_fault_state,
-
-#         net_data_by_components_file =
-#             net_data_by_components_file,
-#         components_libs_dir =
-#             components_libs_dir,
-
-#         timespan         = 10.0,
-#         on_fault_time    = 9.0,
-#         clear_fault_time = 9.001,
-
-#         list_fault_point_from_node_a = [0.3],
-#         list_fault_resistance        = [0.001],
-#         list_no_line_circuit         =  [4],
-
-#         list_edges_to_have_fault   = [ 2 ],
-#         clear_fault_selection_list = [1],
-
-#         basekV          = 1.0,    
-#         use_pu_in_PQ    = true,
-#         line_data_in_pu = true,
-
-#         #--------------------------------------    
-
-#         use_init_u0 = false,
-
-#         use_nlsolve = false,
-
-#         pf_alg        = NewtonRaphson(),
-
-#         #--------------------------------------    
-
-#         ode_alg       = Rodas4(),
-#         # ode_alg     = FBDF()
-#         # ode_alg     = QNDF()
-#         # ode_alg     = radau()
-#         # ode_alg     = RadauIIA5()
-#         # ode_alg     = DFBDF()
-
-#         dae_alg       = IDA(),
-
-#         abstol        = 1e-12,
-#         reltol        = 1e-12,
-
-#         dt            = 0.01)
-
-# #--------------
-
-# post_fault_steady_state_data =
-#     get_a_status_steady_state_data(
-#         :post_fault_state;
-#         with_faults =
-#             false,
-
-#         # :pre_fault_state
-#         # :fault_state 
-#         # :post_fault_state ,
-#         # system_status = :pre_fault_state,
-
-#         net_data_by_components_file =
-#             net_data_by_components_file,
-#         components_libs_dir =
-#             components_libs_dir,
-
-#         timespan         = 10.0,
-#         on_fault_time    = 9.0,
-#         clear_fault_time = 9.001,
-
-#         list_fault_point_from_node_a = [0.3],
-#         list_fault_resistance        = [0.001],
-#         list_no_line_circuit         =  [4],
-
-#         list_edges_to_have_fault   = [ 2 ],
-#         clear_fault_selection_list = [1],
-
-#         basekV          = 1.0,    
-#         use_pu_in_PQ    = true,
-#         line_data_in_pu = true,
-
-#         #--------------------------------------    
-
-#         use_init_u0 = false,
-
-#         use_nlsolve = false,
-
-#         pf_alg        = NewtonRaphson(),
-
-#         #--------------------------------------    
-
-#         ode_alg       = Rodas4(),
-#         # ode_alg     = FBDF()
-#         # ode_alg     = QNDF()
-#         # ode_alg     = radau()
-#         # ode_alg     = RadauIIA5()
-#         # ode_alg     = DFBDF()
-
-#         dae_alg       = IDA(),
-
-#         abstol        = 1e-12,
-#         reltol        = 1e-12,
-
-#         dt            = 0.01)
 
 # #----------------------------------------
 

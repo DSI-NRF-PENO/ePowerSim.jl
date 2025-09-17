@@ -704,6 +704,10 @@ export get_slack_gens_vh_θh_gens_vh_non_slack_gens_vh
 
 export disaggregate_sta_pf_keywords_parameter
 
+export get_pf_streamedlined_simulation_parameters
+
+export get_opf_streamedlined_simulation_parameters
+
 export get_system_net_static_data
 export get_system_net_data_wt_static_parameters
 export get_generic_system_simulation_parameters
@@ -786,19 +790,19 @@ export a_parameter_pertubation_and_step!
 # opf
 #-------------------------------------------------------
 
-# export get_active_power_demand_scenario
-# export get_power_demand_scenario
+export get_active_power_demand_scenario
+export get_power_demand_scenario
 
-# export get_wind_gens_power_forecast
-# export get_solar_gens_power_forecast
+export get_wind_gens_power_forecast
+export get_solar_gens_power_forecast
 
-# export thermal_cost_function
-# export a_gen_cost_fun
-# export a_wind_gen_cost_fun
-# export a_solar_gen_cost_func
-# export a_demand_wind_solar_scenario
-# export make_obj_quadratic_form
-# export obj_quadratic_form
+export thermal_cost_function
+export a_gen_cost_fun
+export a_wind_gen_cost_fun
+export a_solar_gen_cost_func
+export a_demand_wind_solar_scenario
+export make_obj_quadratic_form
+export obj_quadratic_form
 
 
 # export ThermalGenerator
@@ -986,6 +990,8 @@ export get_Ynet_sp_sh
 export get_Yπ_net
 
 export get_Ybus
+
+export get_Ybus_from_Ynet
 
 export get_size_Ybus
 

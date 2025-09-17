@@ -2169,7 +2169,7 @@ function get_Ynet_sp_sh(
     baseMVA = 1.0,
     basekV = 1.0,
     baseShunt = 1.0,
-    line_data_in_pu = true)
+    line_data_in_pu = true )
 
     #--------------------------------------
 
@@ -20715,22 +20715,39 @@ function get_net_generic_idx(
             plant_transmission_data_from_json )
 
     #--------------------------------------
-
+    
     (; slack_bus_idx,
      gens_idx,
      slack_gens_nodes_idx,
      non_slack_gens_nodes_idx,
      gens_nodes_idx,
      gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      loc_load_exist,
      load_nodes_idx,
      transmission_nodes_idx,
      non_gens_nodes_idx,
      all_nodes_idx,
      non_slack_gens_and_non_gens_idx,
-     nodes_with_demands_idx)  =
-         net_nodes_type_idxs
+     nodes_with_demands_idx )  =
+         NamedTupleTools.select(
+             net_nodes_type_idxs,
+             (:slack_bus_idx,
+              :gens_idx,
+              :slack_gens_nodes_idx,
+              :non_slack_gens_nodes_idx,
+              :gens_nodes_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
+              :loc_load_exist,
+              :load_nodes_idx,
+              :transmission_nodes_idx,
+              :non_gens_nodes_idx,
+              :all_nodes_idx,
+              :non_slack_gens_and_non_gens_idx,
+              :nodes_with_demands_idx))
 
+    
     (;n2s_slack_gens_idx,
      n2s_non_slack_gens_idx,
      n2s_gens_idx,
@@ -20739,8 +20756,17 @@ function get_net_generic_idx(
      n2s_gens_with_loc_load_idxs,
      n2s_transmission_idxs,
      n2s_all_nodes_idx ) =
-         get_dict_net_streamlined_idx_by_nodes_type_idxs(
-             net_nodes_type_idxs )
+         NamedTupleTools.select(
+             get_dict_net_streamlined_idx_by_nodes_type_idxs(
+                 net_nodes_type_idxs ),
+             (:n2s_slack_gens_idx,
+              :n2s_non_slack_gens_idx,
+              :n2s_gens_idx,
+              :n2s_non_gens_idx,
+              :n2s_load_idx,
+              :n2s_gens_with_loc_load_idxs,
+              :n2s_transmission_idxs,
+              :n2s_all_nodes_idx ))
     
     #-------------------------------
 
@@ -21140,7 +21166,11 @@ function get_net_generic_idx(
          gens_nodes_idx,
          non_gens_nodes_idx,
          gens_nodes_with_loc_loads_idx,
-         all_nodes_idx )
+         gens_with_loc_load_idx,
+         all_nodes_idx,
+         
+         non_slack_gens_and_non_gens_idx,
+         nodes_with_demands_idx)
     
     #-------------------------------
     

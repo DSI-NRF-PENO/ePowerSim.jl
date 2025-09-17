@@ -112,7 +112,14 @@ function kron_symmetric_by_idx(A,k)
     
 end
 
+"""
 
+    get_Ybus_from_Ynet(
+        Ynet, nodes_node_idx_and_incident_edges_other_node_idx
+        )
+
+Converts Ynet to Ybus
+"""
 function get_Ybus_from_Ynet(
     Ynet, nodes_node_idx_and_incident_edges_other_node_idx
     )::Matrix{Number} 

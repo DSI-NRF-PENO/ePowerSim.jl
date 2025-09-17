@@ -156,22 +156,25 @@ function get_algebraic_vars_labels(
     dyn_pf_fun_kwd_net_idxs;
     label_prefix = "bus" )
 
-
+    # gens_nodes_with_loc_loads_idx
+    
+    # :gens_with_loc_loads_idx
+    
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
      gens_with_loc_loads_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     # algebraic_vars_labels =
     return [generate_labels_by_nodes_idxs_and_vars(
@@ -224,19 +227,19 @@ function get_network_vars_labels(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     return [get_state_labels(
         gens_govs_avrs_states_syms,
@@ -423,19 +426,19 @@ function get_plants_states_syms_wt_labels_wt_names(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
 
     (;n2s_gens_idx,
@@ -610,19 +613,19 @@ function get_model_syms(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     
     algebraic_vars_labels =
@@ -874,19 +877,19 @@ function get_state_and_algebraic_vars_Idx_in_state(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
      (;n2s_gens_idx,
      n2s_non_gens_idx,
@@ -955,19 +958,19 @@ function get_model_nodes_types_names(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
 
      (;n2s_gens_idx,
@@ -1462,9 +1465,8 @@ function get_pf_vh_θh_idx_and_idx2Idx(
      non_slack_gens_nodes_idx,
      gens_nodes_idx,
      non_gens_nodes_idx,
+     gens_nodes_with_loc_loads_idx,
      gens_with_loc_load_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
      all_nodes_idx) =
         NamedTupleTools.select(
             dyn_pf_fun_kwd_net_idxs,
@@ -1472,13 +1474,13 @@ function get_pf_vh_θh_idx_and_idx2Idx(
              :non_slack_gens_nodes_idx,
              :gens_nodes_idx,
              :non_gens_nodes_idx,
+             :gens_nodes_with_loc_loads_idx,
              :gens_with_loc_load_idx,
-             # :gens_nodes_with_loc_loads_idx,
-             :gens_with_loc_loads_idx,
              :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
+    
     #-------------------------------
 
     non_slack_gens_and_non_gens_idx =
@@ -2341,19 +2343,19 @@ function get_generic_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              :gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
     #----------------------------------------
 
     dim_gens =
@@ -2410,19 +2412,19 @@ function get_generic_Pg_Qg_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
     
     #----------------------------------------
 
@@ -2485,19 +2487,19 @@ function get_generic_scale_Pg_Qg_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -2562,19 +2564,19 @@ function get_generic_Pg_Png_Qng_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -2631,19 +2633,19 @@ function get_generic_scale_Pg_Png_Qng_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -2784,19 +2786,19 @@ function get_dyn_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -2850,19 +2852,19 @@ function get_dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -2920,19 +2922,19 @@ function get_dyn_δ_eq_dash_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -2986,19 +2988,19 @@ function get_dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     dim_gens =
         length(gens_nodes_idx)
@@ -3385,19 +3387,19 @@ function get_generic_n_gens_paras_wt_Png_Qng_Pll_Qll_Idx(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
     #----------------------------------------
 
@@ -3517,19 +3519,19 @@ function get_generic_nodes_names(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
     
     all_nodes_names =
         ["bus$(n2s_all_nodes_idx[idx])"
@@ -3586,19 +3588,19 @@ function get_generic_network_vars_labels(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
 
    (;n2s_gens_idx,
@@ -4013,20 +4015,19 @@ function get_static_Idx_and_syms(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
-
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
    (;n2s_gens_idx,
     n2s_non_gens_idx,
@@ -4254,20 +4255,19 @@ function get_states_Idx_syms_wt_functions(
 
     (gens_nodes_idx,
      non_gens_nodes_idx,
-     # gens_nodes_with_loc_loads_idx,
-     gens_with_loc_loads_idx,
+     gens_nodes_with_loc_loads_idx,
+     gens_with_loc_load_idx,
      all_nodes_idx) =
          NamedTupleTools.select(
              dyn_pf_fun_kwd_net_idxs,
              (:gens_nodes_idx,
               :non_gens_nodes_idx,
-              # :gens_nodes_with_loc_loads_idx,
-              gens_with_loc_loads_idx,
+              :gens_nodes_with_loc_loads_idx,
+              :gens_with_loc_load_idx,
               :all_nodes_idx))
 
-    gens_nodes_with_loc_loads_idx =
-        gens_with_loc_loads_idx
-
+    # gens_nodes_with_loc_loads_idx =
+    #     gens_with_loc_loads_idx
 
    (;n2s_gens_idx,
     n2s_non_gens_idx,

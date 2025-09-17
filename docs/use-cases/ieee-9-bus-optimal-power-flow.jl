@@ -1,5 +1,5 @@
 #=
-# [Example of Optimal Power Flow with IEEE 5 Bus Test System](@id ieee-5-bus-optimal-power-flow)
+# [Example of Optimal Power Flow with IEEE 9 Bus Test System](@id ieee-9-bus-optimal-power-flow)
 
 =#
 
@@ -376,3 +376,94 @@ open( tex_filename , "a") do file_handle
     
 end
 
+#---------------------------------------------------
+#---------------------------------------------------
+# pf  simulation parameters 
+#---------------------------------------------------
+#---------------------------------------------------
+
+pf_streamedlined_simulation_parameters = 
+    get_pf_streamedlined_simulation_parameters(
+        net_data_by_components_file;
+        components_libs_dir =
+            components_libs_dir,
+        basekV = 1.0,    
+        use_pu_in_PQ      = true,
+        line_data_in_pu   = true,
+        with_faults       = false,
+        pf_alg            = NewtonRaphson(),
+        no_lines_fault    = 1)
+
+
+#---------------------------------------------------
+# opf  simulation parameters 
+#---------------------------------------------------
+
+opf_streamedlined_simulation_parameters = 
+    get_opf_streamedlined_simulation_parameters(
+        net_data_by_components_file;
+        components_libs_dir =
+            components_libs_dir,
+        basekV = 1.0,    
+        use_pu_in_PQ      = true,
+        opf_use_pu_in_PQ  = true,
+        line_data_in_pu   = true,
+        with_faults       = false )
+
+
+
+fractional_digits = 4
+
+(;no_nodes,
+no_gens,
+gens_nodes_idx,
+
+P_Gen_lb,
+P_Gen_ub,
+
+Q_Gen_lb,
+Q_Gen_ub,
+
+slack_gens_nodes_idx,
+dyn_pf_fun_kwd_net_idxs,
+
+P_Demand,
+Q_Demand,
+S_Demand,
+Ybus,
+
+gens_cost_coeff_ascen,
+Ynet_wt_nodes_idx_wt_adjacent_nodes) =
+     NamedTupleTools.select(
+    opf_streamedlined_simulation_parameters,
+    (:no_nodes,
+     :no_gens,
+     :gens_nodes_idx,
+
+     :P_Gen_lb,
+     :P_Gen_ub,
+
+     :Q_Gen_lb,
+     :Q_Gen_ub,
+
+     :slack_gens_nodes_idx,
+     :dyn_pf_fun_kwd_net_idxs,
+
+     :P_Demand,
+     :Q_Demand ,
+     :S_Demand,
+     :Ybus,
+
+      :gens_cost_coeff_ascen,
+      :Ynet_wt_nodes_idx_wt_adjacent_nodes))
+
+
+#---------------------------------------------------
+    
+(Ynet,
+ nodes_idx_with_adjacent_nodes_idx) =
+     Ynet_wt_nodes_idx_wt_adjacent_nodes
+
+YBus =  get_Ybus_from_Ynet(
+    Ynet,
+    nodes_idx_with_adjacent_nodes_idx)

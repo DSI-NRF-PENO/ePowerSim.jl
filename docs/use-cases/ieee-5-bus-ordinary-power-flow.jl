@@ -105,6 +105,20 @@ using NamedTupleTools
 using Accessors, AccessorsExtra 
 
 #---------------------------------------------------
+# global settings
+#---------------------------------------------------
+
+freq = 60
+
+Ωb = 2 * pi * freq
+
+ωs = Ωb 
+
+ω_ref0 = ωs
+
+basekV = 1.0
+
+#---------------------------------------------------
 #---------------------------------------------------
 
 
@@ -152,6 +166,7 @@ dynamic_net_data_by_components_file =
 
 json_net_data_by_components_file =
     dynamic_net_data_by_components_file
+    # "opf-pf-net-default-static-data,json"
 
 #---------------------------------------------------
 
@@ -275,8 +290,7 @@ system_net_static_data =
             NewtonRaphson(),
         no_lines_fault = 1)
 
-
-#-------------------------------
+#---------------------------------------------------
 
 (;plant_generators_data_from_json,
  plant_loads_data_from_json,
@@ -529,8 +543,6 @@ Jac_vh_θh =
 
 Ynet_pf_fun_mismatch =
     get_generic_sta_pf_ΔPQ_mismatch
-    # get_a_model_integrated_pf_sta_ΔPQ_mismatch
-
 
  jac_Ynet_pf_sol =  NonlinearSolve.solve(
     NonlinearProblem(
@@ -549,7 +561,8 @@ Ynet_pf_fun_mismatch =
                                    net_addmitance_tuple =
                                        Ynet_wt_nodes_idx_wt_adjacent_nodes,
                                    by_Ynet_or_Yπ_net =
-                                       :Ynet ) ),
+                                       :generic_Ynet # :Ynet
+                               ) ),
         sta_red_vh_θh_0,
         pf_PQ_param ),
     NewtonRaphson() ;
@@ -596,23 +609,18 @@ Ynet_pf_fun_mismatch =
 # Ybus  NonlinearSolve with Jac
 #-------------------------------
 
-
 red_ΔPQ_x = similar(sta_red_vh_θh_0)
-
 
 Jac_row_size =
     Jac_col_size = length( sta_red_vh_θh_0 )
 
-
 Jac_vh_θh =
     spzeros( Jac_row_size, Jac_col_size )
-
 
 Ybus_pf_fun_mismatch =
     get_ΔPQ_mismatch_by_sparse_Ybus
     # get_ΔPQ_mismatch_by_Ybus
     # get_ΔI_mismatch_by_Ybus
-
 
 jac_nonlinearsolve_pf_sol = NonlinearSolve.solve(
     NonlinearProblem(
@@ -638,7 +646,6 @@ jac_nonlinearsolve_pf_sol = NonlinearSolve.solve(
     NewtonRaphson();
         abstol = 1e-10,
     reltol = 1e-10)
-
 
 #---------------------------------------------------
 #---------------------------------------------------

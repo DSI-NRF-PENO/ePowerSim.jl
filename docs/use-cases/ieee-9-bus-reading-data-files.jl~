@@ -626,26 +626,26 @@ dyn_pf_fun_kwd_net_idxs =
 
 #----------------------------------------
 
-# t_gens_nodes_idx =
-#     getproperty(
-#         dyn_pf_fun_kwd_net_idxs,
-#         :gens_nodes_idx )
+t_gens_nodes_idx =
+    getproperty(
+        dyn_pf_fun_kwd_net_idxs,
+        :gens_nodes_idx )
 
-# #     1     2    3    4
-# Pg = [2.0, 3.0, 2.0, 0.2]
+#     1     2    3    4
+Pg = [2.0, 3.0, 2.0, 0.2]
 
-# t_n2s_gens_nodes_idx =
-#     get_n2s_any(t_gens_nodes_idx )
+t_n2s_gens_nodes_idx =
+    get_n2s_any(t_gens_nodes_idx )
 
 
-# states_Idx_syms_wt_functions = 
-# get_states_Idx_syms_wt_functions(
-#     net_data_by_components_file,    
-#     dyn_pf_fun_kwd_net_idxs,
-#     dyn_pf_fun_kwd_n2s_idxs;
-#     components_libs_dir =
-#         components_libs_dir,
-#     no_lines_fault = 1 )
+states_Idx_syms_wt_functions = 
+get_states_Idx_syms_wt_functions(
+    net_data_by_components_file,    
+    dyn_pf_fun_kwd_net_idxs,
+    dyn_pf_fun_kwd_n2s_idxs;
+    components_libs_dir =
+        components_libs_dir,
+    no_lines_fault = 1 )
 
 #----------------------------------------
 

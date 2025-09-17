@@ -150,7 +150,7 @@ json_net_data_by_components_file =
 
 #---------------------------------------------------
 
-case_name = "case5"
+case_name = "case9"
 
 # This ensures a lowercase name
 case_name = lowercase(case_name) 
@@ -223,10 +223,6 @@ sd_dynamics_sim_csv_filename =
         "$(case_name)-" *
             "$(sim_type)-" *
             "sim-results.csv")
-
-#---------------------------------------------------
-
-basekV = 1.0
 
 #---------------------------------------------------
 # base setting and some booleans 
@@ -334,8 +330,6 @@ tspan         = (0.0, timespan)
 sim_timespan  = (0.0, timespan)
 
 plot_timespan = (0.0, timespan)
-
-#---------------------------------------------------
 
 #---------------------------------------------------
 # Reading network data
@@ -623,29 +617,6 @@ dyn_pf_fun_kwd_net_idxs =
          :gens_with_loc_load_idx,
          :gens_nodes_with_loc_loads_idx,
          :all_nodes_idx))
-
-#----------------------------------------
-
-# t_gens_nodes_idx =
-#     getproperty(
-#         dyn_pf_fun_kwd_net_idxs,
-#         :gens_nodes_idx )
-
-# #     1     2    3    4
-# Pg = [2.0, 3.0, 2.0, 0.2]
-
-# t_n2s_gens_nodes_idx =
-#     get_n2s_any(t_gens_nodes_idx )
-
-
-# states_Idx_syms_wt_functions = 
-# get_states_Idx_syms_wt_functions(
-#     net_data_by_components_file,    
-#     dyn_pf_fun_kwd_net_idxs,
-#     dyn_pf_fun_kwd_n2s_idxs;
-#     components_libs_dir =
-#         components_libs_dir,
-#     no_lines_fault = 1 )
 
 #----------------------------------------
 
@@ -1230,33 +1201,33 @@ plants_cb_paras_kwd_para =
 
 #----------------------------------------
 
-"""
-generic_model_callback_paras =
-    plants_generic_model_callback_paras_func(
-        state_vars_idx,
-        plants_states_syms;
-        kwd_para =
-            plants_cb_paras_kwd_para )
+# """
+# generic_model_callback_paras =
+#     plants_generic_model_callback_paras_func(
+#         state_vars_idx,
+#         plants_states_syms;
+#         kwd_para =
+#             plants_cb_paras_kwd_para )
 
-plants_cb_paras_switches =
-    getproperty(
-        generic_model_callback_paras,
-        :plants_cb_paras_switches)
+# plants_cb_paras_switches =
+#     getproperty(
+#         generic_model_callback_paras,
+#         :plants_cb_paras_switches)
 
 
-avrs_govs_cb_sw =
-    getproperty(
-        generic_model_callback_paras,
-        :plants_avr_gov_cb_para_sw_in_plant)
+# avrs_govs_cb_sw =
+#     getproperty(
+#         generic_model_callback_paras,
+#         :plants_avr_gov_cb_para_sw_in_plant)
 
-avrs_govs_cb_sw_Idx =
-    getproperty(
-        generic_model_callback_paras,
-        :plants_avr_gov_cb_para_sw_idx_in_plant )
+# avrs_govs_cb_sw_Idx =
+#     getproperty(
+#         generic_model_callback_paras,
+#         :plants_avr_gov_cb_para_sw_idx_in_plant )
 
-cb = cb_fun_make_state_callbacks(
-    generic_model_callback_paras)
-"""
+# cb = cb_fun_make_state_callbacks(
+#     generic_model_callback_paras)
+# """
 
 #----------------------------------------
 
@@ -1283,10 +1254,6 @@ cb = cb_fun_make_state_callbacks(
     list_selected_plants_state_event_cb_paras,
     list_selected_plants_state_affect_cb_paras )
 
-
-#----------------------------------------
-#########################################
-#----------------------------------------
 
 #----------------------------------------
 # Composition and aggregations
@@ -1600,9 +1567,6 @@ plants_kwd_para =
 
     ωs) 
 
-# plants_kwd_para =
-#     deepcopy(ode_plants_kwd_para)
-
 
 ode_plants_kwd_para =
     (;state_vars_idx,
@@ -1782,7 +1746,6 @@ mm_generic_model_dynamics_kwd_para =
      ωs,
      loc_load_exist,
      state_vars_idx,
-
      dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx, #
 
      gens_state_vars_idx_in_state,
@@ -1889,3 +1852,91 @@ pre_post_generic_system_dynamics_wt_fault_kwd_para =
 
 #---------------------------------------------------
 #---------------------------------------------------
+# pf  simulation parameters 
+#---------------------------------------------------
+#---------------------------------------------------
+
+pf_streamedlined_simulation_parameters = 
+    get_pf_streamedlined_simulation_parameters(
+        net_data_by_components_file;
+        components_libs_dir =
+            components_libs_dir,
+        basekV = 1.0,    
+        use_pu_in_PQ      = true,
+        line_data_in_pu   = true,
+        with_faults       = false,
+        pf_alg            = NewtonRaphson(),
+        no_lines_fault    = 1)
+
+
+#---------------------------------------------------
+# opf  simulation parameters 
+#---------------------------------------------------
+
+opf_streamedlined_simulation_parameters = 
+    get_opf_streamedlined_simulation_parameters(
+        net_data_by_components_file;
+        components_libs_dir =
+            components_libs_dir,
+        basekV = 1.0,    
+        use_pu_in_PQ      = true,
+        opf_use_pu_in_PQ  = true,
+        line_data_in_pu   = true,
+        with_faults       = false )
+
+
+fractional_digits = 4
+
+(;no_nodes,
+no_gens,
+gens_nodes_idx,
+
+P_Gen_lb,
+P_Gen_ub,
+
+Q_Gen_lb,
+Q_Gen_ub,
+
+slack_gens_nodes_idx,
+dyn_pf_fun_kwd_net_idxs,
+
+P_Demand,
+Q_Demand,
+S_Demand,
+Ybus,
+
+gens_cost_coeff_ascen,
+Ynet_wt_nodes_idx_wt_adjacent_nodes) =
+     NamedTupleTools.select(
+    opf_streamedlined_simulation_parameters,
+    (:no_nodes,
+     :no_gens,
+     :gens_nodes_idx,
+
+     :P_Gen_lb,
+     :P_Gen_ub,
+
+     :Q_Gen_lb,
+     :Q_Gen_ub,
+
+     :slack_gens_nodes_idx,
+     :dyn_pf_fun_kwd_net_idxs,
+
+     :P_Demand,
+     :Q_Demand ,
+     :S_Demand,
+     :Ybus,
+
+      :gens_cost_coeff_ascen,
+      :Ynet_wt_nodes_idx_wt_adjacent_nodes))
+
+
+#---------------------------------------------------
+    
+(Ynet,
+ nodes_idx_with_adjacent_nodes_idx) =
+     Ynet_wt_nodes_idx_wt_adjacent_nodes
+
+YBus =  get_Ybus_from_Ynet(
+    Ynet,
+    nodes_idx_with_adjacent_nodes_idx)

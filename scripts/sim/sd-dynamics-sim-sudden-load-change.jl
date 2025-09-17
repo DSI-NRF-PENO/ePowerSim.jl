@@ -311,7 +311,7 @@ function sim_sudden_load_change(
               :algebraic_vars_labels))
 
     #---------------------------------------------------
-    ## ODE system dyamanics simulation
+    ## DAE system dyamanics simulation
     #---------------------------------------------------
 
     system_dynamics_fun! =
