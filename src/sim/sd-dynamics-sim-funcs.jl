@@ -2542,7 +2542,7 @@ function sim_red_model_distributed_slack_pf(
 
     with_faults = false,
 
-    json_net_data_by_components_file =
+    net_data_by_components_file =
         nothing,
 
     data_dir=
@@ -2566,7 +2566,8 @@ function sim_red_model_distributed_slack_pf(
     basekV = 1.0,    
     use_pu_in_PQ = true,
     line_data_in_pu = true,
-    fractional_digits=4,)
+    fractional_digits=4,
+    pf_alg = NewtonRaphson() )
 
     
     #--------------------------------------
@@ -2588,39 +2589,39 @@ function sim_red_model_distributed_slack_pf(
 
     #--------------------------------------    
 
-    if (data_dir == "") || (data_dir == nothing)
+    # if (data_dir == "") || (data_dir == nothing)
 
-        package_dir = pkgdir(ePowerSim)
+    #     package_dir = pkgdir(ePowerSim)
 
-        data_dir = joinpath(package_dir,
-                     "data")
+    #     data_dir = joinpath(package_dir,
+    #                  "data")
         
-    end
+    # end
     
-    #--------------------------------------
+    # #--------------------------------------
 
-    json_case_dir =
-        joinpath(
-            data_dir,
-            "converted-data",
-            case_name,
-            "json")
+    # json_case_dir =
+    #     joinpath(
+    #         data_dir,
+    #         "converted-data",
+    #         case_name,
+    #         "json")
 
-    if  (json_net_data_by_components_file == "" ||
-        json_net_data_by_components_file == nothing) 
+    # if  (json_net_data_by_components_file == "" ||
+    #     json_net_data_by_components_file == nothing) 
 
-        net_data_by_components_file =
-            joinpath(
-                json_case_dir,
-                "net_data_by_components_file.json")
-    else
+    #     net_data_by_components_file =
+    #         joinpath(
+    #             json_case_dir,
+    #             "net_data_by_components_file.json")
+    # else
 
-        net_data_by_components_file =
-            joinpath(
-                json_case_dir,
-                json_net_data_by_components_file)
+    #     net_data_by_components_file =
+    #         joinpath(
+    #             json_case_dir,
+    #             json_net_data_by_components_file)
 
-    end
+    # end
 
     #--------------------------------------
 
@@ -2930,6 +2931,7 @@ function sim_red_model_distributed_slack_pf(
             Pg_Qg_Png_Qng_Pll_Qll_Idx,    
             gens_nodes_idx,
             n2s_gens_idx,
+            gens_nodes_with_loc_loads_idx,
             n2s_gens_with_loc_load_idxs)
 
     Pg_inj_Qg_inj_Png_Qng =
@@ -8997,12 +8999,13 @@ function sim_sudden_load_change(
         mm_ode_generic_system_model_by_funcs_dynamics!
         # dae_generic_system_model_by_funcs_dynamics!
 
-    generic_model_dynamics_para =
-        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll
-        # deepcopy(ω_ref_v_ref_p_order_Png_Qng_Pll_Qll)
+    # generic_model_dynamics_para =
+    #     ω_ref_v_ref_p_order_Png_Qng_Pll_Qll
+    #     # deepcopy(ω_ref_v_ref_p_order_Png_Qng_Pll_Qll)
 
     model_dynamics_para =
-        (;generic_model_dynamics_para,
+        (;generic_model_dynamics_para =
+        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
           plants_cb_paras_switches )          
 
     model_dynamics_kwd_para =
