@@ -2283,6 +2283,22 @@ function get_pf_streamedlined_simulation_parameters(
 
     #------------------------------------------------
 
+    opf_gens_para_selections  =
+        (:vh,
+         :P, :Q,
+         :Pmin, :Pmax,
+         :Qmin, :Qmax)
+    
+    opf_generic_gens_para = 
+        get_ode_gens_generic_para(
+                 plant_generators_data_from_json;
+                 sequence_order =
+                     ode_gens_generic_sequence_order,
+                 selections =
+                     opf_gens_para_selections)
+    
+    #------------------------------------------------
+
     
     # ode_gens_para =
     #     NamedTupleTools.select(
@@ -2487,6 +2503,7 @@ function get_pf_streamedlined_simulation_parameters(
      sch_Pg, sch_Qg,
      gens_Pmin, gens_Pmax,
      gens_Qmin, gens_Qmax) =
+         #opf_generic_gens_para
          NamedTupleTools.select(
              opf_generic_gens_para,
              (:vh,
@@ -2792,6 +2809,8 @@ function get_pf_streamedlined_simulation_parameters(
             no_nodes,
             no_gens,
             no_edges,
+
+            opf_generic_gens_para,
 
             generic_gens_para,
             ode_gens_generic_para,
