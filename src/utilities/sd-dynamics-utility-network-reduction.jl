@@ -248,7 +248,7 @@ function get_Y_aug_matrices(
     gens_with_loc_load_idx,
     all_nodes_idx) =
         NamedTupleTools.select(
-            nodes_types_idxs,
+            pf_kw_nodes_types_idxs,
             (:slack_gens_nodes_idx,
              :non_slack_gens_nodes_idx,
              :gens_nodes_idx,
@@ -263,7 +263,7 @@ function get_Y_aug_matrices(
     n2s_gens_with_loc_load_idxs,
     n2s_all_nodes_idx ) =
         NamedTupleTools.select(
-            n2s_idxs,
+            pf_kw_n2s_idxs,
             (:n2s_slack_gens_idx,
              :n2s_non_slack_gens_idx,
              :n2s_gens_idx,

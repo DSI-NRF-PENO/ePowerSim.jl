@@ -1027,6 +1027,32 @@ export get_Yint_and_Yred_matrices
 
 export get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend
 
+
+#-------------------------------------------------------
+# Stability
+#-------------------------------------------------------
+
+export get_eig_values_in_states_participation
+
+export get_eigens_via_arblib
+
+export get_eigens 
+
+export get_participation_factors
+
+export get_generic_stability_static_powerflow 
+
+export get_generic_electro_mechanical_oscillation_indicies
+
+export get_generic_reduced_and_linearised_model_parameters
+
+export get_generic_Asys_linearised_dynamic_model
+
+export get_generic_linearised_dynamic_model
+
+export get_generic_small_signal_stability_indices
+
+
 #-------------------------------------------------------
 # Others
 #-------------------------------------------------------

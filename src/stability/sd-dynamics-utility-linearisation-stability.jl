@@ -98,8 +98,10 @@ return_code = Arblib.approx_eig_qr!(
     Arblib._precision(Acb_system_matrix) )
 
 """
+
 function get_eigens_via_arblib(
-    system_matrix; prec = nothing  )
+    system_matrix;
+    prec = nothing  )
 
 
     matrix_rows, matrix_cols = size(system_matrix)
@@ -137,8 +139,8 @@ end
 
 
 """
+    get_eigens(system_matrix)
 
-`get_eigens`
 This function returns eigen values, left and right
 eigen vectors.
 
@@ -174,7 +176,14 @@ https://ralphas.github.io/GenericSchur.jl/stable/
 This function returns the participation factor matrix
 
 Sauer: see page 232, equation 8.84
+    """
 
+"""
+
+    get_participation_factors(
+        system_matrix )
+
+Returns the participation factor matrix.
 
 """
 function get_participation_factors(
@@ -217,7 +226,16 @@ end
 #####################################################
 
 
+"""
+    get_generic_stability_static_powerflow(
+        pf_PQ_param ;
+        kwd_para =
+            stability_static_powerflow_kwd_para)
 
+
+Returns a tuple of `(vh, θh, pf_P_gens, pf_Q_gens)` based on powerflow.
+
+"""
 function get_generic_stability_static_powerflow(
     pf_PQ_param ;
     kwd_para =
@@ -380,6 +398,17 @@ function get_generic_stability_static_powerflow(
 end
 
 
+
+"""
+    get_generic_electro_mechanical_oscillation_indicies(
+       pf_P_gens, pf_Q_gens,
+       vh, gens_vh, gens_θh, ωs;
+       kwd_para =
+           inm_electro_mech_oscill_kwd_para )
+
+
+Returns a nampedruple of `(;Yint, Yred, δg, Eg, Cinm, Dinm, Aω_matrix, A_matrix)`.
+"""
 function get_generic_electro_mechanical_oscillation_indicies(
     pf_P_gens, pf_Q_gens,
     vh,
@@ -1070,7 +1099,6 @@ function get_generic_reduced_and_linearised_model_parameters(
         get_generic_electro_mechanical_oscillation_indicies(
             pf_P_gens, pf_Q_gens,
             vh,
-            # θh,
             gens_vh, gens_θh, ωs;
             kwd_para =
                 inm_electro_mech_oscill_kwd_para )
