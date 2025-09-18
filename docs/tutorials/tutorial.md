@@ -15,13 +15,15 @@
 
 - **[Formulation of  Distributed Power Flow](@ref distributed-power-flow)** - Demonstrates how to implement distributed slack bus, loss participation factors and dynamic load pick-up participation factor.
 
-- **[Formulation of  Optimal Power Flow](@ref optimal-power-flow)** - Demonstrates how use ePowerSim to formulate optimal power flow problems and solutions with JuMP or other optimisation frameworks.
+- **[Formulation of  Optimal Power Flow](@ref optimal-power-flow)** -
+  Demonstrates how to use ePowerSim to formulate optimal power flow problems and solutions with JuMP or other optimisation frameworks.
 
 - **[Formulation of  Continuation Power Flow](@ref continuation-power-flow)** - Demonstrates how to implement continuation power flow using ePowerSim.
   
-- **[Formulation of Callbacksl](@ref callbacks)** - Demonstrates how to create callbacks for parameters, state and algebraic variable in an electric power system.
+- **[Formulation of Callbacksl](@ref callbacks)** - Demonstrates how to create callbacks for parameters, state and algebraic variables in an electric power system.
 
-- **[Formulation of  Network Structure Pertubation](@ref network-perturbation)** - Demonstrates how for formulate network structure pertubations such a a fault on transmission line, loss of a line or a fault on bus bar.
+- **[Formulation of  Network Structure Pertubation](@ref
+  network-perturbation)** - Demonstrates how to formulate network structure pertubations such as a fault on transmission line, loss of a line or a fault on bus bar.
 
 - **[Formulation of  Load-Generation Pertubation](@ref load-generation-perturbations)** - Demonstrates how to formulate a load pertubation in form of a sudden change in load or generation.
   
@@ -33,7 +35,7 @@
 - **[Network Reduction](@ref network-reduction)** - Demonstrates how
   to perform network reduction in ePowerSim.
 
-- **[Results Dcumentation and Presentation](@ref results-documentation-and-presentation)** - Demonstrates how to save simulation results in csv or tex format and select relevant variables in simulation results to plot. 
+- **[Results Dcumentation and Presentation](@ref results-documentation-and-presentation)** - Demonstrates how to save simulation results in csv or latex format and select relevant variables in simulation results to plot. 
 
 
 

@@ -3,5 +3,3 @@
 
 Demonstrates how to implement continuation power flow using ePowerSim.
 
-
-

@@ -1,5 +1,5 @@
 #=
-# [Example of Ordinary Power Flow with IEEE 5 Bus Test System](@id ieee-5-bus-ordinary-power-flow)
+# [Example of Dynanmics SImulation with IEEE 9 Bus Test System](@id ieee-9-bus-dynamic-simulation)
 =#
 
 #---------------------------------------------------

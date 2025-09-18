@@ -1,5 +1,5 @@
 #=
-# [Example of Ordinary Power Flow with IEEE 5 Bus Test System](@id ieee-5-bus-ordinary-power-flow)
+# [Example of Graph with IEEE 5 Bus Test System](@id ieee-5-graph)
 =#
 
 #---------------------------------------------------

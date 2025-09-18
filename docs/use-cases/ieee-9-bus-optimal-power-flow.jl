@@ -196,7 +196,6 @@ end
 
 #---------------------------------------------------
 
-
 sim_type  = "sim-optimal-powerflow"
 
 cd(script_dir)
