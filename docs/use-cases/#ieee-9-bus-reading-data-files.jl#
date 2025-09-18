@@ -367,14 +367,6 @@ plot_timespan = (0.0, timespan)
 baseMVA = baseMVA_data_from_json
 
 
-
-(; opf_generic_gens_para,) =
-    NamedTupleTools.select(
-        get_pf_streamedlined_simulation_parameters(
-            net_data_by_components_file;
-            components_libs_dir),
-        (:opf_generic_gens_para,))
-
 #----------------------------------------
 # Dynamic components functions
 #----------------------------------------
@@ -466,6 +458,15 @@ ode_gens_generic_para =
             vec_datatype = Float64 ),
         (:ra, :X_d, :X_q,     
          :X_d_dash, :X_q_dash, :Sn) )
+
+#----------------------------------------
+
+(; opf_generic_gens_para,) =
+    NamedTupleTools.select(
+        get_pf_streamedlined_simulation_parameters(
+            net_data_by_components_file;
+            components_libs_dir),
+        (:opf_generic_gens_para,))
 
 #------------------------------------------------
 

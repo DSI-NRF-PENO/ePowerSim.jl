@@ -2958,38 +2958,38 @@ function get_opf_streamedlined_simulation_parameters(
     #------------------------------------------------
 
 
-    # (;edges_orientation,
-    #  edges_Ybr_cal,
-    #  Ybr_cal_and_edges_orientation,
-    #  Ynet_wt_nodes_idx_wt_adjacent_nodes) =
-    #      NamedTupleTools.select(
-    #          get_transmission_network_parameters_by_json(
-    #              plant_generators_data_from_json,
-    #              plant_loads_data_from_json,
-    #              plant_transmission_data_from_json,
-    #              edge_data_from_json,
-    #              shunt_data_from_json;
-    #              baseMVA =
-    #                  baseMVA,
-    #              basekV =
-    #                  basekV,
-    #              use_pu_in_PQ =
-    #                  use_pu_in_PQ,
-    #              line_data_in_pu =
-    #                  line_data_in_pu ),
-    #          (:edges_orientation,
-    #           :edges_Ybr_cal,
-    #           :Ybr_cal_and_edges_orientation,
-    #           :Ynet_wt_nodes_idx_wt_adjacent_nodes))
+    (;edges_orientation,
+     edges_Ybr_cal,
+     Ybr_cal_and_edges_orientation,
+     Ynet_wt_nodes_idx_wt_adjacent_nodes) =
+         NamedTupleTools.select(
+             get_transmission_network_parameters_by_json(
+                 plant_generators_data_from_json,
+                 plant_loads_data_from_json,
+                 plant_transmission_data_from_json,
+                 edge_data_from_json,
+                 shunt_data_from_json;
+                 baseMVA =
+                     baseMVA,
+                 basekV =
+                     basekV,
+                 use_pu_in_PQ =
+                     use_pu_in_PQ,
+                 line_data_in_pu =
+                     line_data_in_pu ),
+             (:edges_orientation,
+              :edges_Ybr_cal,
+              :Ybr_cal_and_edges_orientation,
+              :Ynet_wt_nodes_idx_wt_adjacent_nodes))
     
-    Ynet_wt_nodes_idx_wt_adjacent_nodes = 
-        get_Ynet(
-            edge_data_from_json,
-            shunt_data_from_json;
-            baseMVA = baseMVA,
-            basekV = basekV,
-            baseShunt = baseMVA ,
-            line_data_in_pu = line_data_in_pu)
+    # Ynet_wt_nodes_idx_wt_adjacent_nodes = 
+    #     get_Ynet(
+    #         edge_data_from_json,
+    #         shunt_data_from_json;
+    #         baseMVA = baseMVA,
+    #         basekV = basekV,
+    #         baseShunt = baseMVA ,
+    #         line_data_in_pu = line_data_in_pu)
 
     #------------------------------------------------
     
@@ -3286,7 +3286,7 @@ function get_opf_streamedlined_simulation_parameters(
 
             gens_vh,
             # ds_generic_gens_para,
-            gens_vh_slack_θh_para,
+            # gens_vh_slack_θh_para,
 
             opf_generic_gens_para,
 
