@@ -385,6 +385,14 @@ function clear_fault_Ynet_affect!(
 end
 
 
+function clear_outage_affect!(
+    integrator )
+
+    integrator.p.system_fault_status[1] = 2
+    
+    nothing
+end
+
 #----------------------------------------
 # fault on a line
 #----------------------------------------

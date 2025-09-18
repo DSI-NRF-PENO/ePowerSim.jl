@@ -374,10 +374,6 @@ sim_timespan  = (0.0, timespan)
 plot_timespan = (0.0, timespan)
 
 #---------------------------------------------------
-#---------------------------------------------------
-
-
-#---------------------------------------------------
 ## ntuple_status_steady_state_data
 #---------------------------------------------------
 
@@ -414,148 +410,6 @@ ntuple_status_steady_state_data =
             use_pu_in_PQ,
         line_data_in_pu =
             line_data_in_pu)
-
-
-
-#---------------------------------------------------
-#---------------------------------------------------
-
-
-(s_pf_P_gens,
- s_pf_Q_gens,
- s_vh,
- s_θh,
- s_gens_vh,
- s_gens_θh,
- s_gens_id,
- s_gens_iq,
- 
- s_gens_mag_E,
- s_gens_ang_E,
- s_post_sta_PQ,
- s_Yred,
- s_Yint,
-
- s_ω_ref, s_v_ref, s_p_order,
- s_gens_i_d, s_gens_i_q,
- 
- s_flat_vh_flat_θh_id_iq_u0,
- s_flat_vh_flat_θh_id_iq_vfh_θfh,
- s_gens_δ,
- s_gens_ed_dash,
- s_gens_eq_dash) =
-     NamedTupleTools.select(
-        getproperty(
-            getproperty(
-                ntuple_status_steady_state_data,
-                :pre_fault_state),
-            :static_prefault_paras),
-        (:pf_P_gens,
-         :pf_Q_gens,
-         :vh,
-         :θh,
-         :gens_vh,
-         :gens_θh,
-         :gens_id,
-         :gens_iq,
-         
-         :gens_mag_E,
-         :gens_ang_E,
-         :post_sta_PQ,
-         :Yred,
-         :Yint,
-         
-         :ω_ref, :v_ref, :p_order,
-         :gens_i_d, :gens_i_q,
-         
-         :flat_vh_flat_θh_id_iq_u0,
-         :flat_vh_flat_θh_id_iq_vfh_θfh,
-         :gens_δ,
-         :gens_ed_dash,
-         :gens_eq_dash ) )
-
-
-(f_dyn_pf_P_gens,
- f_dyn_pf_Q_gens,
- f_dyn_vh,
- f_dyn_θh,
- f_dyn_gens_vh,
- f_dyn_gens_θh,
- f_dyn_gens_id,
- f_dyn_gens_iq,
- f_dyn_gens_mag_E,
- f_dyn_gens_ang_E,
- f_post_dyn_PQ,
- f_dyn_Yred,
- f_dyn_Yint,
- f_flat_vh_flat_θh_id_iq_vfh_θfh,
- f_dyn_gens_δ,
- f_dyn_gens_ed_dash,
- f_dyn_gens_eq_dash) =
-     NamedTupleTools.select(
-        getproperty(
-            getproperty(
-                ntuple_status_steady_state_data,
-                :fault_state),
-            :dynamic_status_paras),
-        (:dyn_pf_P_gens,
-         :dyn_pf_Q_gens,
-         :dyn_vh,
-         :dyn_θh,
-         :dyn_gens_vh,
-         :dyn_gens_θh,
-         :dyn_gens_id,
-         :dyn_gens_iq,
-         :dyn_gens_mag_E,
-         :dyn_gens_ang_E,
-         :post_dyn_PQ,
-         :dyn_Yred, :dyn_Yint,
-         :flat_vh_flat_θh_id_iq_vfh_θfh,
-         :dyn_gens_δ,
-         :dyn_gens_ed_dash,
-         :dyn_gens_eq_dash ) )
-
-#----------------------------------------
-
-(p_dyn_pf_P_gens,
- p_dyn_pf_Q_gens,
- p_dyn_vh,
- p_dyn_θh,
- p_dyn_gens_vh,
- p_dyn_gens_θh,
- p_dyn_gens_id,
- p_dyn_gens_iq,
- p_dyn_gens_mag_E,
- p_dyn_gens_ang_E,
- p_post_dyn_PQ,
- p_dyn_Yred,
- p_dyn_Yint,
- p_flat_vh_flat_θh_id_iq_vfh_θfh,
- p_dyn_gens_δ,
- p_dyn_gens_ed_dash,
- p_dyn_gens_eq_dash) =
-     NamedTupleTools.select(
-        getproperty(
-            getproperty(
-                ntuple_status_steady_state_data,
-                :post_fault_state),
-            :dynamic_status_paras),
-        (:dyn_pf_P_gens,
-         :dyn_pf_Q_gens,
-         :dyn_vh,
-         :dyn_θh,
-         :dyn_gens_vh,
-         :dyn_gens_θh,
-         :dyn_gens_id,
-         :dyn_gens_iq,
-         :dyn_gens_mag_E,
-         :dyn_gens_ang_E,
-         :post_dyn_PQ,
-         :dyn_Yred, :dyn_Yint,
-         :flat_vh_flat_θh_id_iq_vfh_θfh,
-         :dyn_gens_δ,
-         :dyn_gens_ed_dash,
-         :dyn_gens_eq_dash) )
 
 #---------------------------------------------------
 #---------------------------------------------------
@@ -771,6 +625,13 @@ plot_dae_dynamics =
 
 #---------------------------------------------------
 
+# plot_dae_dynamics properties
+# (:δ_a_plot, :ω_a_plot, :ed_dash_a_plot,
+#  :eq_dash_a_plot, :vr1_a_plot, :vr2_a_plot,
+#  :vf_tilade_a_plot, :xg1_a_plot, :xg2_a_plot,
+#  :plot_gens_vh, :plot_gens_θh, :plot_non_gens_vh,
+#  :plot_non_gens_θh)
+
 δ_a_plot =
     getproperty(
         plot_dae_dynamics,
@@ -803,30 +664,164 @@ plot_non_gens_θh =
         plot_dae_dynamics,
         :plot_non_gens_θh)
 
-# (:δ_a_plot, :ω_a_plot, :ed_dash_a_plot, :eq_dash_a_plot, :vr1_a_plot, :vr2_a_plot, :vf_tilade_a_plot, :xg1_a_plot, :xg2_a_plot, :plot_gens_vh, :plot_gens_θh, :plot_non_gens_vh, :plot_non_gens_θh)
-
 #---------------------------------------------------
 #---------------------------------------------------
 
+(s_pf_P_gens,
+ s_pf_Q_gens,
+ s_vh,
+ s_θh,
+ s_gens_vh,
+ s_gens_θh,
+ s_gens_id,
+ s_gens_iq,
+ 
+ s_gens_mag_E,
+ s_gens_ang_E,
+ s_post_sta_PQ,
+ s_Yred,
+ s_Yint,
 
+ s_ω_ref, s_v_ref, s_p_order,
+ s_gens_i_d, s_gens_i_q,
+ 
+ s_flat_vh_flat_θh_id_iq_u0,
+ s_flat_vh_flat_θh_id_iq_vfh_θfh,
+ s_gens_δ,
+ s_gens_ed_dash,
+ s_gens_eq_dash) =
+     NamedTupleTools.select(
+        getproperty(
+            getproperty(
+                ntuple_status_steady_state_data,
+                :pre_fault_state),
+            :static_prefault_paras),
+        (:pf_P_gens,
+         :pf_Q_gens,
+         :vh,
+         :θh,
+         :gens_vh,
+         :gens_θh,
+         :gens_id,
+         :gens_iq,
+         
+         :gens_mag_E,
+         :gens_ang_E,
+         :post_sta_PQ,
+         :Yred,
+         :Yint,
+         
+         :ω_ref, :v_ref, :p_order,
+         :gens_i_d, :gens_i_q,
+         
+         :flat_vh_flat_θh_id_iq_u0,
+         :flat_vh_flat_θh_id_iq_vfh_θfh,
+         :gens_δ,
+         :gens_ed_dash,
+         :gens_eq_dash ) )
+
+
+(f_dyn_pf_P_gens,
+ f_dyn_pf_Q_gens,
+ f_dyn_vh,
+ f_dyn_θh,
+ f_dyn_gens_vh,
+ f_dyn_gens_θh,
+ f_dyn_gens_id,
+ f_dyn_gens_iq,
+ f_dyn_gens_mag_E,
+ f_dyn_gens_ang_E,
+ f_post_dyn_PQ,
+ f_dyn_Yred,
+ f_dyn_Yint,
+ f_flat_vh_flat_θh_id_iq_vfh_θfh,
+ f_dyn_gens_δ,
+ f_dyn_gens_ed_dash,
+ f_dyn_gens_eq_dash) =
+     NamedTupleTools.select(
+        getproperty(
+            getproperty(
+                ntuple_status_steady_state_data,
+                :fault_state),
+            :dynamic_status_paras),
+        (:dyn_pf_P_gens,
+         :dyn_pf_Q_gens,
+         :dyn_vh,
+         :dyn_θh,
+         :dyn_gens_vh,
+         :dyn_gens_θh,
+         :dyn_gens_id,
+         :dyn_gens_iq,
+         :dyn_gens_mag_E,
+         :dyn_gens_ang_E,
+         :post_dyn_PQ,
+         :dyn_Yred, :dyn_Yint,
+         :flat_vh_flat_θh_id_iq_vfh_θfh,
+         :dyn_gens_δ,
+         :dyn_gens_ed_dash,
+         :dyn_gens_eq_dash ) )
+
+#----------------------------------------
+
+(p_dyn_pf_P_gens,
+ p_dyn_pf_Q_gens,
+ p_dyn_vh,
+ p_dyn_θh,
+ p_dyn_gens_vh,
+ p_dyn_gens_θh,
+ p_dyn_gens_id,
+ p_dyn_gens_iq,
+ p_dyn_gens_mag_E,
+ p_dyn_gens_ang_E,
+ p_post_dyn_PQ,
+ p_dyn_Yred,
+ p_dyn_Yint,
+ p_flat_vh_flat_θh_id_iq_vfh_θfh,
+ p_dyn_gens_δ,
+ p_dyn_gens_ed_dash,
+ p_dyn_gens_eq_dash) =
+     NamedTupleTools.select(
+        getproperty(
+            getproperty(
+                ntuple_status_steady_state_data,
+                :post_fault_state),
+            :dynamic_status_paras),
+        (:dyn_pf_P_gens,
+         :dyn_pf_Q_gens,
+         :dyn_vh,
+         :dyn_θh,
+         :dyn_gens_vh,
+         :dyn_gens_θh,
+         :dyn_gens_id,
+         :dyn_gens_iq,
+         :dyn_gens_mag_E,
+         :dyn_gens_ang_E,
+         :post_dyn_PQ,
+         :dyn_Yred, :dyn_Yint,
+         :flat_vh_flat_θh_id_iq_vfh_θfh,
+         :dyn_gens_δ,
+         :dyn_gens_ed_dash,
+         :dyn_gens_eq_dash) )
 
 #---------------------------------------------------
 #---------------------------------------------------
 
 
 """
-
 # Possible system_status
 
 system_status = :pre_fault_state,
 system_status = :fault_state
 system_status = :post_fault_state
 
+"""
+
+
+"""
 # outage_type = :line_outage    
 # outage_type = :line_outage_wt_pref_adjs
 # outage_type = :line_outage_wt_vpref_adjs
  
-
 """
 
 line_outage_pertubation_by_mm_ode = 
@@ -841,7 +836,7 @@ sim_line_outage_pertubation_by_mm_ode(
 
     net_data_by_components_file,
 
-    timespan = 50,
+    timespan,
 
     components_libs_dir,
 
@@ -851,149 +846,6 @@ sim_line_outage_pertubation_by_mm_ode(
 
     list_edges_to_have_fault  = [ 8 ],
     clear_fault_selection_list = [1] )
-
-
-#----------------------------------------
-#----------------------------------------
-
-
-list_network_status = 
-            [:pre_fault_state,
-             :post_fault_state]
-
-ntuple_status_steady_state_data =
-    get_ntuple_status_steady_state_data(
-        ;with_faults =
-            with_faults,
-        net_data_by_components_file =
-            net_data_by_components_file,
-        components_libs_dir =
-            components_libs_dir,
-    
-        timespan =
-            timespan,
-        on_fault_time =
-            on_fault_time,
-        clear_fault_time =
-            clear_fault_time,
-    
-        list_fault_point_from_node_a =
-            list_fault_point_from_node_a,
-        list_fault_resistance =
-            list_fault_resistance,
-        list_no_line_circuit =
-            list_no_line_circuit,
-
-        list_edges_to_have_fault =
-            list_edges_to_have_fault,
-        clear_fault_selection_list =
-            clear_fault_selection_list,
-    
-        basekV =
-            basekV,    
-        use_pu_in_PQ =
-            use_pu_in_PQ,
-        line_data_in_pu =
-            line_data_in_pu,
-        list_network_status = 
-            list_network_status )
-
-
-# status_steady_state_parameters =
-#     get_status_steady_state_parameters(
-#         net_data_by_components_file;
-#         components_libs_dir =
-#             components_libs_dir,
-        
-#         basekV = 1.0,
-        
-#         use_pu_in_PQ = true,
-        
-#         line_data_in_pu = true,
-
-#         use_init_u0 = false,    
-#         use_nlsolve = false,
-
-#         pf_alg = NewtonRaphson(),
-
-#         abstol =
-#             abstol,
-        
-#         reltol =
-#             reltol,
-
-#         on_fault_time    =
-#             on_fault_time,
-        
-#         clear_fault_time =
-#             clear_fault_time,
-
-#         list_fault_point_from_node_a =
-#             list_fault_point_from_node_a,
-        
-#         list_fault_resistance =
-#             list_fault_resistance,
-        
-#         list_no_line_circuit =
-#             list_no_line_circuit,
-
-#         list_edges_to_have_fault   =
-#             list_edges_to_have_fault,
-        
-#         clear_fault_selection_list =
-#             clear_fault_selection_list,
-
-#         with_faults = false )
-
-# #----------------------------------------
-
-# #----------------------------------------
-
-# ntuple_status_steady_state_data =
-#     get_ntuple_status_steady_state_data(
-#     ;with_faults = with_faults,
-#     net_data_by_components_file =
-#         net_data_by_components_file,
-#     components_libs_dir =
-#         components_libs_dir,
-    
-#         timespan =
-#             timespan,
-#         on_fault_time =
-#             on_fault_time,
-#         clear_fault_time =
-#             clear_fault_time,
-    
-#         list_fault_point_from_node_a =
-#             list_fault_point_from_node_a,
-#         list_fault_resistance =
-#             list_fault_resistance,
-#         list_no_line_circuit =
-#             list_no_line_circuit,
-
-#         list_edges_to_have_fault =
-#             list_edges_to_have_fault,
-#         clear_fault_selection_list =
-#             clear_fault_selection_list,
-    
-#         basekV =
-#             1.0,    
-#         use_pu_in_PQ =
-#             use_pu_in_PQ,
-#         line_data_in_pu =
-#             line_data_in_pu)
-
-
-# (;sta_pf_red_sol,
-#  dyn_pf_fun_kwd_net_idxs) =
-#     NamedTupleTools.select(
-#         getproperty(
-#             getproperty(
-#                 ntuple_status_steady_state_data,
-#                 :pre_fault_state),
-#             :static_prefault_paras),
-#         (:sta_pf_red_sol,
-#          :dyn_pf_fun_kwd_net_idxs))
 
 #---------------------------------------------------
 #---------------------------------------------------

@@ -170,7 +170,7 @@ json_net_data_by_components_file =
 
 
 
-case_name = "case14"
+case_name = "case5"
 
 
 case_data_dir =
@@ -199,7 +199,7 @@ end
 #---------------------------------------------------
 
 
-sim_type  = "sim-ordinary-powerflow"
+sim_type  = "sim-network-graph"
 
 cd(script_dir)
 
@@ -309,12 +309,13 @@ using GraphRecipes
 G_net_graph = SimpleDiGraph(
     Edge.(edges_orientation))
 
-plt_G_net = graphplot(G_net_graph)
-
 dict_edges_label =
     Dict( a_key => a_value
           for (a_value, a_key) in
               enumerate(edges_orientation))
+
+
+# plt_G_net = graphplot(G_net_graph)
 
 plt_G_net2 = plot(G_net_graph;
                   names=collect(1:nv(G_net_graph)),

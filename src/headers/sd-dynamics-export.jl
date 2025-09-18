@@ -498,6 +498,8 @@ export on_fault_Ynet_affect!
 
 export clear_fault_Ynet_affect!
 
+export clear_outage_affect!
+
 #-------------------------------------------------------
 # simulations
 #-------------------------------------------------------
