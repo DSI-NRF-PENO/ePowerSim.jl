@@ -37,6 +37,7 @@ function get_base_loads(
     return loads_base_dict 
 end
 
+
 function get_base_gens(
     network_data,
     sorted_gens_list)
@@ -62,6 +63,7 @@ function get_base_gens(
     
     return gens_base_dict 
 end
+
 
 function perturb_loads!(
     network_data,
@@ -120,7 +122,7 @@ function destroy_federate(fed)
     @info "Federate destroyed"
 end
 
-################################################################
+
 
 function get_subscriptions(fed)
     
@@ -209,20 +211,30 @@ function get_endpoints(fed)
     
 end
 
-################################################################
 
-function ConvertComplexVectorToDoubleVector(vectorInput::Vector{ComplexF64})
+function ConvertComplexVectorToDoubleVector(
+    vectorInput::Vector{ComplexF64})
+    
     vectorLength = length(vectorInput)
-	doubleVectorInput = Vector{Float64}(undef,0)
-	for cVal in vectorInput
-		push!(doubleVectorInput, cVal.re)
-		push!(doubleVectorInput, cVal.im)
-	end
+    
+    doubleVectorInput =
+        Vector{Float64}(undef,0)
+    for cVal in vectorInput
+        
+	push!(doubleVectorInput, cVal.re)
+        
+        push!(doubleVectorInput, cVal.im)
+        
+    end
+    
    return doubleVectorInput
 end
 
-function ConvertDoubleVectorToComplexVector(vectorInput::Vector{Float64})
+function ConvertDoubleVectorToComplexVector(
+    vectorInput::Vector{Float64})
+    
     complexVector = Vector{ComplexF64}(undef, 0)
+    
     for i in 1:length(vectorInput)
         if 2*i <= length(vectorInput)
 	    push!(complexVector, vectorInput[2*i - 1] + 1im * vectorInput[2*i])
@@ -232,34 +244,60 @@ function ConvertDoubleVectorToComplexVector(vectorInput::Vector{Float64})
 end
 
 
-function a_results_to_file(results_dir, element_name, a_result_dict, sim_time_array, sorted_elements_list)
+function a_results_to_file(
+    results_dir, element_name,
+    a_result_dict,
+    sim_time_array,
+    sorted_elements_list)
 
     # I need to check if the element dict is empty
     key_test = collect(keys(a_result_dict))[1]
     
     if length(collect(keys(a_result_dict[key_test]))) !=0
-        element_results_dict_key_list = keys(a_result_dict)
+        
+        element_results_dict_key_list =
+            keys(a_result_dict)
 
         for a_variable in element_results_dict_key_list
-            time_sim_and_element_results_dict = OrderedDict{String, Vector{Float64}}()
-            time_sim_and_element_results_dict["time_sim"] = sim_time_array
+            
+            time_sim_and_element_results_dict =
+                OrderedDict{String, Vector{Float64}}()
+            
+            time_sim_and_element_results_dict["time_sim"] =
+                sim_time_array
 
             for key in sorted_elements_list
-                time_sim_and_element_results_dict["$(element_name)_$(key)"] =  a_result_dict[a_variable][key]
+                
+                time_sim_and_element_results_dict[
+                    "$(element_name)_$(key)"] =
+                        a_result_dict[a_variable][key]
             end
 
-            element_df = DataFrame(time_sim_and_element_results_dict)
+            element_df =
+                DataFrame(time_sim_and_element_results_dict)
 
-            element_filename = "$(element_name)-$(a_variable).csv"
-            result_csv_file = joinpath(results_dir, element_filename) 
+            element_filename =
+                "$(element_name)-$(a_variable).csv"
+            
+            result_csv_file =
+                joinpath(results_dir,
+                         element_filename)
+            
             CSV.write(result_csv_file, element_df)
         end
     end
 end
 
-function a_results_to_file(results_dir, filename, results_df)
 
-    result_csv_file = joinpath(results_dir, filename) 
+function a_results_to_file(
+    results_dir,
+    filename,
+    results_df)
+
+    result_csv_file =
+        joinpath(results_dir,
+                 filename)
+    
     CSV.write(result_csv_file, results_df)
     
 end

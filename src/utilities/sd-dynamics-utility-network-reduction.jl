@@ -169,12 +169,16 @@ end
 #-------------------------------------------------------
 
 """
-reduced order matrices,
+    get_Y_aug_matrices(
+        pf_PQ_param,
+        vh;
+        y_aug_kw_para =
+            y_aug_kw_para  )
+
+
+Returns reduced order matrices.
 
 """
-
-#-------------------------------------------------------
-
 function get_Y_aug_matrices(
     pf_PQ_param,
     vh;

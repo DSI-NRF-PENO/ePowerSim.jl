@@ -1,5 +1,5 @@
 #=
-# [Example of Distributed Slack Power Flow with IEEE 14 Bus Test System] (@id ieee-14-bus-distributed-slack-power-flow)
+# [Example of Distributed Slack Power Flow with IEEE 9 Bus Test System] (@id ieee-9-bus-distributed-slack-power-flow)
 =#
 
 
@@ -187,9 +187,7 @@ json_net_data_by_components_file =
 
 #---------------------------------------------------
 
-# case_name = "case9"
-
-case_name = "case14"
+case_name = "case9"
 
 # This ensures a lowercase name
 

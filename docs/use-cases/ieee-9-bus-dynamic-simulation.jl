@@ -2,6 +2,7 @@
 # [Example of Dynanmics SImulation with IEEE 9 Bus Test System](@id ieee-9-bus-dynamic-simulation)
 =#
 
+
 #---------------------------------------------------
 #---------------------------------------------------
 
@@ -263,9 +264,35 @@ with_faults     = false
 pf_alg      = NewtonRaphson()
 
 
+ode_alg     = Rodas4()
+
+dae_alg     = IDA()
+
+
 abstol      = 1e-12
 
 reltol      = 1e-12
+
+
+#---------------------------------------------------
+
+
+sim_duration  = 20.0
+
+
+
+timespan      =
+     sim_duration 
+
+time_start    = 0.0
+
+time_final    = timespan
+
+tspan         = (0.0, timespan)
+
+sim_timespan  = (0.0, timespan)
+
+plot_timespan = (0.0, timespan)
 
 
 #---------------------------------------------------
@@ -436,7 +463,8 @@ model_dynamics_para =
 
 
 dae_model_dynamics_kwd_para =
-    dae_generic_model_kwd_para
+    generic_system_dynamics_kwd_para
+    # dae_generic_model_kwd_para
 
 
 DAE_system_dynamics_fun! =
@@ -463,7 +491,7 @@ system_sol =
     differential_vars =
         model_bool_dae_vars ),
         dae_alg,
-        callback = cb,
+        callback = cb_states,
         abstol   = abstol,
         reltol   = reltol )
 
@@ -497,6 +525,13 @@ plot_dae_dynamics =
 r_δ_a_plot = getproperty(
     plot_dae_dynamics,
     :δ_a_plot)
+
+
+r_ω_a_plot = getproperty(
+    plot_dae_dynamics,
+    :ω_a_plot)
+
+
 
 sol_auxilliary_results = 
     get_sol_auxilliary_results(
@@ -595,7 +630,8 @@ model_dynamics_para =
       plants_cb_paras_switches)
 
 dae_model_dynamics_kwd_para =
-    dae_generic_model_dynamics_kwd_para
+    generic_system_dynamics_kwd_para
+    # dae_generic_model_dynamics_kwd_para
 
 
 DAE_system_dynamics_fun! =
@@ -648,7 +684,8 @@ model_dynamics_para =
         ω_ref_v_ref_p_order_Png_Qng_Pll_Qll
 
 model_dynamics_kwd_para =
-    mm_generic_model_kwd_para
+    generic_system_dynamics_kwd_para
+    # mm_generic_model_kwd_para
 
 mm_ODE_system_dynamics_fun! =
     mm_ode_generic_system_dynamics_by_ode_pf_funcs!
@@ -694,7 +731,8 @@ model_dynamics_para =
       plants_cb_paras_switches)
 
 model_dynamics_kwd_para =
-    mm_generic_model_kwd_para
+    generic_system_dynamics_kwd_para
+    # mm_generic_model_kwd_para
 
 ##
 mm_ODE_system_dynamics_fun! =
@@ -832,7 +870,8 @@ model_dynamics_para =
       plants_cb_paras_switches)
 
 model_dynamics_kwd_para =
-    ode_generic_model_dynamics_kwd_para
+    generic_system_dynamics_kwd_para
+    # ode_generic_model_dynamics_kwd_para
 
 ODE_system_dynamics_fun! =
     ode_generic_system_model_by_funcs_dynamics!

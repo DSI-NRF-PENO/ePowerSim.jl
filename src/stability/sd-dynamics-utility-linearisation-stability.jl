@@ -1688,539 +1688,6 @@ function get_generic_Asys_linearised_dynamic_model(
 end
 
 
-
-"""
-Seems not to be providing correct answer
-"""
-function test_get_generic_linearised_dynamic_model(
-    sol,
-    tt,
-    ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
-    nothing;
-    use_init_condition =
-        false,
-    kwd_para =
-        linearised_dynamic_kwd_para )
-
-    if use_init_condition == true
-
-        sol_t = sol
-    else
-        sol_t = sol(tt)
-    end
-
-    (;loc_load_exist,
-
-     pf_generic_gens_para,         
-     Ynet_wt_nodes_idx_wt_adjacent_nodes,
-     
-     state_vars_and_i_dq_Idx_in_state,
-     state_algebraic_vars_Idx_in_state,
-     gens_state_vars_idx_in_state,
-     
-     dyn_pf_flat_vh_flat_θh_id_iq_Idx,
-     
-     dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
-     dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
-     
-     dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
-     
-     dyn_pf_fun_kwd_net_idxs,
-     dyn_pf_fun_kwd_n2s_idxs,
-
-     ode_plants_kwd_para) =
-         kwd_para
-
-    #----------------------------------------
-    
-    algebraic_generic_model_kwd_para =
-        (;loc_load_exist,
-                  
-         dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
-         
-         dyn_pf_flat_vh_flat_θh_id_iq_Idx,
-
-         dyn_pf_fun_kwd_n2s_idxs,
-         dyn_pf_fun_kwd_net_idxs,
-
-         pf_generic_gens_para,
-         
-         Ynet_wt_nodes_idx_wt_adjacent_nodes )    
-
-    #----------------------------------------
-    
-    # (;loc_load_exist,
-     
-    #  state_vars_and_i_dq_Idx_in_state,
-    #  state_algebraic_vars_Idx_in_state,
-    #  gens_state_vars_idx_in_state,
-     
-    #  dyn_pf_flat_vh_flat_θh_id_iq_Idx,
-     
-    #  dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
-    #  dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
-    #  dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
-    #  dyn_pf_fun_kwd_net_idxs,
-    #  dyn_pf_fun_kwd_n2s_idxs,
-
-    #  ode_plants_kwd_para) =
-    #      kwd_para
-
-    #----------------------------------------
-    
-        (;state_var_Idx_in_state,
-         vh_Idx_in_state,
-         θh_Idx_in_state,
-         id_Idx_in_state,
-         iq_Idx_in_state) = NamedTupleTools.select(
-             state_vars_and_i_dq_Idx_in_state,
-                 (:state_var_Idx_in_state,
-                  :vh_Idx_in_state,
-                  :θh_Idx_in_state,
-                  :id_Idx_in_state,
-                  :iq_Idx_in_state))
-    
-    (;state_var_Idx_in_state,
-     algebraic_var_Idx_in_state ) =
-         NamedTupleTools.select(
-             state_algebraic_vars_Idx_in_state,
-             (:state_var_Idx_in_state,
-              :algebraic_var_Idx_in_state))
-    
-    (δ_idx_in_state,
-     ed_dash_idx_in_state,
-     eq_dash_idx_in_state ) =
-         NamedTupleTools.select(
-             gens_state_vars_idx_in_state,
-             (:δ_idx_in_state,
-              :ed_dash_idx_in_state,
-              :eq_dash_idx_in_state))
-    
-    (;dyn_ω_ref_Idx,
-     dyn_v_ref_Idx,
-     dyn_p_order_Idx,
-     dyn_Png_Idx,
-     dyn_Qng_Idx,
-     dyn_Pll_Idx,
-     dyn_Qll_Idx ) =
-         NamedTupleTools.select(
-             dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
-             (:dyn_ω_ref_Idx,
-              :dyn_v_ref_Idx,
-              :dyn_p_order_Idx,
-              :dyn_Png_Idx,
-              :dyn_Qng_Idx,
-              :dyn_Pll_Idx,
-              :dyn_Qll_Idx))
-
-    #----------------------------------------    
-    
-    (f_ωref0_Idx,
-     f_vref0_Idx,
-     f_porder0_Idx,
-     f_id_Idx,
-     f_iq_Idx,
-     f_vg_Idx ) =
-         NamedTupleTools.select(
-             dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
-             (:dyn_ωref0_Idx,
-              :dyn_vref0_Idx,
-              :dyn_porder0_Idx,
-              :dyn_id_Idx,
-              :dyn_iq_Idx,
-              :dyn_vh_Idx))
-    
-    #----------------------------------------    
-
-    (;
-     dyn_pf_vh_Idxs,
-     dyn_pf_θh_Idxs,       
-     dyn_pf_id_Idxs,
-     dyn_pf_iq_Idxs) =
-         NamedTupleTools.select(
-             dyn_pf_flat_vh_flat_θh_id_iq_Idx,
-             (:dyn_pf_vh_Idxs,
-              :dyn_pf_θh_Idxs,       
-              :dyn_pf_id_Idxs,
-              :dyn_pf_iq_Idxs ))
-
-    (
-     dyn_δ_Idxs,
-     dyn_ed_dash_Idxs,       
-     dyn_eq_dash_Idxs,
-     
-     dyn_P_non_gens_Idxs,
-     dyn_Q_non_gens_Idxs,       
-     dyn_P_gens_loc_load_Idxs,
-     dyn_Q_gens_loc_load_Idxs) =
-         NamedTupleTools.select(
-             dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx ,
-             (:dyn_δ_Idx,
-              :dyn_ed_dash_Idx,       
-              :dyn_eq_dash_Idx,
-              
-              :dyn_Png_Idx,
-              :dyn_Qng_Idx,
-              :dyn_Pll_Idx,
-              :dyn_Qll_Idx))
-    
-    #----------------------------------------    
-
-    (slack_gens_nodes_idx,
-     gens_nodes_idx,
-     non_gens_nodes_idx,
-     gens_nodes_with_loc_loads_idx,
-     all_nodes_idx) =
-         NamedTupleTools.select(
-             dyn_pf_fun_kwd_net_idxs,
-             (:slack_gens_nodes_idx,
-              :gens_nodes_idx,
-              :non_gens_nodes_idx,
-              :gens_nodes_with_loc_loads_idx,
-              :all_nodes_idx))
-
-    (;n2s_slack_gens_idx,
-     n2s_gens_idx,
-    n2s_non_gens_idx,
-    n2s_gens_with_loc_load_idxs,
-    n2s_all_nodes_idx ) =
-        NamedTupleTools.select(
-            dyn_pf_fun_kwd_n2s_idxs,
-            (:n2s_slack_gens_idx,
-             :n2s_gens_idx,
-             :n2s_non_gens_idx,
-             :n2s_gens_with_loc_load_idxs,
-             :n2s_all_nodes_idx))
-    
-    #----------------------------------------        
-    #----------------------------------------    
-
-    f_u_idx = first(f_ωref0_Idx):last(f_porder0_Idx)
-    
-    f_i_dq_idx = first(f_id_Idx):last(f_iq_Idx)
-
-    
-    #----------------------------------------    
-
-    g_vθ_idx =
-        first(dyn_pf_vh_Idxs):last(dyn_pf_θh_Idxs)
-
-    g_i_dq_idx =
-        first(dyn_pf_id_Idxs):last(dyn_pf_iq_Idxs)
-    
-    vθ_g_idx  =
-        [dyn_pf_vh_Idxs[gens_nodes_idx];
-         dyn_pf_θh_Idxs[gens_nodes_idx]]
-    
-    vθ_ng_idx =
-        [dyn_pf_vh_Idxs[non_gens_nodes_idx];
-         dyn_pf_θh_Idxs[non_gens_nodes_idx]]
-
-    ###
-    
-    g_rows_P_idx = dyn_pf_vh_Idxs
-    g_rows_Q_idx = dyn_pf_θh_Idxs
-    
-    g_rows_P_g_idx = g_rows_P_idx[gens_nodes_idx]
-    g_rows_Q_g_idx = g_rows_Q_idx[gens_nodes_idx]
-    
-    g_rows_P_ng_idx = g_rows_P_idx[non_gens_nodes_idx]
-    g_rows_Q_ng_idx = g_rows_Q_idx[non_gens_nodes_idx]
-
-    g_rows_idq_idx =
-        first(dyn_pf_id_Idxs):last(dyn_pf_iq_Idxs)
-    
-    #----------------------------------------    
-
-    g_x_δ_edash_idx =
-        first(dyn_δ_Idxs):last(dyn_eq_dash_Idxs)
-    
-    g_PQ_ng_idx = 
-        first(dyn_P_non_gens_Idxs):last(
-            dyn_Q_non_gens_Idxs)
-
-    g_PQll_idx = loc_load_exist == true ? 
-        (first(dyn_P_gens_loc_load_Idxs):last(
-            dyn_Q_gens_loc_load_Idxs)) : []
-
-    #----------------------------------------    
-
-    δ_ed_dash_eq_dash_idx_in_state =
-        [δ_idx_in_state;
-         ed_dash_idx_in_state;
-         eq_dash_idx_in_state ]
-
-    #----------------------------------------    
-
-    # dyn_pf_vh_Idxs
-    # dyn_pf_θh_Idxs
-    # dyn_pf_id_Idxs
-    # dyn_pf_iq_Idxs
-
-    # slack_gens_nodes_idx
-    
-    # gens_nodes_idx
-    
-    # non_gens_nodes_idx
-
-    dyn_pf_gens_vh_Idxs =
-        dyn_pf_vh_Idxs[gens_nodes_idx]
-
-    dyn_pf_non_gens_vh_Idxs =
-        dyn_pf_vh_Idxs[non_gens_nodes_idx]
-
-    dyn_pf_slack_θh_Idxs =
-        dyn_pf_θh_Idxs[slack_gens_nodes_idx]
-
-    dyn_pf_non_slack_θh_Idxs =
-        setdiff(collect(dyn_pf_θh_Idxs),
-                dyn_pf_θh_Idxs[slack_gens_nodes_idx] )
-    
-    JLF_idx = [dyn_pf_non_gens_vh_Idxs ;
-               dyn_pf_non_slack_θh_Idxs]
-    
-    algeb_by_state_link_cols_idx =
-        [dyn_pf_gens_vh_Idxs;
-         # dyn_pf_slack_θh_Idxs;
-         dyn_pf_id_Idxs;
-         dyn_pf_iq_Idxs]
-
-    # δ_ed_dash_eq_dash_idx_in_state
-    state_by_algeb_link_cols_idx =
-        [δ_idx_in_state;
-         ed_dash_idx_in_state;
-         eq_dash_idx_in_state]
-    
-    #----------------------------------------    
-    #----------------------------------------
-
-    vh  =  sol_t[ vh_Idx_in_state]
-    
-    θh  =  sol_t[ θh_Idx_in_state]
-    
-    gens_i_d =  sol_t[id_Idx_in_state]
-    
-    gens_i_q =  sol_t[iq_Idx_in_state]
-
-
-    #----------------------------------------
-    
-    gens_vh =
-        vh[ gens_nodes_idx ]
-    
-    #----------------------------------------
-        
-    gens_δ = sol_t[
-        δ_idx_in_state]
-        
-    gens_ed_dash = sol_t[
-        ed_dash_idx_in_state]
-    
-    gens_eq_dash = sol_t[
-        eq_dash_idx_in_state]    
-
-    #----------------------------------------
-    #----------------------------------------
-    
-    ω_ref =
-        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
-            dyn_ω_ref_Idx]
-    
-    v_ref =
-        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
-            dyn_v_ref_Idx]
-    
-    p_order =
-        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
-            dyn_p_order_Idx]
-    
-    P_non_gens =
-        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
-            dyn_Png_Idx]
-    
-    Q_non_gens =
-        ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
-            dyn_Qng_Idx]
-    
-    if loc_load_exist == true
-        
-        P_g_loc_load =
-            ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
-                dyn_Pll_Idx]
-        
-        Q_g_loc_load =
-            ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
-                dyn_Qll_Idx]        
-    else
-
-        P_g_loc_load  = []
-        
-        Q_g_loc_load  = []
-        
-    end
-
-    #----------------------------------------
-    
-    N_g  = length(gens_nodes_idx)
-    N_ng = length(non_gens_nodes_idx)
-    
-    #----------------------------------------
-    
-    ωref_vref_porder0_id_iq_vh =
-        Float64[ω_ref;
-         v_ref;
-         p_order;
-         gens_i_d;
-         gens_i_q;
-         gens_vh ]
-
-
-    #----------------------------------------    
-
-    δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para =
-        Float64[gens_δ;
-         gens_ed_dash;
-         gens_eq_dash;
-         P_non_gens;
-         Q_non_gens;
-         P_g_loc_load;
-         Q_g_loc_load]
-
-    #----------------------------------------    
-
-    f_x  = sol_t[
-        state_var_Idx_in_state]
-    
-    f_dx = similar(f_x)
-
-    g_y = sol_t[
-        algebraic_var_Idx_in_state]
-
-    g_dy = similar(g_y)
-
-    #----------------------------------------
-    
-    ∂f∂x = ForwardDiff.jacobian(
-        (dx, x ) -> ode_gens_plants_generic_model_func!(
-            dx, x,
-            ωref_vref_porder0_id_iq_vh,
-            tt;
-            kwd_para =
-                    ode_plants_kwd_para ),
-        f_dx, f_x )
-
-    
-    ∂f∂p = ForwardDiff.jacobian(
-        (dx, p ) -> ode_gens_plants_generic_model_func!(
-            dx, f_x, p, tt;
-            kwd_para =
-                    ode_plants_kwd_para ),
-        f_dx, ωref_vref_porder0_id_iq_vh )
-    
-    #----------------------------------------
-    
-    ∂g∂y = ForwardDiff.jacobian(
-        (dy, y ) -> algebraic_generic_pf_ΔPQ_mismatch!(
-            dy, y,
-            δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
-            kwd_para =
-                    algebraic_generic_model_kwd_para ),
-        g_dy, g_y )
-
-    
-    ∂g∂p = ForwardDiff.jacobian(
-        (dy, p ) -> algebraic_generic_pf_ΔPQ_mismatch!(
-            dy, g_y, p;
-            kwd_para = algebraic_generic_model_kwd_para
-                     ),
-        g_dy, δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para )
-
-    #----------------------------------------
-
-    a =  ∂g∂p[g_rows_P_ng_idx, g_PQ_ng_idx]\
-            ∂g∂y[g_rows_P_ng_idx, vθ_g_idx ] 
-    
-    b = ∂g∂p[g_rows_P_ng_idx, g_PQ_ng_idx]\
-            ∂g∂y[g_rows_P_ng_idx, vθ_ng_idx ] 
-    
-    c = ∂g∂y[g_rows_Q_ng_idx, vθ_g_idx] -
-        ∂g∂p[g_rows_Q_ng_idx, g_PQ_ng_idx ] * a
-    
-    d = ∂g∂y[g_rows_Q_ng_idx, vθ_ng_idx] -
-        ∂g∂p[g_rows_Q_ng_idx, g_PQ_ng_idx ] * b
-
-
-    e =  ∂g∂y[g_rows_idq_idx, g_i_dq_idx]\
-            ∂g∂y[g_rows_idq_idx, vθ_g_idx ] 
-
-
-    f =  ∂g∂y[g_rows_idq_idx, g_i_dq_idx]\
-            ∂g∂p[g_rows_idq_idx, g_x_δ_edash_idx ] 
-
-    h = ∂g∂y[g_rows_P_g_idx, vθ_g_idx ] -
-        ∂g∂y[g_rows_P_g_idx, vθ_ng_idx ] * (d\c) -
-        ∂g∂y[g_rows_P_g_idx, g_i_dq_idx ] * e
-
-    i = ∂g∂p[g_rows_P_g_idx, g_x_δ_edash_idx ] -
-        ∂g∂y[g_rows_P_g_idx, g_i_dq_idx ] * f
-
-    j = ∂g∂y[g_rows_Q_g_idx, vθ_g_idx] -
-        ∂g∂y[g_rows_Q_g_idx, vθ_ng_idx] * (d\c) -
-        ∂g∂y[g_rows_Q_g_idx, g_i_dq_idx] * e
-
-    k = ∂g∂p[g_rows_Q_g_idx, g_x_δ_edash_idx ] -
-        ∂g∂y[g_rows_Q_g_idx, g_i_dq_idx] * f
-
-    l = loc_load_exist == true ? (
-        h - ∂g∂p[g_rows_P_g_idx, g_PQll_idx ] * (
-            ∂g∂p[g_rows_Q_g_idx, g_PQll_idx ] \ j) ) :
-                j # j + h
-    
-    m = loc_load_exist == true ? (
-        i - ∂g∂p[g_rows_P_g_idx, g_PQll_idx ] * (
-            ∂g∂p[g_rows_Q_g_idx, g_PQll_idx ] \ k) ) :
-                k # k + i
-
-    N = (l\m)
-
-    Γ = ∂f∂p[:, f_i_dq_idx] * (e * N - f) -
-        ∂f∂p[:, f_vg_Idx] * N[ 1:N_g, :]
-
-    # Asys = ∂f∂x[state_var_Idx_in_state,
-    #             state_var_Idx_in_state ]
-
-    Asys = copy(∂f∂x)
-    
-    #
-    Asys[:,  δ_ed_dash_eq_dash_idx_in_state] .=
-        Asys[:, δ_ed_dash_eq_dash_idx_in_state] + Γ
-
-    # Asys[:, g_x_δ_edash_idx] =
-    #     Asys[:, g_x_δ_edash_idx] + Γ
-    
-    Λ = ∂f∂u =  ∂f∂p[:, f_u_idx]
-    
-    #----------------------------------------
-
-    # Δ⨰ = Asys Δx + Λ Δu
-    
-    # where Δu = Δωref0_vref0_porder0
-    
-    #----------------------------------------
-    #----------------------------------------
-
-    sys_eigvalues = eigvals(Asys)
-
-    printed_sys_eigvalues =
-        round.( sys_eigvalues; digits = 4 )
-    
-    return (; Asys,  Λ,
-            sys_eigvalues,
-            printed_sys_eigvalues )
-    
-end
-
-
 function get_generic_linearised_dynamic_model(
     sol,
     tt,
@@ -3801,3 +3268,537 @@ end
 
 #-------------------------------------------------------
 #-------------------------------------------------------
+
+
+
+# """
+# Seems not to be providing correct answer
+# """
+# function test_get_generic_linearised_dynamic_model(
+#     sol,
+#     tt,
+#     ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+#     nothing;
+#     use_init_condition =
+#         false,
+#     kwd_para =
+#         linearised_dynamic_kwd_para )
+
+#     if use_init_condition == true
+
+#         sol_t = sol
+#     else
+#         sol_t = sol(tt)
+#     end
+
+#     (;loc_load_exist,
+
+#      pf_generic_gens_para,         
+#      Ynet_wt_nodes_idx_wt_adjacent_nodes,
+     
+#      state_vars_and_i_dq_Idx_in_state,
+#      state_algebraic_vars_Idx_in_state,
+#      gens_state_vars_idx_in_state,
+     
+#      dyn_pf_flat_vh_flat_θh_id_iq_Idx,
+     
+#      dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
+#      dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+     
+#      dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
+     
+#      dyn_pf_fun_kwd_net_idxs,
+#      dyn_pf_fun_kwd_n2s_idxs,
+
+#      ode_plants_kwd_para) =
+#          kwd_para
+
+#     #----------------------------------------
+    
+#     algebraic_generic_model_kwd_para =
+#         (;loc_load_exist,
+                  
+#          dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
+         
+#          dyn_pf_flat_vh_flat_θh_id_iq_Idx,
+
+#          dyn_pf_fun_kwd_n2s_idxs,
+#          dyn_pf_fun_kwd_net_idxs,
+
+#          pf_generic_gens_para,
+         
+#          Ynet_wt_nodes_idx_wt_adjacent_nodes )    
+
+#     #----------------------------------------
+    
+#     # (;loc_load_exist,
+     
+#     #  state_vars_and_i_dq_Idx_in_state,
+#     #  state_algebraic_vars_Idx_in_state,
+#     #  gens_state_vars_idx_in_state,
+     
+#     #  dyn_pf_flat_vh_flat_θh_id_iq_Idx,
+     
+#     #  dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx,
+#     #  dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+#     #  dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
+#     #  dyn_pf_fun_kwd_net_idxs,
+#     #  dyn_pf_fun_kwd_n2s_idxs,
+
+#     #  ode_plants_kwd_para) =
+#     #      kwd_para
+
+#     #----------------------------------------
+    
+#         (;state_var_Idx_in_state,
+#          vh_Idx_in_state,
+#          θh_Idx_in_state,
+#          id_Idx_in_state,
+#          iq_Idx_in_state) = NamedTupleTools.select(
+#              state_vars_and_i_dq_Idx_in_state,
+#                  (:state_var_Idx_in_state,
+#                   :vh_Idx_in_state,
+#                   :θh_Idx_in_state,
+#                   :id_Idx_in_state,
+#                   :iq_Idx_in_state))
+    
+#     (;state_var_Idx_in_state,
+#      algebraic_var_Idx_in_state ) =
+#          NamedTupleTools.select(
+#              state_algebraic_vars_Idx_in_state,
+#              (:state_var_Idx_in_state,
+#               :algebraic_var_Idx_in_state))
+    
+#     (δ_idx_in_state,
+#      ed_dash_idx_in_state,
+#      eq_dash_idx_in_state ) =
+#          NamedTupleTools.select(
+#              gens_state_vars_idx_in_state,
+#              (:δ_idx_in_state,
+#               :ed_dash_idx_in_state,
+#               :eq_dash_idx_in_state))
+    
+#     (;dyn_ω_ref_Idx,
+#      dyn_v_ref_Idx,
+#      dyn_p_order_Idx,
+#      dyn_Png_Idx,
+#      dyn_Qng_Idx,
+#      dyn_Pll_Idx,
+#      dyn_Qll_Idx ) =
+#          NamedTupleTools.select(
+#              dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+#              (:dyn_ω_ref_Idx,
+#               :dyn_v_ref_Idx,
+#               :dyn_p_order_Idx,
+#               :dyn_Png_Idx,
+#               :dyn_Qng_Idx,
+#               :dyn_Pll_Idx,
+#               :dyn_Qll_Idx))
+
+#     #----------------------------------------    
+    
+#     (f_ωref0_Idx,
+#      f_vref0_Idx,
+#      f_porder0_Idx,
+#      f_id_Idx,
+#      f_iq_Idx,
+#      f_vg_Idx ) =
+#          NamedTupleTools.select(
+#              dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
+#              (:dyn_ωref0_Idx,
+#               :dyn_vref0_Idx,
+#               :dyn_porder0_Idx,
+#               :dyn_id_Idx,
+#               :dyn_iq_Idx,
+#               :dyn_vh_Idx))
+    
+#     #----------------------------------------    
+
+#     (;
+#      dyn_pf_vh_Idxs,
+#      dyn_pf_θh_Idxs,       
+#      dyn_pf_id_Idxs,
+#      dyn_pf_iq_Idxs) =
+#          NamedTupleTools.select(
+#              dyn_pf_flat_vh_flat_θh_id_iq_Idx,
+#              (:dyn_pf_vh_Idxs,
+#               :dyn_pf_θh_Idxs,       
+#               :dyn_pf_id_Idxs,
+#               :dyn_pf_iq_Idxs ))
+
+#     (
+#      dyn_δ_Idxs,
+#      dyn_ed_dash_Idxs,       
+#      dyn_eq_dash_Idxs,
+     
+#      dyn_P_non_gens_Idxs,
+#      dyn_Q_non_gens_Idxs,       
+#      dyn_P_gens_loc_load_Idxs,
+#      dyn_Q_gens_loc_load_Idxs) =
+#          NamedTupleTools.select(
+#              dyn_δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_Idx ,
+#              (:dyn_δ_Idx,
+#               :dyn_ed_dash_Idx,       
+#               :dyn_eq_dash_Idx,
+              
+#               :dyn_Png_Idx,
+#               :dyn_Qng_Idx,
+#               :dyn_Pll_Idx,
+#               :dyn_Qll_Idx))
+    
+#     #----------------------------------------    
+
+#     (slack_gens_nodes_idx,
+#      gens_nodes_idx,
+#      non_gens_nodes_idx,
+#      gens_nodes_with_loc_loads_idx,
+#      all_nodes_idx) =
+#          NamedTupleTools.select(
+#              dyn_pf_fun_kwd_net_idxs,
+#              (:slack_gens_nodes_idx,
+#               :gens_nodes_idx,
+#               :non_gens_nodes_idx,
+#               :gens_nodes_with_loc_loads_idx,
+#               :all_nodes_idx))
+
+#     (;n2s_slack_gens_idx,
+#      n2s_gens_idx,
+#     n2s_non_gens_idx,
+#     n2s_gens_with_loc_load_idxs,
+#     n2s_all_nodes_idx ) =
+#         NamedTupleTools.select(
+#             dyn_pf_fun_kwd_n2s_idxs,
+#             (:n2s_slack_gens_idx,
+#              :n2s_gens_idx,
+#              :n2s_non_gens_idx,
+#              :n2s_gens_with_loc_load_idxs,
+#              :n2s_all_nodes_idx))
+    
+#     #----------------------------------------        
+#     #----------------------------------------    
+
+#     f_u_idx = first(f_ωref0_Idx):last(f_porder0_Idx)
+    
+#     f_i_dq_idx = first(f_id_Idx):last(f_iq_Idx)
+
+    
+#     #----------------------------------------    
+
+#     g_vθ_idx =
+#         first(dyn_pf_vh_Idxs):last(dyn_pf_θh_Idxs)
+
+#     g_i_dq_idx =
+#         first(dyn_pf_id_Idxs):last(dyn_pf_iq_Idxs)
+    
+#     vθ_g_idx  =
+#         [dyn_pf_vh_Idxs[gens_nodes_idx];
+#          dyn_pf_θh_Idxs[gens_nodes_idx]]
+    
+#     vθ_ng_idx =
+#         [dyn_pf_vh_Idxs[non_gens_nodes_idx];
+#          dyn_pf_θh_Idxs[non_gens_nodes_idx]]
+
+#     ###
+    
+#     g_rows_P_idx = dyn_pf_vh_Idxs
+#     g_rows_Q_idx = dyn_pf_θh_Idxs
+    
+#     g_rows_P_g_idx = g_rows_P_idx[gens_nodes_idx]
+#     g_rows_Q_g_idx = g_rows_Q_idx[gens_nodes_idx]
+    
+#     g_rows_P_ng_idx = g_rows_P_idx[non_gens_nodes_idx]
+#     g_rows_Q_ng_idx = g_rows_Q_idx[non_gens_nodes_idx]
+
+#     g_rows_idq_idx =
+#         first(dyn_pf_id_Idxs):last(dyn_pf_iq_Idxs)
+    
+#     #----------------------------------------    
+
+#     g_x_δ_edash_idx =
+#         first(dyn_δ_Idxs):last(dyn_eq_dash_Idxs)
+    
+#     g_PQ_ng_idx = 
+#         first(dyn_P_non_gens_Idxs):last(
+#             dyn_Q_non_gens_Idxs)
+
+#     g_PQll_idx = loc_load_exist == true ? 
+#         (first(dyn_P_gens_loc_load_Idxs):last(
+#             dyn_Q_gens_loc_load_Idxs)) : []
+
+#     #----------------------------------------    
+
+#     δ_ed_dash_eq_dash_idx_in_state =
+#         [δ_idx_in_state;
+#          ed_dash_idx_in_state;
+#          eq_dash_idx_in_state ]
+
+#     #----------------------------------------    
+
+#     # dyn_pf_vh_Idxs
+#     # dyn_pf_θh_Idxs
+#     # dyn_pf_id_Idxs
+#     # dyn_pf_iq_Idxs
+
+#     # slack_gens_nodes_idx
+    
+#     # gens_nodes_idx
+    
+#     # non_gens_nodes_idx
+
+#     dyn_pf_gens_vh_Idxs =
+#         dyn_pf_vh_Idxs[gens_nodes_idx]
+
+#     dyn_pf_non_gens_vh_Idxs =
+#         dyn_pf_vh_Idxs[non_gens_nodes_idx]
+
+#     dyn_pf_slack_θh_Idxs =
+#         dyn_pf_θh_Idxs[slack_gens_nodes_idx]
+
+#     dyn_pf_non_slack_θh_Idxs =
+#         setdiff(collect(dyn_pf_θh_Idxs),
+#                 dyn_pf_θh_Idxs[slack_gens_nodes_idx] )
+    
+#     JLF_idx = [dyn_pf_non_gens_vh_Idxs ;
+#                dyn_pf_non_slack_θh_Idxs]
+    
+#     algeb_by_state_link_cols_idx =
+#         [dyn_pf_gens_vh_Idxs;
+#          # dyn_pf_slack_θh_Idxs;
+#          dyn_pf_id_Idxs;
+#          dyn_pf_iq_Idxs]
+
+#     # δ_ed_dash_eq_dash_idx_in_state
+#     state_by_algeb_link_cols_idx =
+#         [δ_idx_in_state;
+#          ed_dash_idx_in_state;
+#          eq_dash_idx_in_state]
+    
+#     #----------------------------------------    
+#     #----------------------------------------
+
+#     vh  =  sol_t[ vh_Idx_in_state]
+    
+#     θh  =  sol_t[ θh_Idx_in_state]
+    
+#     gens_i_d =  sol_t[id_Idx_in_state]
+    
+#     gens_i_q =  sol_t[iq_Idx_in_state]
+
+
+#     #----------------------------------------
+    
+#     gens_vh =
+#         vh[ gens_nodes_idx ]
+    
+#     #----------------------------------------
+        
+#     gens_δ = sol_t[
+#         δ_idx_in_state]
+        
+#     gens_ed_dash = sol_t[
+#         ed_dash_idx_in_state]
+    
+#     gens_eq_dash = sol_t[
+#         eq_dash_idx_in_state]    
+
+#     #----------------------------------------
+#     #----------------------------------------
+    
+#     ω_ref =
+#         ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+#             dyn_ω_ref_Idx]
+    
+#     v_ref =
+#         ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+#             dyn_v_ref_Idx]
+    
+#     p_order =
+#         ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+#             dyn_p_order_Idx]
+    
+#     P_non_gens =
+#         ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+#             dyn_Png_Idx]
+    
+#     Q_non_gens =
+#         ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+#             dyn_Qng_Idx]
+    
+#     if loc_load_exist == true
+        
+#         P_g_loc_load =
+#             ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+#                 dyn_Pll_Idx]
+        
+#         Q_g_loc_load =
+#             ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+#                 dyn_Qll_Idx]        
+#     else
+
+#         P_g_loc_load  = []
+        
+#         Q_g_loc_load  = []
+        
+#     end
+
+#     #----------------------------------------
+    
+#     N_g  = length(gens_nodes_idx)
+#     N_ng = length(non_gens_nodes_idx)
+    
+#     #----------------------------------------
+    
+#     ωref_vref_porder0_id_iq_vh =
+#         Float64[ω_ref;
+#          v_ref;
+#          p_order;
+#          gens_i_d;
+#          gens_i_q;
+#          gens_vh ]
+
+
+#     #----------------------------------------    
+
+#     δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para =
+#         Float64[gens_δ;
+#          gens_ed_dash;
+#          gens_eq_dash;
+#          P_non_gens;
+#          Q_non_gens;
+#          P_g_loc_load;
+#          Q_g_loc_load]
+
+#     #----------------------------------------    
+
+#     f_x  = sol_t[
+#         state_var_Idx_in_state]
+    
+#     f_dx = similar(f_x)
+
+#     g_y = sol_t[
+#         algebraic_var_Idx_in_state]
+
+#     g_dy = similar(g_y)
+
+#     #----------------------------------------
+    
+#     ∂f∂x = ForwardDiff.jacobian(
+#         (dx, x ) -> ode_gens_plants_generic_model_func!(
+#             dx, x,
+#             ωref_vref_porder0_id_iq_vh,
+#             tt;
+#             kwd_para =
+#                     ode_plants_kwd_para ),
+#         f_dx, f_x )
+
+    
+#     ∂f∂p = ForwardDiff.jacobian(
+#         (dx, p ) -> ode_gens_plants_generic_model_func!(
+#             dx, f_x, p, tt;
+#             kwd_para =
+#                     ode_plants_kwd_para ),
+#         f_dx, ωref_vref_porder0_id_iq_vh )
+    
+#     #----------------------------------------
+    
+#     ∂g∂y = ForwardDiff.jacobian(
+#         (dy, y ) -> algebraic_generic_pf_ΔPQ_mismatch!(
+#             dy, y,
+#             δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para;
+#             kwd_para =
+#                     algebraic_generic_model_kwd_para ),
+#         g_dy, g_y )
+
+    
+#     ∂g∂p = ForwardDiff.jacobian(
+#         (dy, p ) -> algebraic_generic_pf_ΔPQ_mismatch!(
+#             dy, g_y, p;
+#             kwd_para = algebraic_generic_model_kwd_para
+#                      ),
+#         g_dy, δ_ed_dash_eq_dash_Png_Qng_Pll_Qll_para )
+
+#     #----------------------------------------
+
+#     a =  ∂g∂p[g_rows_P_ng_idx, g_PQ_ng_idx]\
+#             ∂g∂y[g_rows_P_ng_idx, vθ_g_idx ] 
+    
+#     b = ∂g∂p[g_rows_P_ng_idx, g_PQ_ng_idx]\
+#             ∂g∂y[g_rows_P_ng_idx, vθ_ng_idx ] 
+    
+#     c = ∂g∂y[g_rows_Q_ng_idx, vθ_g_idx] -
+#         ∂g∂p[g_rows_Q_ng_idx, g_PQ_ng_idx ] * a
+    
+#     d = ∂g∂y[g_rows_Q_ng_idx, vθ_ng_idx] -
+#         ∂g∂p[g_rows_Q_ng_idx, g_PQ_ng_idx ] * b
+
+
+#     e =  ∂g∂y[g_rows_idq_idx, g_i_dq_idx]\
+#             ∂g∂y[g_rows_idq_idx, vθ_g_idx ] 
+
+
+#     f =  ∂g∂y[g_rows_idq_idx, g_i_dq_idx]\
+#             ∂g∂p[g_rows_idq_idx, g_x_δ_edash_idx ] 
+
+#     h = ∂g∂y[g_rows_P_g_idx, vθ_g_idx ] -
+#         ∂g∂y[g_rows_P_g_idx, vθ_ng_idx ] * (d\c) -
+#         ∂g∂y[g_rows_P_g_idx, g_i_dq_idx ] * e
+
+#     i = ∂g∂p[g_rows_P_g_idx, g_x_δ_edash_idx ] -
+#         ∂g∂y[g_rows_P_g_idx, g_i_dq_idx ] * f
+
+#     j = ∂g∂y[g_rows_Q_g_idx, vθ_g_idx] -
+#         ∂g∂y[g_rows_Q_g_idx, vθ_ng_idx] * (d\c) -
+#         ∂g∂y[g_rows_Q_g_idx, g_i_dq_idx] * e
+
+#     k = ∂g∂p[g_rows_Q_g_idx, g_x_δ_edash_idx ] -
+#         ∂g∂y[g_rows_Q_g_idx, g_i_dq_idx] * f
+
+#     l = loc_load_exist == true ? (
+#         h - ∂g∂p[g_rows_P_g_idx, g_PQll_idx ] * (
+#             ∂g∂p[g_rows_Q_g_idx, g_PQll_idx ] \ j) ) :
+#                 j # j + h
+    
+#     m = loc_load_exist == true ? (
+#         i - ∂g∂p[g_rows_P_g_idx, g_PQll_idx ] * (
+#             ∂g∂p[g_rows_Q_g_idx, g_PQll_idx ] \ k) ) :
+#                 k # k + i
+
+#     N = (l\m)
+
+#     Γ = ∂f∂p[:, f_i_dq_idx] * (e * N - f) -
+#         ∂f∂p[:, f_vg_Idx] * N[ 1:N_g, :]
+
+#     # Asys = ∂f∂x[state_var_Idx_in_state,
+#     #             state_var_Idx_in_state ]
+
+#     Asys = copy(∂f∂x)
+    
+#     #
+#     Asys[:,  δ_ed_dash_eq_dash_idx_in_state] .=
+#         Asys[:, δ_ed_dash_eq_dash_idx_in_state] + Γ
+
+#     # Asys[:, g_x_δ_edash_idx] =
+#     #     Asys[:, g_x_δ_edash_idx] + Γ
+    
+#     Λ = ∂f∂u =  ∂f∂p[:, f_u_idx]
+    
+#     #----------------------------------------
+
+#     # Δ⨰ = Asys Δx + Λ Δu
+    
+#     # where Δu = Δωref0_vref0_porder0
+    
+#     #----------------------------------------
+#     #----------------------------------------
+
+#     sys_eigvalues = eigvals(Asys)
+
+#     printed_sys_eigvalues =
+#         round.( sys_eigvalues; digits = 4 )
+    
+#     return (; Asys,  Λ,
+#             sys_eigvalues,
+#             printed_sys_eigvalues )
+    
+# end
+

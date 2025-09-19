@@ -396,16 +396,13 @@ export get_generic_namedtuple_per_plant_para_wt_kwd_para
 #  Pertubation systems dynamics functions 
 # ------------------------------------------------------
 
-export line_outage_generic_dynamics_wt_pre_post_fault_by_dae_pf_funcs!
-
-export Ynet_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
-
-
-
+export generic_dynamics_wt_fault_by_dae_pf_funcs!
 
 export generic_dynamics_wt_fault_by_ode_pf_funcs!
 
-export generic_dynamics_wt_fault_by_dae_pf_funcs!
+export get_generic_network_fault_pertubation
+
+
 
 export generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
 
@@ -416,6 +413,8 @@ export line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
 export line_outage_generic_dynamics_wt_pre_post_fault_by_dae_pf_funcs!
 
 export Ynet_generic_dynamics_wt_pre_post_fault_by_dae_pf_funcs!
+
+
 
 export mm_generic_dynamics_wt_pre_fault_post_by_ode_pf_funcs!
 
@@ -429,10 +428,9 @@ export mm_Ynet_generic_dynamics_wt_pre_post_fault_by_ode_pf_funcs!
 
 
 
-export get_generic_network_fault_pertubation
+export get_line_loss_outage_wt_or_no_ref_adjs
 
-export get_net_status_Yint_and_Yred_matrices
-
+export get_generic_line_loss_outage_wt_or_no_ref_adjs
 
 # -------------------------------------------------------
 
@@ -759,9 +757,6 @@ export get_losses_per_node_by_flattened_Ynet
 
 export get_a_node_state_algb_vars_indices_in_system
 
-export get_line_loss_outage_wt_or_no_ref_adjs
-
-
 #-------------------------------------------------------
 # Pertubation 
 #-------------------------------------------------------
@@ -787,6 +782,8 @@ export pertubation_by_itegrator
 export a_parameter_pertubation!
 
 export a_parameter_pertubation_and_step!
+
+
 
 #-------------------------------------------------------
 # opf
@@ -995,6 +992,8 @@ export get_Ybus
 
 export get_Ybus_from_Ynet
 
+export get_sparseYbus_from_Ynet
+
 export get_size_Ybus
 
 export get_similar_collection_diff
@@ -1014,19 +1013,30 @@ export get_test_system_Ynet_size
 # ------------------------------------------------------
 
 export get_init_flux_decay_model
+
 export get_state_init_flux_decay
 
 export get_init_internal_node_model
-export get_Y_aug_matrices
 
 #-------------------------------------------------------
 # Reduction network admittance vetors or matrices
 #-------------------------------------------------------
 
+export  kron
+
+export kron_by_idx
+
+export kron_symmetric_by_idx
+
 export get_Yint_and_Yred_matrices
 
-export get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend
+export get_Y_aug_matrices
 
+export get_a_status_Yint_Yred
+
+export get_net_status_Yint_and_Yred_matrices
+
+export get_Ynet_real_imag_Idxs_wt_rows_Idxs_in_flattend
 
 #-------------------------------------------------------
 # Stability

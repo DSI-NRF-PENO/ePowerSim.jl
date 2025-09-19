@@ -4,6 +4,7 @@
 
 
 using Revise
+
 using ePowerSim
 
 # using SciMLBase
@@ -126,25 +127,25 @@ basekV = 1.0
 #---------------------------------------------------
 #---------------------------------------------------
 
-"""
-net_type = "dynamic-net-data"
+# """
+# net_type = "dynamic-net-data"
 
-gen_type = "gen-sauer"
+# gen_type = "gen-sauer"
 
-avr_type = "avr-t1-cb-sauer"
+# avr_type = "avr-t1-cb-sauer"
 
-gov_type = "gov-t1-cb-sauer"
+# gov_type = "gov-t1-cb-sauer"
 
-data_ext = "json"
+# data_ext = "json"
 
-dynamic_net_data_by_components_file =
-    "$(net_type)-"*
-    "$(gen_type)-"*
-    "$(avr_type)-"*
-    "$(gov_type)"*
-    ".$(data_ext)"
+# dynamic_net_data_by_components_file =
+#     "$(net_type)-"*
+#     "$(gen_type)-"*
+#     "$(avr_type)-"*
+#     "$(gov_type)"*
+#     ".$(data_ext)"
 
-"""
+# """
 
 
 net_wt_avr_string = "net-static-data-avr-sauer"

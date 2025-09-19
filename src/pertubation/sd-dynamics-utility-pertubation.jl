@@ -14,6 +14,19 @@
 
 
 """
+    pertubation_by_itegrator(
+        var_normal_value,
+        pertubation_factor,
+        pertubation_tstop,
+        var_idx,
+        system_integrator;
+        parameter_df =
+            nothing,
+        change_in_parameter_dict =
+            nothing,
+        target_parameter_sym =
+            nothing )
+
 These functions are used in generating results for load
 pertubation, co-simulation, etc.
 
@@ -1434,40 +1447,6 @@ function get_generic_network_fault_pertubation(
 
     #----------------------------------
     
-    # if components_libs_dir == nothing
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..",
-    #                  "src",
-    #                  "components-lib")
-    # end
-    
-
-    # if data_dir == nothing
-
-    #     data_dir =
-    #         joinpath(@__DIR__,"..","..",
-    #                  "src","data-dir",
-    #                  "converted_data" )
-        
-    # end
-    
-    # json_case_dir =
-    #     joinpath( data_dir, case_name, "json")
-
-    # if json_net_data_by_components_file == nothing
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  "net_data_by_components_file.json")
-    # else
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  json_net_data_by_components_file)
-
-    # end
-    
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
 
@@ -2224,40 +2203,6 @@ function get_network_fault_pertubation_by_inm_model(
     reltol = 1e-12 )
 
     #----------------------------------
-    
-    # if components_libs_dir == nothing
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..","src",
-    #                  "components-lib")
-    # end
-    
-
-    # if data_dir == nothing
-
-    #     data_dir =
-    #         joinpath(@__DIR__,"..","..",
-    #                  "src","data-dir",
-    #                  "converted_data" )
-        
-    # end
-    
-    # json_case_dir =
-    #     joinpath( data_dir, case_name, "json")
-
-    # if json_net_data_by_components_file == nothing
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  "net_data_by_components_file.json")
-    # else
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  json_net_data_by_components_file)
-
-    # end
-
     
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -3459,8 +3404,9 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
     basekV = 1.0,    
     use_pu_in_PQ = true,
     line_data_in_pu = true,
-    list_network_status =
-        nothing,
+
+    # list_network_status =
+    #     nothing,
     
     use_init_u0 = false,
 
@@ -3480,44 +3426,13 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
 
     abstol = 1e-12,
 
-    reltol = 1e-12 )
+    reltol = 1e-12,
+    list_network_status = 
+    [:pre_fault_state,
+     :fault_state,
+     :post_fault_state ] )
 
     #----------------------------------
-    
-    # if components_libs_dir == nothing
-
-    #     components_libs_dir =
-    #         joinpath(@__DIR__,"..","..",
-    #                  "src",
-    #                  "components-lib")
-    # end
-    
-
-    # if data_dir == nothing
-
-    #     data_dir =
-    #         joinpath(@__DIR__,"..","..",
-    #                  "src","data-dir",
-    #                  "converted_data" )
-        
-    # end
-    
-    # json_case_dir =
-    #     joinpath( data_dir, case_name, "json")
-
-    # if json_net_data_by_components_file == nothing
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  "net_data_by_components_file.json")
-    # else
-
-    #     net_data_by_components_file =
-    #         joinpath(json_case_dir,
-    #                  json_net_data_by_components_file)
-
-    # end
-
         
     if (components_libs_dir == "") || (
         components_libs_dir == nothing)
@@ -3576,10 +3491,6 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
 
     time_final = timespan
 
-    # dt = 0.0001
-
-    # Δt = 1.0 / 2^(4)
-
     tspan = (0.0, timespan)
 
     sim_timespan  = (0.0, timespan)
@@ -3588,26 +3499,6 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
 
     #---------------------------------------------------
     ## solvers and settings
-    #---------------------------------------------------
-
-    # use_init_u0 = false
-
-    # use_nlsolve = false
-
-    # pf_alg = NewtonRaphson()
-
-    # #---------------------------------------------------
-
-    # ode_alg = Rodas4()
-
-    # # ode_alg = ImplicitMidpoint()
-
-    # dae_alg = IDA()
-
-    # abstol = 1e-12
-
-    # reltol = 1e-12
-
     #---------------------------------------------------
 
     ntuple_status_steady_state_data =
@@ -3702,8 +3593,8 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
     use_init_u0 = false,
     use_nlsolve = false,
     
-    list_network_status =
-        nothing,
+    # list_network_status =
+    #     nothing,
 
     pf_alg  = NewtonRaphson(),
     ode_alg = Rodas4(),
@@ -3713,7 +3604,11 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
     reltol = 1e-12,
 
     dt = 0.0001,
-    Δt = 1.0 / 2^(4) )
+    Δt = 1.0 / 2^(4),
+    list_network_status = 
+        [:pre_fault_state,
+         :fault_state,
+         :post_fault_state ] )
 
     #---------------------------------------------------
     # Simulation Period
@@ -3776,9 +3671,15 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
         line_outage_time,
         generation_adjustment_time;
         sim_timespan =
-            sim_timespan,    
+            sim_timespan,
+        
+        pf_alg  =
+            pf_alg,
         dae_alg =
             dae_alg,
+        ode_alg =
+            ode_alg,
+        
         abstol  =
             abstol,
         reltol  =
@@ -3795,8 +3696,12 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
     # :line_outage_wt_pref_adjs
     # :line_outage_wt_vpref_adjs
     # outage_type = :line_outage,
-    sim_timespan = (0.0, 20),    
+    sim_timespan = (0.0, 20),
+    
+    pf_alg  = NewtonRaphson(),
     dae_alg = IDA(),
+    ode_alg = Rodas4(),
+    
     abstol  = 1e-12,
     reltol  = 1e-12 )
 
@@ -4033,9 +3938,33 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
             [line_outage_time,
              generation_adjustment_time]
         
-    else # :line_outage
+    elseif outage_type == :line_outage
+
+         cb_clear_fault = DiscreteCallback(
+             (u, t, integrator) ->
+                 clear_fault_condition(
+                     u, t, integrator,
+                     generation_adjustment_time),
+
+            clear_outage_affect!;
+             save_positions=(true,true),
+             initializealg =
+                 ShampineCollocationInit())
+
+
+        cb_outage_set =
+            CallbackSet(cb_line_outage,
+            cb_clear_fault)
+        
+        tstop_outage =
+            [line_outage_time,
+             generation_adjustment_time]
+
+
+    else 
 
         nothing
+        
     end
     
     #---------------------------------------
@@ -4107,6 +4036,802 @@ function get_line_loss_outage_wt_or_no_ref_adjs(
                 tstop_outage,
             abstol = abstol,
             reltol = reltol )
+
+    return (;system_sol,
+            model_syms,
+            gens_nodes_names,
+            SM_gens_nodes_names,
+            non_gens_nodes_names,
+            sim_timespan,
+
+            state_labels,
+            algebraic_vars_labels,
+     
+            dyn_pf_fun_kwd_n2s_idxs,
+            dyn_pf_fun_kwd_net_idxs,
+
+            edges_r,
+            edges_x,
+            edges_b,
+            edges_ratio,
+            edges_angle,
+            edges_type,
+            Gs,
+            Bs,
+            Ybr_cal_and_edges_orientation,
+            Ynet_wt_nodes_idx_wt_adjacent_nodes,
+            ntuple_status_steady_state_data )    
+end
+
+
+# ------------------------------------------------------
+# ------------------------------------------------------
+
+
+"""
+    get_generic_line_loss_outage_wt_or_no_ref_adjs(
+        outage_type,
+
+        on_fault_time,
+        clear_fault_time,
+
+        line_outage_time,
+        generation_adjustment_time,
+
+        net_data_by_components_file;
+        <keywords arguments> )
+
+
+Returns dynamic solution of a network with line outage.
+
+# Arguments
+ - `outage_type`
+    - `:line_outage_wt_pref_adjs`
+    - `:line_outage_wt_vpref_adjs`
+    - `:line_outage`
+    
+ - `on_fault_time`
+ - `clear_fault_time`
+ - `net_data_by_components_file`
+
+ - `components_libs_dir`
+ - `data_dir`
+ - `line_outage_time`
+ - `generation_adjustment_time`
+ - `sim_timespan = (0.0, 20)`
+ - `pf_alg  = NewtonRaphson()`
+ - `dae_alg = IDA()`
+ - `ode_alg = Rodas4()`
+ - `abstol  = 1e-12`
+ - `reltol  = 1e-12`
+
+ - `nt_system_dynamics_fun_type =`
+     `(;system_dynamics_fun_type =
+     :dae_line_loss_pre_fault_post_pf_funcs,
+     system_dynamics_fun =
+     line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!)` 
+
+`nt_system_dynamics_fun_type` is a namedtuple of dynamic function type symbol and a dynamic function.
+
+The list of function types are given below:
+
+# dae funs symbols denoted by `system_dynamics_fun_type` 
+
+- :dae_generic_pre_fault_post_pf_funcs
+- :dae_Ynet_pre_fault_post_pf_funcs 
+- :dae_line_loss_pre_fault_post_pf_funcs
+- :dae_line_outage_pre_fault_post_pf_funcs
+- :dae_Ynet_pre_post_pf_funcs
+
+# functions denoted by system_dynamics_fun
+
+- generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+- Ynet_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+- line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+- `line_outage_generic_dynamics_wt_pre_post_fault_by_dae_pf_funcs!`
+- `Ynet_generic_dynamics_wt_pre_post_fault_by_dae_pf_funcs!`
+
+# mm ode funs symbols denoted by `system_dynamics_fun_type` 
+- :mm_generic_pre_fault_post_pf_funcs
+- :mm_Ynet_pre_fault_post_pf_funcs 
+- :mm_line_loss_pre_fault_post_pf_funcs
+- :mm_line_outage_pre_fault_post_pf_funcs
+- :mm_Ynet_pre_post_pf_funcs
+
+# functions denoted by system_dynamics_fun
+
+- `mm_generic_dynamics_wt_pre_fault_post_by_ode_pf_funcs!`
+- `mm_Ynet_generic_dynamics_wt_pre_fault_post_by_ode_pf_funcs!`
+- `mm_line_loss_generic_dynamics_wt_pre_fault_post_by_ode_pf_funcs!`
+- `mm_line_outage_generic_dynamics_wt_pre_post_fault_by_ode_pf_funcs!`
+- `mm_Ynet_generic_dynamics_wt_pre_post_fault_by_ode_pf_funcs!`
+
+"""
+function get_generic_line_loss_outage_wt_or_no_ref_adjs(
+    outage_type,
+    
+    on_fault_time,
+    clear_fault_time,
+    
+    line_outage_time,
+    generation_adjustment_time,
+    
+    net_data_by_components_file;
+
+    timespan = 20.0,    
+    
+    with_faults =
+        false,    
+    
+    components_libs_dir =
+        nothing,
+    
+    data_dir =
+        nothing,
+        
+    list_fault_point_from_node_a = [0.3],
+    list_fault_resistance = [0.001],
+    list_no_line_circuit  = [1],
+
+    list_edges_to_have_fault   = [ 8 ],
+    clear_fault_selection_list = [1],
+    
+    basekV          = 1.0,    
+    use_pu_in_PQ    = true,
+    line_data_in_pu = true,
+
+    use_init_u0 = false,
+    use_nlsolve = false,
+
+    pf_alg  = NewtonRaphson(),
+    ode_alg = Rodas4(),
+    dae_alg = IDA(),
+
+    abstol = 1e-12,
+    reltol = 1e-12,
+
+    dt = 0.0001,
+    Δt = 1.0 / 2^(4),
+    
+    list_network_status = 
+        [:pre_fault_state,
+         :fault_state,
+         :post_fault_state ],
+    
+    nt_system_dynamics_fun_type =
+        (;system_dynamics_fun_type =
+        :dae_line_loss_pre_fault_post_pf_funcs,
+        system_dynamics_fun =
+        line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!) )
+
+    #---------------------------------------------------
+    # Simulation Period
+    #---------------------------------------------------
+
+    time_final    = timespan
+
+    tspan         = (0.0, timespan)
+
+    sim_timespan  = (0.0, timespan)
+
+    plot_timespan = (0.0, timespan)
+
+    #---------------------------------------------------
+    ## solvers and settings
+    #---------------------------------------------------
+
+    ntuple_status_steady_state_data =
+        get_ntuple_status_steady_state_data(
+            ;with_faults =
+                with_faults,
+            net_data_by_components_file =
+                net_data_by_components_file,
+            components_libs_dir =
+                components_libs_dir,
+
+            timespan =
+                timespan,
+            on_fault_time =
+                on_fault_time,
+            clear_fault_time =
+                clear_fault_time,
+
+            list_fault_point_from_node_a =
+                list_fault_point_from_node_a,
+            list_fault_resistance =
+                list_fault_resistance,
+            list_no_line_circuit =
+                list_no_line_circuit,
+
+            list_edges_to_have_fault =
+                list_edges_to_have_fault,
+            clear_fault_selection_list =
+                clear_fault_selection_list,
+
+            basekV =
+                basekV,    
+            use_pu_in_PQ =
+                use_pu_in_PQ,
+            line_data_in_pu =
+                line_data_in_pu,
+            list_network_status =
+                list_network_status )
+
+        #---------------------------------------------------
+
+    return get_generic_line_loss_outage_wt_or_no_ref_adjs(
+        outage_type,
+        ntuple_status_steady_state_data,
+        line_outage_time,
+        generation_adjustment_time;
+        sim_timespan =
+            sim_timespan,
+        
+        pf_alg  =
+            pf_alg,
+        dae_alg =
+            dae_alg,
+        ode_alg =
+            ode_alg,
+        
+        abstol  =
+            abstol,
+        reltol  =
+            reltol,
+        nt_system_dynamics_fun_type =
+            nt_system_dynamics_fun_type )
+    
+end
+
+
+"""
+
+    get_generic_line_loss_outage_wt_or_no_ref_adjs(
+        outage_type,
+        ntuple_status_steady_state_data,
+        line_outage_time,
+        generation_adjustment_time;
+        <keywords arguments> )
+
+Returns dynamic solution of a network with line outage.
+
+# Arguments
+ - `outage_type`
+    - `:line_outage_wt_pref_adjs`
+    - `:line_outage_wt_vpref_adjs`
+    - `:line_outage`
+ - `ntuple_status_steady_state_data`
+ - `line_outage_time`
+ - `generation_adjustment_time`
+ - `sim_timespan = (0.0, 20)`
+ - `pf_alg  = NewtonRaphson()`
+ - `dae_alg = IDA()`
+ - `ode_alg = Rodas4()`
+ - `abstol  = 1e-12`
+ - `reltol  = 1e-12`
+
+ - `nt_system_dynamics_fun_type =`
+     `(;system_dynamics_fun_type =
+     :dae_line_loss_pre_fault_post_pf_funcs,
+     system_dynamics_fun =
+     line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!)` 
+
+`nt_system_dynamics_fun_type` is a namedtuple of dynamic function type symbol and a dynamic function.
+
+The list of function types are given below:
+
+# dae funs symbols denoted by `system_dynamics_fun_type` 
+
+- :dae_generic_pre_fault_post_pf_funcs
+- :dae_Ynet_pre_fault_post_pf_funcs 
+- :dae_line_loss_pre_fault_post_pf_funcs
+- :dae_line_outage_pre_fault_post_pf_funcs
+- :dae_Ynet_pre_post_pf_funcs
+
+# functions denoted by system_dynamics_fun
+
+- generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+- Ynet_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+- line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!
+- `line_outage_generic_dynamics_wt_pre_post_fault_by_dae_pf_funcs!`
+- `Ynet_generic_dynamics_wt_pre_post_fault_by_dae_pf_funcs!`
+
+# mm ode funs symbols denoted by `system_dynamics_fun_type`
+
+- :mm_generic_pre_fault_post_pf_funcs
+- :mm_Ynet_pre_fault_post_pf_funcs 
+- :mm_line_loss_pre_fault_post_pf_funcs
+- :mm_line_outage_pre_fault_post_pf_funcs
+- :mm_Ynet_pre_post_pf_funcs
+
+# functions denoted by system_dynamics_fun
+
+- `mm_generic_dynamics_wt_pre_fault_post_by_ode_pf_funcs!`
+- `mm_Ynet_generic_dynamics_wt_pre_fault_post_by_ode_pf_funcs!`
+- `mm_line_loss_generic_dynamics_wt_pre_fault_post_by_ode_pf_funcs!`
+- `mm_line_outage_generic_dynamics_wt_pre_post_fault_by_ode_pf_funcs!`
+- `mm_Ynet_generic_dynamics_wt_pre_post_fault_by_ode_pf_funcs!`
+
+"""
+function get_generic_line_loss_outage_wt_or_no_ref_adjs(
+    outage_type,
+    ntuple_status_steady_state_data,
+    line_outage_time,
+    generation_adjustment_time;
+    # :line_outage_wt_pref_adjs
+    # :line_outage_wt_vpref_adjs
+    # outage_type = :line_outage,
+    sim_timespan = (0.0, 20),
+    
+    pf_alg  = NewtonRaphson(),
+    dae_alg = IDA(),
+    ode_alg = Rodas4(),
+    
+    abstol  = 1e-12,
+    reltol  = 1e-12,
+
+    nt_system_dynamics_fun_type =
+        (;system_dynamics_fun_type =
+        :dae_line_loss_pre_fault_post_pf_funcs,
+        system_dynamics_fun =
+        line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!)
+    )
+
+    (;state_labels,
+     algebraic_vars_labels,
+     
+     dyn_pf_fun_kwd_n2s_idxs,
+     dyn_pf_fun_kwd_net_idxs,
+
+     system_fault_status,
+     generic_system_dynamics_wt_fault_kwd_para,
+     on_fault_net_para,
+     cleared_selected_lines_faults_net_para,
+
+     ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+
+     model_bool_dae_vars_wt_fault,
+     model_syms_wt_fault,         
+     u0_model_states_init_wt_fault,
+
+     model_bool_dae_vars,     
+     model_syms,
+     u0_model_states_init,
+     model_mass_matrix,             
+
+     cb_states,
+     plants_cb_paras_switches,
+
+     nodes_names,
+     gens_nodes_names,
+     non_gens_nodes_names,
+     SM_gens_nodes_names,
+     SC_gens_nodes_names,
+
+     ωref0_vref0_porder0_id_iq_vh_Idx,
+     dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
+
+     dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+
+     edges_r,
+     edges_x,
+     edges_b,
+     edges_ratio,
+     edges_angle,
+     edges_type,
+     Gs,
+     Bs,
+     Ybr_cal_and_edges_orientation,
+     Ynet_wt_nodes_idx_wt_adjacent_nodes) =
+        NamedTupleTools.select(
+            getproperty(
+                getproperty(
+                    ntuple_status_steady_state_data,
+                    :pre_fault_state),
+                :static_prefault_paras),        
+            (:state_labels,
+             :algebraic_vars_labels,
+             :dyn_pf_fun_kwd_n2s_idxs,
+             :dyn_pf_fun_kwd_net_idxs,
+             
+             :system_fault_status,
+             :generic_system_dynamics_wt_fault_kwd_para,
+             :on_fault_net_para,
+             :cleared_selected_lines_faults_net_para,
+
+             :ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+
+             :model_bool_dae_vars_wt_fault,
+             :model_syms_wt_fault,         
+             :u0_model_states_init_wt_fault,
+
+             :model_bool_dae_vars,     
+             :model_syms,
+             :u0_model_states_init,
+             :model_mass_matrix,             
+
+             :cb_states,
+             :plants_cb_paras_switches,
+
+             :nodes_names,
+             :gens_nodes_names,
+             :non_gens_nodes_names,
+             :SM_gens_nodes_names,
+             :SC_gens_nodes_names,
+
+             :ωref0_vref0_porder0_id_iq_vh_Idx,
+             :dyn_ωref0_vref0_porder0_id_iq_vh_Idx,
+
+             :dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+
+             :edges_r,
+             :edges_x,
+             :edges_b,
+             :edges_ratio,
+             :edges_angle,
+             :edges_type,
+             :Gs,
+             :Bs,
+             :Ybr_cal_and_edges_orientation,
+             :Ynet_wt_nodes_idx_wt_adjacent_nodes))
+
+    #----------------------------------------
+
+    # po := post_outage
+    
+    (po_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,) =
+        NamedTupleTools.select(
+            getproperty(
+                getproperty(
+                    ntuple_status_steady_state_data,
+                    :post_fault_state),
+                :dynamic_status_paras),
+            (:ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,))
+
+    #----------------------------------------
+    #----------------------------------------
+
+    (Ynet, ) =
+         NamedTupleTools.select(
+        Ynet_wt_nodes_idx_wt_adjacent_nodes,
+             (:Ynet, ) )
+
+    #----------------------------------------
+
+    (fault_Ynet,
+     post_fault_Ynet) =
+        NamedTupleTools.select(
+        cleared_selected_lines_faults_net_para,
+            (:pre_clear_fault_Ynet,
+             :post_clear_fault_Ynet, ))
+
+    #----------------------------------------
+    (;dyn_ω_ref_Idx,
+     dyn_v_ref_Idx,
+     dyn_p_order_Idx,
+     dyn_Png_Idx,
+     dyn_Qng_Idx,
+     dyn_Pll_Idx,
+     dyn_Qll_Idx ) =
+         NamedTupleTools.select(
+             dyn_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll_Idx,
+             (:dyn_ω_ref_Idx,
+              :dyn_v_ref_Idx,
+              :dyn_p_order_Idx,
+              :dyn_Png_Idx,
+              :dyn_Qng_Idx,
+              :dyn_Pll_Idx,
+              :dyn_Qll_Idx))
+
+    #---------------------------------------
+
+    @show system_fault_status
+    
+    if system_fault_status[1] != 0
+
+        system_fault_status[1] = 0
+        
+    end
+
+    
+    #---------------------------------------
+
+    system_dynamics_fun_type =
+        getproperty(
+            nt_system_dynamics_fun_type,
+            :system_dynamics_fun_type)
+    
+    system_dynamics_fun! =
+        getproperty(
+            nt_system_dynamics_fun_type,
+            :system_dynamics_fun)
+
+
+    "Splits the first part of the symbol to determine if it is a dae or not"
+    model_type =
+        string(split(String(system_dynamics_fun_type),
+                     "_")[1])
+
+    # model_type =
+    #     string(split(String(:dae_line_outage_pf_funcs),
+    #                  "_")[1])
+    
+    #---------------------------------------
+    #---------------------------------------
+    # line loss outage callbacks
+    #---------------------------------------
+    #---------------------------------------
+        
+    cb_line_outage = DiscreteCallback(
+        (u, t, integrator) ->
+            on_line_outage_condition(
+                u, t, integrator,
+                line_outage_time),
+
+       on_line_outage_affect!;
+        save_positions=(true, true),
+        initializealg =
+            ShampineCollocationInit() )
+
+    cb_outage_set =
+        CallbackSet(cb_line_outage,)
+
+    tstop_outage =
+        [line_outage_time]
+
+    
+    if outage_type == :line_outage_wt_pref_adjs
+
+        gens_porder_adj =
+            po_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+                dyn_p_order_Idx]
+
+        cb_gens_porder_adjustment = DiscreteCallback(
+            (u, t, integrator) ->
+                on_generation_adjustment_condition(
+                    u, t, integrator,
+                    generation_adjustment_time),
+
+            (integrator) ->
+                on_generation_adjustment_affect!(
+                    integrator,
+                    gens_porder_adj,
+                    dyn_p_order_Idx );
+            save_positions=(true, true),
+            initializealg =
+                ShampineCollocationInit() )
+
+
+        cb_outage_set =
+            CallbackSet(cb_line_outage,
+            cb_gens_porder_adjustment)
+
+        tstop_outage =
+            [line_outage_time,
+             generation_adjustment_time]
+
+        
+    elseif outage_type == :line_outage_wt_vpref_adjs
+
+        vref_and_porder_Idx =
+            [ dyn_v_ref_Idx; dyn_p_order_Idx]
+
+        vref_and_porder_adj =
+            po_ω_ref_v_ref_p_order_Png_Qng_Pll_Qll[
+                vref_and_porder_Idx]
+        
+        cb_vref_and_porder_adj = DiscreteCallback(
+            (u, t, integrator) ->
+                on_generation_adjustment_condition(
+                    u, t, integrator,
+                    generation_adjustment_time),
+
+            (integrator) ->
+                on_generation_adjustment_affect!(
+                integrator,
+                vref_and_porder_adj,
+                vref_and_porder_Idx);
+            save_positions=(true, true),
+            initializealg =
+                ShampineCollocationInit() )
+
+        cb_outage_set =
+            CallbackSet(cb_line_outage,
+            cb_vref_and_porder_adj)
+
+        tstop_outage =
+            [line_outage_time,
+             generation_adjustment_time]
+        
+    elseif outage_type == :line_outage
+
+         cb_clear_fault = DiscreteCallback(
+             (u, t, integrator) ->
+                 clear_fault_condition(
+                     u, t, integrator,
+                     generation_adjustment_time),
+
+            clear_outage_affect!;
+             save_positions=(true,true),
+             initializealg =
+                 ShampineCollocationInit())
+
+
+        cb_outage_set =
+            CallbackSet(cb_line_outage,
+            cb_clear_fault)
+        
+        tstop_outage =
+            [line_outage_time,
+             generation_adjustment_time]
+
+
+    else 
+
+        nothing
+        
+    end
+
+
+    
+    if (system_dynamics_fun_type ==
+        :dae_generic_pre_fault_post_pf_funcs) ||
+        (system_dynamics_fun_type ==
+        :mm_generic_pre_fault_post_pf_funcs)
+
+        model_dynamics_para =
+            (; ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+             Ynet,
+             system_fault_status)
+
+
+    elseif (system_dynamics_fun_type ==
+        :dae_Ynet_pre_fault_post_pf_funcs) ||
+        (system_dynamics_fun_type ==
+        :mm_Ynet_pre_fault_post_pf_funcs)
+        
+        model_dynamics_para =
+            (;
+            ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+             Ynet,
+             fault_Ynet,
+             post_fault_Ynet,
+             system_fault_status)
+        
+
+    elseif (system_dynamics_fun_type ==
+        :dae_line_loss_pre_fault_post_pf_funcs) ||
+        (system_dynamics_fun_type ==
+        :mm_line_loss_pre_fault_post_pf_funcs)
+        
+        model_dynamics_para =
+            (;generic_model_dynamics_para =
+            ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+             Ynet,
+             fault_Ynet,
+             post_fault_Ynet,
+             system_fault_status,
+             plants_cb_paras_switches)
+        
+    elseif (system_dynamics_fun_type ==
+        :dae_line_outage_pre_fault_post_pf_funcs) ||
+        (system_dynamics_fun_type ==
+        :mm_line_outage_pre_fault_post_pf_funcs)
+
+        model_dynamics_para =
+            (;generic_model_dynamics_para =
+            ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+             Ynet,
+             post_fault_Ynet,
+             system_fault_status,
+             plants_cb_paras_switches)
+
+    elseif (system_dynamics_fun_type ==
+        :dae_Ynet_pre_post_pf_funcs) ||
+       (system_dynamics_fun_type ==
+        :mm_Ynet_pre_post_pf_funcs)
+        
+        model_dynamics_para =
+            (;
+            ω_ref_v_ref_p_order_Png_Qng_Pll_Qll,
+             Ynet,
+             post_fault_Ynet,
+             system_fault_status)
+    else
+
+        throw(" fault dynamic model unknown, " *
+            "check the doc string")
+        
+    end
+
+    model_dynamics_kwd_para =
+        generic_system_dynamics_wt_fault_kwd_para
+
+    
+    if model_type == "dae"
+
+        #----------------------------------------
+ 
+        # model_syms =
+        #     model_syms_wt_fault
+        
+        # model_bool_dae_vars =
+        #     model_bool_dae_vars_wt_fault
+
+        # u0_model_states_init =
+        #     u0_model_states_init_wt_fault
+
+        #----------------------------------------
+
+        du0_model_states_init =
+            zeros( length( u0_model_states_init_wt_fault ))
+
+        res = similar( u0_model_states_init_wt_fault )
+
+        #----------------------------------------
+
+        system_sol =
+            DifferentialEquations.solve(
+                DAEProblem(
+            DAEFunction(
+                (res, dx, x, p, t) ->
+                    system_dynamics_fun!(
+                        res, dx, x,
+                        model_dynamics_para,
+                        t;
+                        kwd_para =
+                            model_dynamics_kwd_para);
+                syms =
+                    model_syms_wt_fault),
+                    du0_model_states_init,
+                    u0_model_states_init_wt_fault,
+                    sim_timespan,
+                    model_dynamics_para,
+                    differential_vars =
+                        model_bool_dae_vars_wt_fault,
+                    callback =
+                        cb_states),
+                dae_alg,
+                callback =
+                    cb_outage_set,
+                tstops =
+                    tstop_outage,
+                abstol = abstol,
+                reltol = reltol )
+
+    else
+
+        system_sol =
+            DifferentialEquations.solve(
+                ODEProblem(
+            ODEFunction(
+            (dx,x,p,t) ->
+                system_dynamics_fun!(
+                    dx, x,
+                    model_dynamics_para,
+                    t;
+                    kwd_para =
+                        model_dynamics_kwd_para);
+                syms =
+                    model_syms,
+                mass_matrix =
+                    model_mass_matrix ) ,
+                    u0_model_states_init,
+                    sim_timespan,
+                    model_dynamics_para,
+                    callback =
+                        cb_states),
+                    ode_alg,
+                    callback =
+                        cb_outage_set,
+                    tstops =
+                        tstop_outage,
+                    abstol = abstol,
+                    reltol = reltol )
+
+        
+    end
+    
 
     return (;system_sol,
             model_syms,
