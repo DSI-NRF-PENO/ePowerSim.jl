@@ -2,6 +2,9 @@
 # [Example of Network Perturbation with IEEE 5 Bus Test System](@id ieee-5-bus-network-perturbation)
 =#
 
+#=
+# [Example of Network Perturbation with IEEE 5 Bus Test System](@id ieee-5-bus-network-perturbation)
+=#
 
 #---------------------------------------------------
 
@@ -144,11 +147,10 @@ script_dir = @__DIR__
 #---------------------------------------------------
 #---------------------------------------------------
 
-"""
 
-sauer_net_wt_avr_string    = "net-static-data-avr-sauer-"
+sauer_net_wt_avr_string    = "net-static-data-avr-sauer"
 
-rtds_net_wt_avr_string     = "net-static-data-avr-rtds-"
+rtds_net_wt_avr_string     = "net-static-data-avr-rtds"
 
 sauer_gov_string           = "gov-sauer"
 
@@ -158,28 +160,40 @@ ieee_tgov1_gov_string      = "gov-ieee-tgov1"
 
 #---------------------------------------------------
 
+# # rtds
+
 # net_wt_avr_string = rtds_net_wt_avr_string
 # gov_string        = ieee_tgov1_gov_string
+
+
+# sauer
 
 net_wt_avr_string = sauer_net_wt_avr_string
 gov_string        = sauer_gov_string
 
+
 dynamic_net_data_by_components_file =
-    "$(net_wt_avr_string)"*
-    "$(gov_string)" *
-    ".json"
+    "$(net_wt_avr_string)-$(gov_string).json"
 
 json_net_data_by_components_file =
     dynamic_net_data_by_components_file
 
-"""
 
-json_net_data_by_components_file =
-    "net-static-data-avr-sauer-gov-sauer.json"
+# net_wt_avr_string   = "net-static-data-avr-sauer"
 
+# gov_string                 = "gov-sauer"
+
+# dynamic_net_data_by_components_file =
+#     "$(net_wt_avr_string)-$(gov_string).json"
+
+# json_net_data_by_components_file =
+#     dynamic_net_data_by_components_file
+
+#---------------------------------------------------
 #---------------------------------------------------
 
 case_name = "case9"
+
 # case_name = "case14"
 
 # This ensures a lowercase name
@@ -188,7 +202,6 @@ case_name = lowercase(case_name)
 
 #---------------------------------------------------
 #---------------------------------------------------
-
 
 case_data_dir =
    joinpath( data_dir,
@@ -213,17 +226,12 @@ else
 
 end
 
-
 #---------------------------------------------------
 #---------------------------------------------------
 
-# sim_type  = "$(case_name)-"*"network-pertubation-"*
-#     "-$(net_wt_avr_string)-$(gov_string)"
+sim_type  = "$(case_name)-"*"test-"*"network-pertubation"*
+    "-$(net_wt_avr_string)-$(gov_string)"
 
-sim_type  = "$(case_name)-"*"network-pertubation"
-
-
-# sim_type  = "sim-network-perturbation"
 
 cd(script_dir)
 
@@ -264,6 +272,7 @@ sd_dynamics_sim_csv_filename =
             "$(sim_type)-" *
             "sim-results.csv")
 
+#---------------------------------------------------
 #---------------------------------------------------
 
 basekV = 1.0
@@ -356,7 +365,7 @@ restoration_time   = clear_fault_time
 # Simulation Period
 #---------------------------------------------------
 
-sim_duration  = 20.0
+sim_duration  = 30.0
 
 timespan_min  = restoration_time + Δt1 + Δt2
 
@@ -372,6 +381,523 @@ tspan         = (0.0, timespan)
 sim_timespan  = (0.0, timespan)
 
 plot_timespan = (0.0, timespan)
+
+
+#---------------------------------------------------
+# A generalised function that takes functions
+# as a namedtuple
+# 
+# get_generic_line_loss_outage_wt_or_no_ref_adjs
+# 
+#---------------------------------------------------
+
+list_network_status = 
+    [:pre_fault_state,
+     :fault_state,
+     :post_fault_state ]
+
+nt_system_dynamics_fun_type =
+        (;system_dynamics_fun_type =
+        :dae_line_loss_pre_fault_post_pf_funcs,
+        system_dynamics_fun =
+        line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs! )
+
+ 
+generic_plot_line_outage =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            get_generic_line_loss_outage_wt_or_no_ref_adjs(
+                :line_outage, # outage_type,    
+
+                   on_fault_time,
+                   clear_fault_time,
+
+                   line_outage_time,
+                   generation_adjustment_time,
+
+                   net_data_by_components_file;
+
+                   timespan,    
+
+                   with_faults,   
+
+                   components_libs_dir,
+
+                   data_dir, 
+
+                   list_fault_point_from_node_a = [0.3],
+                   list_fault_resistance = [0.001],
+                   list_no_line_circuit  = [1],
+
+                   list_edges_to_have_fault   = [ 8 ],
+                   clear_fault_selection_list = [1],
+
+                   basekV          = 1.0,    
+                   use_pu_in_PQ    = true,
+                   line_data_in_pu = true,
+
+                   use_init_u0 = false,
+                   use_nlsolve = false,
+
+                   pf_alg  = NewtonRaphson(),
+                   ode_alg = Rodas4(),
+                   dae_alg = IDA(),
+
+                   abstol = 1e-12,
+                   reltol = 1e-12,
+
+                   dt = 0.0001,
+                   Δt = 1.0 / 2^(4),
+                list_network_status,
+                nt_system_dynamics_fun_type) ,
+                (:system_sol,
+                 :model_syms,
+                 :gens_nodes_names,
+                 :SM_gens_nodes_names,
+                 :non_gens_nodes_names,
+                 :sim_timespan) )... )
+
+
+generic_δ_a_plot = getproperty(
+    generic_plot_line_outage, :δ_a_plot)
+
+
+generic_ω_a_plot  = getproperty(
+    generic_plot_line_outage, :ω_a_plot)
+
+
+# propertynames( plot_line_outage )
+
+# (:δ_a_plot, :ω_a_plot, :ed_dash_a_plot,
+#  :eq_dash_a_plot, :vr1_a_plot, :vr2_a_plot,
+#  :vf_tilade_a_plot, :xg1_a_plot, :xg2_a_plot,
+#  :plot_gens_vh, :plot_gens_θh,
+#  :plot_non_gens_vh, :plot_non_gens_θh)
+
+
+#---------------------------------------------------
+#---------------------------------------------------
+
+list_network_status = 
+    [:pre_fault_state,
+     :fault_state,
+     :post_fault_state ]
+
+ 
+plot_line_outage =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            get_line_loss_outage_wt_or_no_ref_adjs(
+                :line_outage, # outage_type,    
+
+                   on_fault_time,
+                   clear_fault_time,
+
+                   line_outage_time,
+                   generation_adjustment_time,
+
+                   net_data_by_components_file;
+
+                   timespan,    
+
+                   with_faults,   
+
+                   components_libs_dir,
+
+                   data_dir, 
+
+                   list_fault_point_from_node_a = [0.3],
+                   list_fault_resistance = [0.001],
+                   list_no_line_circuit  = [1],
+
+                   list_edges_to_have_fault   = [ 8 ],
+                   clear_fault_selection_list = [1],
+
+                   basekV          = 1.0,    
+                   use_pu_in_PQ    = true,
+                   line_data_in_pu = true,
+
+                   use_init_u0 = false,
+                   use_nlsolve = false,
+
+                   pf_alg  = NewtonRaphson(),
+                   ode_alg = Rodas4(),
+                   dae_alg = IDA(),
+
+                   abstol = 1e-12,
+                   reltol = 1e-12,
+
+                   dt = 0.0001,
+                   Δt = 1.0 / 2^(4),
+                   list_network_status ) ,
+                (:system_sol,
+                 :model_syms,
+                 :gens_nodes_names,
+                 :SM_gens_nodes_names,
+                 :non_gens_nodes_names,
+                 :sim_timespan) )... )
+
+
+δ_a_plot = getproperty(
+    plot_line_outage, :δ_a_plot)
+
+
+ω_a_plot  = getproperty(
+    plot_line_outage, :ω_a_plot)
+
+
+# propertynames( plot_line_outage )
+
+# (:δ_a_plot, :ω_a_plot, :ed_dash_a_plot,
+#  :eq_dash_a_plot, :vr1_a_plot, :vr2_a_plot,
+#  :vf_tilade_a_plot, :xg1_a_plot, :xg2_a_plot,
+#  :plot_gens_vh, :plot_gens_θh,
+#  :plot_non_gens_vh, :plot_non_gens_θh)
+
+#---------------------------------------------------
+
+
+plot_line_outage_wt_pref_adjs =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            get_line_loss_outage_wt_or_no_ref_adjs(
+                :line_outage_wt_pref_adjs, # outage_type,    
+
+                   on_fault_time,
+                   clear_fault_time,
+
+                   line_outage_time,
+                   generation_adjustment_time,
+
+                   net_data_by_components_file;
+
+                   timespan,    
+
+                   with_faults,   
+
+                   components_libs_dir,
+
+                   data_dir, 
+
+                   list_fault_point_from_node_a = [0.3],
+                   list_fault_resistance = [0.001],
+                   list_no_line_circuit  = [1],
+
+                   list_edges_to_have_fault   = [ 8 ],
+                   clear_fault_selection_list = [1],
+
+                   basekV          = 1.0,    
+                   use_pu_in_PQ    = true,
+                   line_data_in_pu = true,
+
+                   use_init_u0 = false,
+                   use_nlsolve = false,
+
+                   pf_alg  = NewtonRaphson(),
+                   ode_alg = Rodas4(),
+                   dae_alg = IDA(),
+
+                   abstol = 1e-12,
+                   reltol = 1e-12,
+
+                   dt = 0.0001,
+                   Δt = 1.0 / 2^(4),
+                   list_network_status ) ,
+                (:system_sol,
+                 :model_syms,
+                 :gens_nodes_names,
+                 :SM_gens_nodes_names,
+                 :non_gens_nodes_names,
+                 :sim_timespan) )... )
+
+
+wt_pref_adjs_δ_a_plot =
+    getproperty(
+        plot_line_outage_wt_pref_adjs,
+        :δ_a_plot)
+
+
+wt_pref_adjs_ω_a_plot  =
+    getproperty(
+        plot_line_outage_wt_pref_adjs,
+        :ω_a_plot)
+
+
+#---------------------------------------------------
+
+
+plot_line_outage_wt_vpref_adjs =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            get_line_loss_outage_wt_or_no_ref_adjs(
+                :line_outage_wt_vpref_adjs, # outage_type,    
+
+                   on_fault_time,
+                   clear_fault_time,
+
+                   line_outage_time,
+                   generation_adjustment_time,
+
+                   net_data_by_components_file;
+
+                   timespan,    
+
+                   with_faults,   
+
+                   components_libs_dir,
+
+                   data_dir, 
+
+                   list_fault_point_from_node_a = [0.3],
+                   list_fault_resistance = [0.001],
+                   list_no_line_circuit  = [1],
+
+                   list_edges_to_have_fault   = [ 8 ],
+                   clear_fault_selection_list = [1],
+
+                   basekV          = 1.0,    
+                   use_pu_in_PQ    = true,
+                   line_data_in_pu = true,
+
+                   use_init_u0 = false,
+                   use_nlsolve = false,
+
+                   pf_alg  = NewtonRaphson(),
+                   ode_alg = Rodas4(),
+                   dae_alg = IDA(),
+
+                   abstol = 1e-12,
+                   reltol = 1e-12,
+
+                   dt = 0.0001,
+                   Δt = 1.0 / 2^(4),
+                   list_network_status ) ,
+                (:system_sol,
+                 :model_syms,
+                 :gens_nodes_names,
+                 :SM_gens_nodes_names,
+                 :non_gens_nodes_names,
+                 :sim_timespan) )... )
+
+
+
+wt_vpref_adjs_δ_a_plot =
+    getproperty(
+        plot_line_outage_wt_vpref_adjs,
+        :δ_a_plot)
+
+
+wt_vpref_adjs_ω_a_plot  =
+    getproperty(
+        plot_line_outage_wt_vpref_adjs,
+        :ω_a_plot)
+
+
+#---------------------------------------------------
+#---------------------------------------------------
+
+
+list_network_status = 
+    [:pre_fault_state,
+     :fault_state,
+     :post_fault_state ]
+
+
+ntuple_status_steady_state_data =
+    get_ntuple_status_steady_state_data(
+        ;with_faults =
+            with_faults,
+        net_data_by_components_file =
+            net_data_by_components_file,
+        components_libs_dir =
+            components_libs_dir,
+
+        timespan =
+            timespan,
+        on_fault_time =
+            on_fault_time,
+        clear_fault_time =
+            clear_fault_time,
+
+        list_fault_point_from_node_a =
+            list_fault_point_from_node_a,
+        list_fault_resistance =
+            list_fault_resistance,
+        list_no_line_circuit =
+            list_no_line_circuit,
+
+        list_edges_to_have_fault =
+            list_edges_to_have_fault,
+        clear_fault_selection_list =
+            clear_fault_selection_list,
+
+        basekV =
+            basekV,    
+        use_pu_in_PQ =
+            use_pu_in_PQ,
+        line_data_in_pu =
+            line_data_in_pu,
+        list_network_status =
+            list_network_status)
+
+#---------------------------------------------------
+
+line_loss_outage = 
+    get_line_loss_outage_wt_or_no_ref_adjs(
+        :line_outage, # outage_type,       
+        ntuple_status_steady_state_data,
+        line_outage_time,
+        generation_adjustment_time;
+        sim_timespan =
+            sim_timespan,    
+        dae_alg =
+            dae_alg,
+        abstol  =
+            abstol,
+        reltol  =
+            reltol )
+
+plot_line_outage =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            line_loss_outage,
+            (:system_sol,
+             :model_syms,
+             :gens_nodes_names,
+             :SM_gens_nodes_names,
+             :non_gens_nodes_names,
+             :sim_timespan) )... )
+
+δ_a_plot = getproperty(
+    plot_line_outage,
+    :δ_a_plot)
+
+
+ω_a_plot = getproperty(
+    plot_line_outage,
+    :ω_a_plot)
+
+
+# (:δ_a_plot, :ω_a_plot, :ed_dash_a_plot,
+#  :eq_dash_a_plot, :vr1_a_plot, :vr2_a_plot,
+#  :vf_tilade_a_plot, :xg1_a_plot, :xg2_a_plot,
+#  :plot_gens_vh, :plot_gens_θh,
+#  :plot_non_gens_vh, :plot_non_gens_θh)
+
+# list_outage_type =
+#     [:line_outage,
+#      :line_outage_wt_pref_adjs,
+#      :line_outage_wt_vpref_adjs]
+
+
+
+#---------------------------------------------------
+
+
+plot_line_outage_wt_pref_adjs =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            get_line_loss_outage_wt_or_no_ref_adjs(
+                :line_outage_wt_pref_adjs, # outage_type,       
+                ntuple_status_steady_state_data,
+                line_outage_time,
+                generation_adjustment_time;
+                sim_timespan =
+                    sim_timespan,    
+                dae_alg =
+                    dae_alg,
+                abstol  =
+                    abstol,
+                reltol  =
+                    reltol ) ,
+                (:system_sol,
+                 :model_syms,
+                 :gens_nodes_names,
+                 :SM_gens_nodes_names,
+                 :non_gens_nodes_names,
+                 :sim_timespan) )... )
+
+
+plot_line_outage_wt_pref_adjs =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            plot_line_outage_wt_pref_adjs,
+            (:system_sol,
+             :model_syms,
+             :gens_nodes_names,
+             :SM_gens_nodes_names,
+             :non_gens_nodes_names,
+             :sim_timespan) )... )
+
+δ_a_plot = getproperty(
+    plot_line_outage_wt_pref_adjs,
+    :δ_a_plot)
+
+
+ω_a_plot = getproperty(
+    plot_line_outage_wt_pref_adjs,
+    :ω_a_plot)
+
+
+# (:δ_a_plot, :ω_a_plot, :ed_dash_a_plot,
+#  :eq_dash_a_plot, :vr1_a_plot, :vr2_a_plot,
+#  :vf_tilade_a_plot, :xg1_a_plot, :xg2_a_plot,
+#  :plot_gens_vh, :plot_gens_θh,
+#  :plot_non_gens_vh, :plot_non_gens_θh)
+
+#---------------------------------------------------
+
+
+plot_line_outage_wt_vref_adjs =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            get_line_loss_outage_wt_or_no_ref_adjs(
+        :line_outage_wt_vpref_adjs, # outage_type,       
+            ntuple_status_steady_state_data,
+            line_outage_time,
+            generation_adjustment_time;
+            sim_timespan =
+                sim_timespan,    
+            dae_alg =
+                dae_alg,
+            abstol  =
+                abstol,
+            reltol  =
+                reltol ) ,
+            (:system_sol,
+             :model_syms,
+             :gens_nodes_names,
+             :SM_gens_nodes_names,
+             :non_gens_nodes_names,
+             :sim_timespan) )... )
+
+
+plot_line_outage_wt_vpref_adjs =
+    get_guick_single_vars_plots_dae_or_ode_sol(
+        ;NamedTupleTools.select(
+            plot_line_outage_wt_vref_adjs ,
+            (:system_sol,
+             :model_syms,
+             :gens_nodes_names,
+             :SM_gens_nodes_names,
+             :non_gens_nodes_names,
+             :sim_timespan) )... )
+
+δ_a_plot = getproperty(
+    plot_line_outage_wt_vpref_adjs,
+    :δ_a_plot)
+
+
+ω_a_plot = getproperty(
+    plot_line_outage_wt_vpref_adjs,
+    :ω_a_plot)
+
+
+# (:δ_a_plot, :ω_a_plot, :ed_dash_a_plot,
+#  :eq_dash_a_plot, :vr1_a_plot, :vr2_a_plot,
+#  :vf_tilade_a_plot, :xg1_a_plot, :xg2_a_plot,
+#  :plot_gens_vh, :plot_gens_θh,
+#  :plot_non_gens_vh, :plot_non_gens_θh)
 
 #---------------------------------------------------
 ## ntuple_status_steady_state_data
@@ -413,7 +939,6 @@ ntuple_status_steady_state_data =
 
 #---------------------------------------------------
 #---------------------------------------------------
-
 
 pre_fault_paras =
     getproperty(
@@ -479,7 +1004,94 @@ post_fault_paras =
          :SM_gens_nodes_names,
          :SC_gens_nodes_names))
 
-#----------------------------------------
+#---------------------------------------------------
+#---------------------------------------------------
+
+(;sta_pf_red_sol,
+ dyn_pf_fun_kwd_net_idxs) =
+    NamedTupleTools.select(
+        getproperty(
+            getproperty(
+                ntuple_status_steady_state_data,
+                :pre_fault_state),
+            :static_prefault_paras),
+        (:sta_pf_red_sol,
+         :dyn_pf_fun_kwd_net_idxs))
+
+#---------------------------------------------------
+
+(;pf_P_gens,
+  pf_Q_gens,
+  vh,
+  θh,
+  θh_deg) =
+    NamedTupleTools.select(
+        sta_pf_red_sol,
+        (:pf_P_gens,
+         :pf_Q_gens,
+         :vh,
+         :θh,
+         :θh_deg))
+
+(gens_nodes_idx,
+ non_gens_nodes_idx,
+ gens_nodes_with_loc_loads_idx,) =
+    NamedTupleTools.select(
+        dyn_pf_fun_kwd_net_idxs,
+        (:gens_nodes_idx,
+         :non_gens_nodes_idx,
+         :gens_nodes_with_loc_loads_idx))
+
+#---------------------------------------------------
+
+gens_vh =
+    round.( vh[gens_nodes_idx]; digits=4)
+
+
+gens_θh =
+    round.( θh[gens_nodes_idx]; digits=4)
+
+
+gens_θh_deg =
+    round.( θh_deg[gens_nodes_idx]; digits=4)
+
+#---------------------------------------------------
+
+non_gens_vh =
+    round.( vh[non_gens_nodes_idx]; digits=4)
+
+non_gens_θh =
+    round.( θh[non_gens_nodes_idx]; digits=4)
+
+non_gens_θh_deg =
+    round.( θh_deg[non_gens_nodes_idx]; digits=4)
+
+#---------------------------------------------------
+
+t_pf_P_gens = round.( pf_P_gens; digits=4)
+
+t_pf_Q_gens = round.( pf_Q_gens; digits=4)
+
+#---------------------------------------------------
+
+# Gens
+
+pf_gens_results =
+    hcat(gens_vh,
+         gens_θh_deg,
+         t_pf_P_gens,
+         t_pf_Q_gens)
+
+#---------------------------------------------------
+
+# Non gens
+
+pf_non_gens_results =
+    hcat(non_gens_vh,
+         non_gens_θh_deg )
+
+#---------------------------------------------------
+
 
 (Ynet, ) =
      NamedTupleTools.select(
@@ -846,6 +1458,91 @@ sim_line_outage_pertubation_by_mm_ode(
 
     list_edges_to_have_fault  = [ 8 ],
     clear_fault_selection_list = [1] )
+
+#---------------------------------------------------
+#---------------------------------------------------
+
+#---------------------------------------------------
+
+# generic_network_fault_pertubation_plot =
+#     get_guick_group_vars_plots_dae_or_ode_sol(
+#         ;include_v_θ_plot =
+#             false,
+#          sim_timespan =
+#              (0, timespan),
+#          get_generic_network_fault_pertubation(
+#              ;case_name = "case9",
+#              timespan   = timespan,
+
+#              on_fault_time = 5.0,
+#              clear_fault_time = 7.0,
+
+#              list_fault_point_from_node_a = [0.3],
+#              list_fault_resistance = [0.001],
+#              list_no_line_circuit =  [1],
+
+#              list_edges_to_have_fault = [ 8 ],
+#              clear_fault_selection_list = [1],
+
+#              basekV = 1.0,    
+#              use_pu_in_PQ = true,
+#              line_data_in_pu = true,
+
+#              with_faults =
+#                  false,
+#              use_state_in_on_clear_fault =
+#                  false,
+#              return_extended_results =
+#                  false,
+
+#              json_net_data_by_components_file =
+#                  json_net_data_by_components_file,
+#              components_libs_dir =
+#                  components_libs_dir,
+#              data_dir =
+#                  data_dir )...)
+
+
+# save_network_pertubation_sim_plot(
+#     "case9";
+#     sim_timespan = (0, timespan),
+#     figure_dir,
+#     sim_type = "network-pertubation",
+#     line_in_fault_name = "line-8",
+#     get_generic_network_fault_pertubation_by_cb(
+#              ;case_name = "case9",
+#              timespan   = timespan,
+
+#              on_fault_time = 5.0,
+#              clear_fault_time = 7.0,
+
+#              list_fault_point_from_node_a = [0.3],
+#              list_fault_resistance = [0.001],
+#              list_no_line_circuit =  [1],
+
+#              list_edges_to_have_fault = [ 8 ],
+#              clear_fault_selection_list = [1],
+
+#              basekV = 1.0,    
+#              use_pu_in_PQ = true,
+#              line_data_in_pu = true,
+
+#              with_faults =
+#                  false,
+#              use_state_in_on_clear_fault =
+#                  false,
+#              return_extended_results =
+#                  false,
+
+#              json_net_data_by_components_file =
+#                  json_net_data_by_components_file,
+#              components_libs_dir =
+#                  components_libs_dir,
+#              data_dir =
+#                  data_dir )...)
+
+
+
 
 #---------------------------------------------------
 #---------------------------------------------------

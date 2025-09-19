@@ -380,6 +380,7 @@ plot_timespan = (0.0, timespan)
 #---------------------------------------------------
 #---------------------------------------------------
 
+red_model_distributed_slack = 
 sim_red_model_distributed_slack_pf(
     net_data_by_components_file;
     components_libs_dir = "",
@@ -393,6 +394,18 @@ sim_red_model_distributed_slack_pf(
     abstol      = 1e-12,
 
     reltol      = 1e-12)
+
+
+(ds_slack_value,
+ df_gens,
+ df_non_gens,
+ df_all_nodes_result) =
+     NamedTupleTools.select(
+         red_model_distributed_slack,
+         (:ds_slack_value,
+          :df_gens,
+          :df_non_gens,
+          :df_all_nodes_result))
 
 #---------------------------------------------------
 #---------------------------------------------------
@@ -448,7 +461,7 @@ r_red_model_distributed_slack_pf =
  df_non_gens,
  df_all_nodes_result) =
      NamedTupleTools.select(
-         red_model_distributed_slack_pf,
+         r_red_model_distributed_slack_pf,
          (:ds_slack_value,
           :df_gens,
           :df_non_gens,

@@ -2,7 +2,6 @@
 # [Example of Network Perturbation with IEEE 5 Bus Test System](@id ieee-5-bus-network-perturbation)
 =#
 
-
 #---------------------------------------------------
 
 using Revise
@@ -145,8 +144,6 @@ script_dir = @__DIR__
 #---------------------------------------------------
 
 
-
-
 sauer_net_wt_avr_string    = "net-static-data-avr-sauer"
 
 rtds_net_wt_avr_string     = "net-static-data-avr-rtds"
@@ -191,9 +188,9 @@ json_net_data_by_components_file =
 #---------------------------------------------------
 #---------------------------------------------------
 
-case_name = "case9"
+# case_name = "case9"
 
-# case_name = "case14"
+case_name = "case14"
 
 # This ensures a lowercase name
 
@@ -383,7 +380,8 @@ plot_timespan = (0.0, timespan)
 
 
 #---------------------------------------------------
-# A generalised function that takes functions as a namedtuple
+# A generalised function that takes functions
+# as a namedtuple
 # 
 # get_generic_line_loss_outage_wt_or_no_ref_adjs
 # 
@@ -398,7 +396,7 @@ nt_system_dynamics_fun_type =
         (;system_dynamics_fun_type =
         :dae_line_loss_pre_fault_post_pf_funcs,
         system_dynamics_fun =
-        line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs!)
+        line_loss_generic_dynamics_wt_pre_fault_post_by_dae_pf_funcs! )
 
  
 generic_plot_line_outage =
